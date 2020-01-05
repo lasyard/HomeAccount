@@ -1,0 +1,13 @@
+---
+BasedOnStyle: Google
+IndentWidth: 4
+ColumnLimit: 120
+---
+Language: Cpp
+AccessModifierOffset: -4
+AlignTrailingComments: true
+#AlignConsecutiveMacros: true
+AllowShortFunctionsOnASingleLine: false
+BreakBeforeBraces: Linux
+BinPackArguments: false
+BinPackParameters: false

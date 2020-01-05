@@ -1,0 +1,23 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "files.exclude": {
+            "**/*.o": true,
+            "HomeAccount": true,
+            "HA/": true,
+            "HomeAccount.app/": true,
+            "res/*.icns": true
+        },
+        "files.associations": {
+            "algorithm": "cpp",
+            "iosfwd": "cpp",
+            "string": "cpp",
+            "exception": "cpp",
+            "sstream": "cpp"
+        }
+    }
+}
