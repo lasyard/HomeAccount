@@ -456,13 +456,13 @@ void MainFrame::showUnknowErrorAndExit()
 void MainFrame::showDataFileError(const DataFileError &e)
 {
     wxString str;
-    str.Printf(_("ErrParse"), e.fileName(), e.lineNo());
+    str.Printf(_("errParse"), e.fileName(), e.lineNo());
     wxMessageBox(str, _("appName"), wxOK | wxICON_ERROR);
 }
 
 void MainFrame::showDailyFileEmpty(const DailyFileEmpty &e)
 {
-    wxMessageBox(_("ErrFileEmpty"), _("AppName"), wxOK | wxICON_ERROR);
+    wxMessageBox(_("errFileEmpty"), _("appName"), wxOK | wxICON_ERROR);
 }
 
 void MainFrame::showDailyDateError(const DailyDateError &e)

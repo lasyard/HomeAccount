@@ -1,8 +1,7 @@
 #include <sstream>
 
-#include <wx/datetime.h>
 #include <wx/dir.h>
-#include <wx/filename.h>
+#include <wx/stdpaths.h>
 
 #include "AnnuallyFileRW.h"
 #include "CashFileRW.h"
@@ -20,28 +19,18 @@ const char *const HaFile::CatFileName = "cat";
 const char *const HaFile::CashFileName = "cash";
 const char *const HaFile::AnnuallyFileName = "annually";
 
-const char *const HaFile::DIR = "HA";
 const char *const HaFile::EXT = "ha";
 
-wxString HaFile::newFileName()
-{
-    wxDateTime date = wxDateTime::Now();
-    return date.Format("%Y%m%d_%H%M%S") + "." + EXT;
-}
-
-wxString HaFile::getPath(const wxString &fileName)
-{
-    return wxFileName(DIR, fileName).GetFullPath();
-}
+wxString HaFile::m_dir = wxStandardPaths::Get().GetDocumentsDir() + "/HA";
 
 HaFile *HaFile::getNewestFile()
 {
-    wxDir dir(DIR);
+    wxDir dir(m_dir);
     if (!dir.IsOpened()) {
-        if (!wxDir::Make(DIR)) {
+        if (!wxDir::Make(m_dir)) {
             return nullptr;
         }
-        dir.Open(DIR);
+        dir.Open(m_dir);
     }
     wxArrayString fileNames;
     wxString fileName;

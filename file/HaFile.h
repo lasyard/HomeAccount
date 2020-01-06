@@ -1,6 +1,10 @@
 #ifndef _HA_FILE_H_
 #define _HA_FILE_H_
 
+#include <wx/datetime.h>
+#include <wx/filename.h>
+#include <wx/string.h>
+
 #include "CryptoFile.h"
 #include "FileNames.h"
 
@@ -57,9 +61,23 @@ public:
 
 protected:
     static const char *const IV;
+    static wxString m_dir;
 
-    static wxString getPath(const wxString &fileName);
-    static wxString newFileName();
+    static wxString getPath(const wxString &fileName)
+    {
+        return wxFileName(m_dir, fileName).GetFullPath();
+    }
+
+    static wxString newFileName()
+    {
+        wxDateTime date = wxDateTime::Now();
+        return date.Format("%Y%m%d_%H%M%S") + "." + EXT;
+    }
+
+    static void setDir(wxString dir)
+    {
+        m_dir = dir;
+    }
 
     bool m_isOld;
 
