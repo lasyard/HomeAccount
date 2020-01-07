@@ -8,11 +8,11 @@ DataGrid::DataGrid(wxWindow *parent, wxWindowID id) : wxGrid(parent, id), m_data
     SetColMinimalAcceptableWidth(70);
     DisableDragRowSize();
     CreateGrid(0, ColumnNum);
-    SetColLabelValue(IncomeIndex, _("strIncome"));
-    SetColLabelValue(OutlayIndex, _("strOutlay"));
-    SetColLabelValue(BalanceIndex, _("strBalance"));
-    SetColLabelValue(DescIndex, _("strDesc"));
-    SetColLabelValue(CommentIndex, _("strComment"));
+    SetColLabelValue(IncomeIndex, _("Income"));
+    SetColLabelValue(OutlayIndex, _("Outlay"));
+    SetColLabelValue(BalanceIndex, _("Balance"));
+    SetColLabelValue(DescIndex, _("Description"));
+    SetColLabelValue(CommentIndex, _("Comments"));
     SetColFormatFloat(IncomeIndex, MONEY_LEN, 2);
     SetColFormatFloat(OutlayIndex, MONEY_LEN, 2);
     SetColFormatFloat(BalanceIndex, MONEY_LEN, 2);
@@ -47,7 +47,7 @@ void DataGrid::processItemChange(struct item *it, int row, int col)
         moneyO = str_to_money(text);
     }
     if (moneyI != 0 && moneyO != 0) {
-        wxMessageBox(_("errDupMoney"), _("appName"), wxOK | wxICON_ERROR);
+        wxMessageBox(_("Cannot set both income and outlay in one line"), _("App name"), wxOK | wxICON_ERROR);
         if (col == IncomeIndex) {
             money = moneyI;
             SetCellValue(row, OutlayIndex, "");
@@ -185,7 +185,7 @@ void DataGrid::showMainData()
     } else if (diff > 0) {
         if (!DeleteRows(m_data->getItemsNum() + 1, diff)) return;
     }
-    SetRowLabelValue(0, _("strInitial"));
+    SetRowLabelValue(0, _("Initial balance"));
     money_to_str(buf, m_data->getInitial());
     SetCellValue(0, BalanceIndex, buf);
     int row = 1;

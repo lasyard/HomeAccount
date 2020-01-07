@@ -38,5 +38,9 @@ HA/
 # MacOS
 *.icns
 
+# i18n
+*.mo
+*.pot
+
 # Logs
 *.log

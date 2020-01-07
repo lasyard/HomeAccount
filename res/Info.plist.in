@@ -9,7 +9,10 @@
         <key>CFBundleDevelopmentRegion</key>
         <string>English</string>
         <key>CFBundleLocalizations</key>
-        <array></array>
+        <array>
+            <string>en</string>
+            <string>cn</string>
+        </array>
         <key>CFBundleExecutable</key>
         <string>EXECUTABLE</string>
         <key>CFBundleIconFile</key>

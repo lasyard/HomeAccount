@@ -68,10 +68,6 @@ private:
 
     void showUnknowErrorAndExit();
     void showDataFileError(const DataFileError &e);
-    void showDailyFileEmpty(const DailyFileEmpty &e);
-    void showDailyDateError(const DailyDateError &e);
-    void showCatFileError(const CatFileError &e);
-    void showCatDupItem(const CatDupItem &e);
 
     DECLARE_EVENT_TABLE()
 };

@@ -34,7 +34,7 @@
 #include "file/except/DataFileError.h"
 #include "file/except/FileCorrupt.h"
 
-MainFrame::MainFrame() : wxFrame(NULL, ID_FRAME, _("appName")), m_file(nullptr)
+MainFrame::MainFrame() : wxFrame(NULL, ID_FRAME, _("App name")), m_file(nullptr)
 {
     wxImage::AddHandler(new wxPNGHandler);
     wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
@@ -48,19 +48,19 @@ MainFrame::MainFrame() : wxFrame(NULL, ID_FRAME, _("appName")), m_file(nullptr)
     m_date->SetMinSize(wxSize(210, 40));
     sizer_up->Add(m_date, wxSizerFlags().Border());
     // monthly button
-    m_monthly = new wxButton(this, ID_MONTHLY, _("btnMonthly"));
+    m_monthly = new wxButton(this, ID_MONTHLY, _("Monthly"));
     sizer_up->Add(m_monthly, wxSizerFlags().Border().Expand());
     // cash button
-    m_cash = new wxButton(this, ID_CASH, _("btnCash"));
+    m_cash = new wxButton(this, ID_CASH, _("Cash"));
     sizer_up->Add(m_cash, wxSizerFlags().Border().Expand());
     // total button
-    m_stat = new wxButton(this, ID_STAT, _("btnStat"));
+    m_stat = new wxButton(this, ID_STAT, _("Statistics"));
     sizer_up->Add(m_stat, wxSizerFlags().Border().Expand());
     // export button
-    m_export = new wxButton(this, ID_EXPORT, _("btnExport"));
+    m_export = new wxButton(this, ID_EXPORT, _("Export"));
     sizer_up->Add(m_export, wxSizerFlags().Border().Expand());
     // import button
-    m_import = new wxButton(this, ID_IMPORT, _("btnImport"));
+    m_import = new wxButton(this, ID_IMPORT, _("Import"));
     sizer_up->Add(m_import, wxSizerFlags().Border().Expand());
     // config button
     m_config = new wxBitmapButton(this, ID_CONFIG, wxBITMAP_PNG(CONFIG));
@@ -108,7 +108,7 @@ void MainFrame::initView()
     int count;
     for (count = 0; count < 3; count++) {
         if (loadCatFile()) break;
-        wxPasswordEntryDialog *dlg = new wxPasswordEntryDialog(this, _("msgPassword"), _("appName"));
+        wxPasswordEntryDialog *dlg = new wxPasswordEntryDialog(this, _("Input password"), _("App name"));
         if (dlg->ShowModal() == wxID_OK) {
             m_file->setKey(std::string(dlg->GetValue()));
         } else {
@@ -152,7 +152,7 @@ void MainFrame::onCashButton(wxCommandEvent &event)
 
 void MainFrame::onStatButton(wxCommandEvent &event)
 {
-    StatDialog *dlg = new StatDialog(this, wxID_ANY, _("appName"), m_file);
+    StatDialog *dlg = new StatDialog(this, wxID_ANY, _("App name"), m_file);
     if (dlg->ShowModal() == wxID_OK) {
         dailyQuerySave();
         int sel = dlg->getSelection();
@@ -160,7 +160,7 @@ void MainFrame::onStatButton(wxCommandEvent &event)
             catQuerySave();
             struct cat_root *cat = m_grid->catFileRW()->getCatRoot();
             if (mtree_is_leaf(&cat->root)) {
-                wxMessageBox(_("errEmptyCat"), _("appName"), wxOK | wxICON_ERROR);
+                wxMessageBox(_("Category config is empty"), _("App name"), wxOK | wxICON_ERROR);
                 dlg->Destroy();
                 return;
             }
@@ -180,7 +180,7 @@ void MainFrame::onStatButton(wxCommandEvent &event)
         } else if (sel == 1) {
             SubAnnuallyFile t(m_file);
             wxString str;
-            str.Printf(_("msgAnnuallyStat"), t()->minYear(), t()->maxYear());
+            str.Printf(_("Annually statistics"), t()->minYear(), t()->maxYear());
             m_html->showIO(t(), str);
         } else if (sel == 2) {
             int selection = dlg->m_year->GetSelection();
@@ -188,7 +188,7 @@ void MainFrame::onStatButton(wxCommandEvent &event)
             int year = str_to_int(yearStr, yearStr.Len());
             SubMonthlyFile t(m_file, year);
             wxString str;
-            str.Printf(_("msgMonthlyStat"), year);
+            str.Printf(_("Monthly statistics"), year);
             m_html->showIO(t(), str);
         }
         showOne(m_html);
@@ -199,9 +199,9 @@ void MainFrame::onStatButton(wxCommandEvent &event)
 void MainFrame::onExportButton(wxCommandEvent &event)
 {
     wxArrayString choices;
-    choices.Add(_("strCurrentFile"));
-    choices.Add(_("strCatFile"));
-    wxSingleChoiceDialog *dlg = new wxSingleChoiceDialog(this, _("msgExportChoice"), _("appName"), choices);
+    choices.Add(_("Current datum"));
+    choices.Add(_("Categories config"));
+    wxSingleChoiceDialog *dlg = new wxSingleChoiceDialog(this, _("Choose one to export"), _("App name"), choices);
     if (dlg->ShowModal() == wxID_OK) {
         int index = dlg->GetSelection();
         wxFileDialog *fileDlg = new wxFileDialog(this,
@@ -237,10 +237,11 @@ void MainFrame::onImportButton(wxCommandEvent &event)
     if (fileDlg->ShowModal() == wxID_OK) {
         std::string path = fileDlg->GetPath().ToStdString();
         wxArrayString choices;
-        choices.Add(_("strDataFile"));
-        choices.Add(_("strCashFile"));
-        choices.Add(_("strCatFile"));
-        wxSingleChoiceDialog *dlg = new wxSingleChoiceDialog(this, _("msgExportChoice"), _("appName"), choices);
+        choices.Add(_("Monthly datum"));
+        choices.Add(_("Cash datum"));
+        choices.Add(_("Categories config"));
+        wxSingleChoiceDialog *dlg =
+            new wxSingleChoiceDialog(this, _("Choose one to import into"), _("App name"), choices);
         if (dlg->ShowModal() == wxID_OK) {
             int index = dlg->GetSelection();
             if (index == 0) {
@@ -252,10 +253,12 @@ void MainFrame::onImportButton(wxCommandEvent &event)
                     showDataFileError(e);
                     return;
                 } catch (DailyFileEmpty &e) {
-                    showDailyFileEmpty(e);
+                    wxMessageBox(_("File is empty"), _("App name"), wxOK | wxICON_ERROR);
                     return;
                 } catch (DailyDateError &e) {
-                    showDailyDateError(e);
+                    wxString str;
+                    str.Printf(_("Invalid date \"%1$s\""), e.title());
+                    wxMessageBox(str, _("App name"), wxOK | wxICON_ERROR);
                     return;
                 }
                 file.setHaFile(m_file);
@@ -292,7 +295,7 @@ void MainFrame::onImportButton(wxCommandEvent &event)
 
 void MainFrame::onConfigButton(wxCommandEvent &event)
 {
-    ConfigDialog *dlg = new ConfigDialog(this, wxID_ANY, _("appName"), true);
+    ConfigDialog *dlg = new ConfigDialog(this, wxID_ANY, _("App name"), true);
     char buf[MONEY_LEN + 1];
     money_to_str(buf, m_file->getInitial());
     dlg->m_initial->SetValue(buf);
@@ -313,7 +316,7 @@ void MainFrame::onConfigButton(wxCommandEvent &event)
                 m_file->changeKey(std::string(passwd));
                 break;
             }
-            wxMessageBox(_("msgPasswdMismatch"), _("appName"), wxOK | wxICON_ERROR);
+            wxMessageBox(_("Input passwords are not the same"), _("App name"), wxOK | wxICON_ERROR);
         } else {
             break;
         }
@@ -346,11 +349,15 @@ bool MainFrame::loadCatFile()
     try {
         cat = m_file->getCatFile();
     } catch (CatFileError &e) {
-        showCatFileError(e);
+        wxString str;
+        str.Printf(_("Error in category config file at line %1$d"), e.lineNo());
+        wxMessageBox(str, _("App name"), wxOK | wxICON_ERROR);
     } catch (CatDupItem &e) {
-        showCatDupItem(e);
+        wxString str;
+        str.Printf(_("Duplicate words in categories config at line %1$d"), e.lineNo());
+        wxMessageBox(str, _("App name"), wxOK | wxICON_ERROR);
     } catch (FileCorrupt &) {
-        wxMessageBox(_("errFileCorrupted"), _("appName"), wxOK | wxICON_ERROR);
+        wxMessageBox(_("File corrupted"), _("App name"), wxOK | wxICON_ERROR);
         wxExit();
     } catch (BadPassword &) {
         return false;
@@ -449,39 +456,13 @@ void MainFrame::showOne(wxWindow *w)
 
 void MainFrame::showUnknowErrorAndExit()
 {
-    wxMessageBox(_("errUnknown"), _("appName"), wxOK | wxICON_ERROR);
+    wxMessageBox(_("Unknown error"), _("App name"), wxOK | wxICON_ERROR);
     wxExit();
 }
 
 void MainFrame::showDataFileError(const DataFileError &e)
 {
     wxString str;
-    str.Printf(_("errParse"), e.fileName(), e.lineNo());
-    wxMessageBox(str, _("appName"), wxOK | wxICON_ERROR);
-}
-
-void MainFrame::showDailyFileEmpty(const DailyFileEmpty &e)
-{
-    wxMessageBox(_("errFileEmpty"), _("appName"), wxOK | wxICON_ERROR);
-}
-
-void MainFrame::showDailyDateError(const DailyDateError &e)
-{
-    wxString str;
-    str.Printf(_("errInvalidDate"), e.title());
-    wxMessageBox(str, _("appName"), wxOK | wxICON_ERROR);
-}
-
-void MainFrame::showCatFileError(const CatFileError &e)
-{
-    wxString str;
-    str.Printf(_("errCatParse"), e.lineNo());
-    wxMessageBox(str, _("appName"), wxOK | wxICON_ERROR);
-}
-
-void MainFrame::showCatDupItem(const CatDupItem &e)
-{
-    wxString str;
-    str.Printf(_("errCatDupItem"), e.lineNo());
-    wxMessageBox(str, _("appName"), wxOK | wxICON_ERROR);
+    str.Printf(_("Error in file \"%1$s\" at line %2$d"), e.fileName(), e.lineNo());
+    wxMessageBox(str, _("App name"), wxOK | wxICON_ERROR);
 }

@@ -7,7 +7,7 @@ void StatHtml::showTotal(struct cat_root *cat, int sYear, int sMonth, int eYear,
 {
     m_src = "<body>";
     wxString tmp;
-    tmp.Printf(_("msgTotalTitle"), sYear, sMonth, eYear, eMonth);
+    tmp.Printf(_("Classified statistics from %1$d/%2$d to %3$d/%4$d"), sYear, sMonth, eYear, eMonth);
     h2(tmp);
     if (!mtree_is_leaf(&cat->root)) {
         totalTableHtml(mtree_first_child(&cat->root), cat->no_cat_in_sum);
@@ -24,10 +24,10 @@ void StatHtml::showIO(DataFileRW *data, const wxString &title)
     h2(title);
     m_src += "<table border='1' cellspacing='0' width='100%'>";
     m_src += "<tr>";
-    m_src += "<th>" + _("strTime") + "</th>";
-    m_src += "<th>" + _("strIncome") + "</th>";
-    m_src += "<th>" + _("strOutlay") + "</th>";
-    m_src += "<th>" + _("strNetIncome") + "</th>";
+    m_src += "<th>" + _("Time") + "</th>";
+    m_src += "<th>" + _("Income") + "</th>";
+    m_src += "<th>" + _("Outlay") + "</th>";
+    m_src += "<th>" + _("Net Income") + "</th>";
     m_src += "</tr>";
     long totalI = 0, totalO = 0;
     for (DataFileRW::pageIterator i = data->pageBegin(); i != data->pageEnd(); ++i) {
@@ -37,7 +37,7 @@ void StatHtml::showIO(DataFileRW *data, const wxString &title)
         totalI += income;
         totalO += outlay;
     }
-    showIOLine(_("strTotal"), totalI, totalO);
+    showIOLine(_("Total"), totalI, totalO);
     m_src += "</table>";
     m_src += "</body>";
     SetPage(m_src);
@@ -77,9 +77,9 @@ void StatHtml::totalTableHtml(struct mtree_node *root, long no_cat_sum)
     m_src += "<tr><th colspan='2' bgcolor='black'><font color='white'>";
     m_src += cat->name.str;
     m_src += "</font></th></tr>";
-    firstLevelRow(_("strTotal"), cat->total);
-    firstLevelRow(_("strNoCat"), no_cat_sum, _("strTotalCent"), calCent(no_cat_sum, cat->total));
-    firstLevelRow(_("strOther"), cat->sub_total, _("strTotalCent"), calCent(cat->sub_total, cat->total));
+    firstLevelRow(_("Total"), cat->total);
+    firstLevelRow(_("Unclassified"), no_cat_sum, _("Percentage in total"), calCent(no_cat_sum, cat->total));
+    firstLevelRow(_("Other"), cat->sub_total, _("Percentage in total"), calCent(cat->sub_total, cat->total));
     firstCatStatHtml(root);
     m_src += "</table>";
 }
@@ -95,8 +95,13 @@ void StatHtml::firstCatStatHtml(struct mtree_node *root)
         m_src += cat->name.str;
         m_src += "</td><td>";
         m_src += "<table border='0' width='100%'>";
-        secondLevelRow(_("strSubTotal"), cat->total, _("strTotalCent"), calCent(cat->total, root_cat->total), true);
-        secondLevelRow(_("strOther"), cat->sub_total, _("strSubCent"), calCent(cat->sub_total, cat->total));
+        secondLevelRow(_("Total of this category"),
+                       cat->total,
+                       _("Percentage in total"),
+                       calCent(cat->total, root_cat->total),
+                       true);
+        secondLevelRow(
+            _("Other"), cat->sub_total, _("Percentage in total of this category"), calCent(cat->sub_total, cat->total));
         secondCatStatHtml(node);
         m_src += "</table>";
         m_src += "</td></tr>";
@@ -110,7 +115,8 @@ void StatHtml::secondCatStatHtml(struct mtree_node *root)
     for (item = root->children.first; item != NULL; item = item->next) {
         struct mtree_node *node = get_mtree_node(item);
         struct cat_node *cat = get_cat_node(node);
-        secondLevelRow(cat->name.str, cat->total, _("strSubCent"), calCent(cat->total, root_cat->total));
+        secondLevelRow(
+            cat->name.str, cat->total, _("Percentage in total of this category"), calCent(cat->total, root_cat->total));
     }
 }
 

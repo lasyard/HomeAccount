@@ -9,7 +9,7 @@
 bool MonthValidator::Validate(wxWindow *parent)
 {
     if (tryTransfer()) return true;
-    wxMessageBox(_("errInputDate"), _("appName"), wxOK | wxICON_ERROR);
+    wxMessageBox(_("Input date is invalid"), _("App name"), wxOK | wxICON_ERROR);
     return false;
 }
 

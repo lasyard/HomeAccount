@@ -9,7 +9,7 @@ DailyGrid::DailyGrid(wxWindow *parent, wxWindowID id)
     : DataGrid(parent, id), m_cat(NULL), m_catChoiceI(new wxArrayString), m_catChoiceO(new wxArrayString)
 {
     AppendCols();
-    SetColLabelValue(ClassIndex, _("strClass"));
+    SetColLabelValue(ClassIndex, _("Category"));
     SetColMinimalWidth(ClassIndex, 120);
     SetColSize(ClassIndex, 120);
     SetReadOnly(0, ClassIndex);
@@ -35,7 +35,7 @@ void DailyGrid::onCellChange(wxGridEvent &event)
         }
     } else {
         if (string_is_empty(&it->desc)) {
-            wxMessageBox(_("errNullDesc"), _("appName"), wxOK | wxICON_ERROR);
+            wxMessageBox(_("Cannot set category for an item with no description"), _("App name"), wxOK | wxICON_ERROR);
             updateCat(row, it);
         } else {
             changeCat(row, it->money);
@@ -63,7 +63,8 @@ void DailyGrid::updateCat()
 
 void DailyGrid::setCatChoice(wxArrayString *arr, struct mtree_node *root)
 {
-    arr->Add(_("strNoCat"));
+    arr->clear();
+    arr->Add(_("Unclassified"));
     if (root == NULL) return;
     struct mtree_node *node;
     for (node = mtree_pf_first(root); node != NULL; node = mtree_pf_next(root, node)) {
@@ -105,7 +106,7 @@ void DailyGrid::updateCat(int row, struct item *it)
         SetCellValue(row, ClassIndex, it->cat->name.str);
         SetCellTextColour(row, ClassIndex, *wxBLACK);
     } else {
-        SetCellValue(row, ClassIndex, _("strNoCat"));
+        SetCellValue(row, ClassIndex, _("Unclassified"));
         SetCellTextColour(row, ClassIndex, *wxRED);
     }
     SetReadOnly(row, ClassIndex, false);

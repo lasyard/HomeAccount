@@ -11,8 +11,8 @@ ConfigDialog::ConfigDialog(wxWindow *parent, wxWindowID id, const wxString &titl
 {
     wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
     m_book = new wxBookCtrl(this, wxID_ANY);
-    m_book->AddPage(createInitialPanel(m_book), _("strInitial"));
-    m_book->AddPage(createPasswordPanel(m_book), _("strChangePasswd"));
+    m_book->AddPage(createInitialPanel(m_book), _("Initial balance"));
+    m_book->AddPage(createPasswordPanel(m_book), _("Change password"));
     sizer->Add(m_book, wxSizerFlags().Border().Expand());
     wxSizer *sizer_bt = CreateButtonSizer(wxOK | wxCANCEL);
     if (sizer_bt != NULL) sizer->Add(sizer_bt, wxSizerFlags().Border().Expand());
@@ -39,10 +39,10 @@ wxPanel *ConfigDialog::createPasswordPanel(wxWindow *parent)
 {
     wxPanel *panel = new wxPanel(parent);
     wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-    sizer->Add(new wxStaticText(panel, wxID_ANY, _("msgInputPasswd")), wxSizerFlags().Border().Expand());
+    sizer->Add(new wxStaticText(panel, wxID_ANY, _("Input password")), wxSizerFlags().Border().Expand());
     m_input = new wxTextCtrl(panel, ID_INPUT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
     sizer->Add(m_input, wxSizerFlags().Border().Expand());
-    sizer->Add(new wxStaticText(panel, wxID_ANY, _("msgInputPasswd1")), wxSizerFlags().Border().Expand());
+    sizer->Add(new wxStaticText(panel, wxID_ANY, _("Input password again")), wxSizerFlags().Border().Expand());
     m_input1 = new wxTextCtrl(panel, ID_INPUT1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
     sizer->Add(m_input1, wxSizerFlags().Border().Expand());
     panel->SetSizer(sizer);

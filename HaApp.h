@@ -7,6 +7,9 @@ class HaApp : public wxApp
 {
 public:
     virtual bool OnInit();
+
+protected:
+    wxLocale m_locale;
 };
 
 DECLARE_APP(HaApp)

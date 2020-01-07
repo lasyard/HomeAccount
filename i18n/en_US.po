@@ -1,0 +1,260 @@
+# English translations for HomeAccount package.
+# Copyright (C) 2020 Lasyard
+# This file is distributed under the same license as the HomeAccount package.
+# Automatically generated, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: HomeAccount 1.0\n"
+"Report-Msgid-Bugs-To: lasyard@yeah.net\n"
+"POT-Creation-Date: 2020-01-07 11:36+0800\n"
+"PO-Revision-Date: 2020-01-07 11:36+0800\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ConfigDialog.cpp:14 DataGrid.cpp:188
+msgid "Initial balance"
+msgstr "Initial balance"
+
+#: ConfigDialog.cpp:15
+msgid "Change password"
+msgstr "Change password"
+
+#: ConfigDialog.cpp:42 MainFrame.cpp:111
+msgid "Input password"
+msgstr "Input password"
+
+#: ConfigDialog.cpp:45
+msgid "Input password again"
+msgstr "Input password again"
+
+#: DailyGrid.cpp:12
+msgid "Category"
+msgstr "Category"
+
+#: DailyGrid.cpp:38
+msgid "Cannot set category for an item with no description"
+msgstr "Cannot set category for an item with no description"
+
+#: DailyGrid.cpp:38 DataGrid.cpp:50 MainFrame.cpp:37 MainFrame.cpp:111
+#: MainFrame.cpp:155 MainFrame.cpp:163 MainFrame.cpp:204 MainFrame.cpp:244
+#: MainFrame.cpp:256 MainFrame.cpp:261 MainFrame.cpp:298 MainFrame.cpp:319
+#: MainFrame.cpp:354 MainFrame.cpp:358 MainFrame.cpp:360 MainFrame.cpp:459
+#: MainFrame.cpp:467 MonthValidator.cpp:12
+msgid "App name"
+msgstr "App name"
+
+#: DailyGrid.cpp:66 DailyGrid.cpp:108 StatHtml.cpp:81
+msgid "Unclassified"
+msgstr "Unclassified"
+
+#: DataGrid.cpp:11 StatHtml.cpp:28
+msgid "Income"
+msgstr "Income"
+
+#: DataGrid.cpp:12 StatHtml.cpp:29
+msgid "Outlay"
+msgstr "Outlay"
+
+#: DataGrid.cpp:13
+msgid "Balance"
+msgstr "Balance"
+
+#: DataGrid.cpp:14
+msgid "Description"
+msgstr "Description"
+
+#: DataGrid.cpp:15
+msgid "Comments"
+msgstr "Comments"
+
+#: DataGrid.cpp:50
+msgid "Cannot set both income and outlay in one line"
+msgstr "Cannot set both income and outlay in one line"
+
+#: DataGrid.cpp:210
+msgid "strTotal"
+msgstr "strTotal"
+
+#: MainFrame.cpp:51
+msgid "Monthly"
+msgstr "Monthly"
+
+#: MainFrame.cpp:54
+msgid "Cash"
+msgstr "Cash"
+
+#: MainFrame.cpp:57
+msgid "Statistics"
+msgstr "Statistics"
+
+#: MainFrame.cpp:60
+msgid "Export"
+msgstr "Export"
+
+#: MainFrame.cpp:63
+msgid "Import"
+msgstr "Import"
+
+#: MainFrame.cpp:163
+msgid "Category config is empty"
+msgstr "Category config is empty"
+
+#: MainFrame.cpp:183 StatDialog.cpp:20
+msgid "Annually statistics"
+msgstr "Annually statistics"
+
+#: MainFrame.cpp:191 StatDialog.cpp:21
+msgid "Monthly statistics"
+msgstr "Monthly statistics"
+
+#: MainFrame.cpp:202
+msgid "Current datum"
+msgstr "Current datum"
+
+#: MainFrame.cpp:203 MainFrame.cpp:242
+msgid "Categories config"
+msgstr "Categories config"
+
+#: MainFrame.cpp:204
+msgid "Choose one to export"
+msgstr "Choose one to export"
+
+#: MainFrame.cpp:240
+msgid "Monthly datum"
+msgstr "Monthly datum"
+
+#: MainFrame.cpp:241
+msgid "Cash datum"
+msgstr "Cash datum"
+
+#: MainFrame.cpp:244
+msgid "Choose one to import into"
+msgstr "Choose one to import into"
+
+#: MainFrame.cpp:256
+msgid "File is empty"
+msgstr "File is empty"
+
+#: MainFrame.cpp:260
+#, c-format
+msgid "Invalid date \"%1$s\""
+msgstr "Invalid date \"%1$s\""
+
+#: MainFrame.cpp:319
+msgid "Input passwords are not the same"
+msgstr "Input passwords are not the same"
+
+#: MainFrame.cpp:353
+#, c-format
+msgid "Error in category config file at line %1$d"
+msgstr "Error in category config file at line %1$d"
+
+#: MainFrame.cpp:357
+#, c-format
+msgid "Duplicate words in categories config at line %1$d"
+msgstr "Duplicate words in categories config at line %1$d"
+
+#: MainFrame.cpp:360
+msgid "File corrupted"
+msgstr "File corrupted"
+
+#: MainFrame.cpp:459
+msgid "Unknown error"
+msgstr "Unknown error"
+
+#: MainFrame.cpp:466
+#, c-format
+msgid "Error in file \"%1$s\" at line %2$d"
+msgstr "Error in file \"%1$s\" at line %2$d"
+
+#: MonthValidator.cpp:12
+msgid "Input date is invalid"
+msgstr "Input date is invalid"
+
+#: StatDialog.cpp:19
+msgid "Classified statistics"
+msgstr "Classified statistics"
+
+#: StatDialog.cpp:89
+msgid "Current month"
+msgstr "Current month"
+
+#: StatDialog.cpp:90
+msgid "Previous month"
+msgstr "Previous month"
+
+#: StatDialog.cpp:91
+msgid "Current year"
+msgstr "Current year"
+
+#: StatDialog.cpp:92
+msgid "Previous year"
+msgstr "Previous year"
+
+#: StatDialog.cpp:93
+msgid "All"
+msgstr "All"
+
+#: StatDialog.cpp:94
+msgid "Customized"
+msgstr "Customized"
+
+#: StatDialog.cpp:100
+msgid "Choices"
+msgstr "Choices"
+
+#: StatDialog.cpp:105
+msgid "From"
+msgstr "From"
+
+#: StatDialog.cpp:111
+msgid "To"
+msgstr "To"
+
+#: StatDialog.cpp:118
+msgid "Input date as yyyymm, e.g. 201202"
+msgstr "Input date as yyyymm, e.g. 201202"
+
+#: StatDialog.cpp:130
+#, c-format
+msgid "Annually statistics from %1$d to %2$d"
+msgstr "Annually statistics from %1$d to %2$d"
+
+#: StatHtml.cpp:10
+#, c-format
+msgid "Classified statistics from %1$d/%2$d to %3$d/%4$d"
+msgstr "Classified statistics from %1$d/%2$d to %3$d/%4$d"
+
+#: StatHtml.cpp:27
+msgid "Time"
+msgstr "Time"
+
+#: StatHtml.cpp:30
+msgid "Net Income"
+msgstr "Net Income"
+
+#: StatHtml.cpp:40 StatHtml.cpp:80
+msgid "Total"
+msgstr "Total"
+
+#: StatHtml.cpp:81 StatHtml.cpp:82 StatHtml.cpp:100
+msgid "Percentage in total"
+msgstr "Percentage in total"
+
+#: StatHtml.cpp:82 StatHtml.cpp:104
+msgid "Other"
+msgstr "Other"
+
+#: StatHtml.cpp:98
+msgid "Total of this category"
+msgstr "Total of this category"
+
+#: StatHtml.cpp:104 StatHtml.cpp:119
+msgid "Percentage in total of this category"
+msgstr "Percentage in total of this category"

@@ -3,7 +3,7 @@ DEBUG ?= y
 
 # Application name
 TARGET := HomeAccount
-VERSION := 0.1
+VERSION := 1.0
 YEAR := 2020
 
 # Source files
@@ -13,6 +13,7 @@ CPP_SRCS := \
   $(wildcard file/except/*.cpp)
 C_SRCS := \
   $(wildcard c/*.c)
+LCS := $(wildcard i18n/*.po)
 SRCS := $(CPP_SRCS) $(C_SRCS)
 
 OS := $(shell uname)
@@ -46,35 +47,60 @@ DEPFILE := .depend
 .PHONY: all clean dep
 
 ifeq ($(OS), Darwin)
-all: $(TARGET).app
+.PHONY: app_bundle
+
+APPDIR := $(TARGET).app
+CTSDIR := $(APPDIR)/Contents
+EXEDIR := $(CTSDIR)/MacOS
+RCSDIR := $(CTSDIR)/Resources
+APPICON := macos.icns
+PNGS := $(subst res,$(RCSDIR),$(wildcard res/*.png))
+APPLCS := $(subst .po,.lproj/ha.mo,$(subst i18n,$(RCSDIR),$(LCS)))
+
+all: app_bundle
+
+app_bundle: \
+  $(CTSDIR)/Info.plist \
+  $(CTSDIR)/PkgInfo \
+  $(EXEDIR)/$(TARGET) \
+  $(RCSDIR)/$(APPICON) \
+  $(PNGS) \
+  $(APPLCS)
+
+$(CTSDIR)/Info.plist: res/Info.plist.in
+	-mkdir -p $(dir $@)
+	cat $< \
+	  | sed -e 's/EXECUTABLE/$(TARGET)/' \
+	  | sed -e 's/VERSION/$(VERSION)/' \
+	  | sed -e 's/YEAR/$(YEAR)/' \
+	  > $@
+
+$(CTSDIR)/PkgInfo:
+	-mkdir -p $(dir $@)
+	echo "APPL????\c" > $@
+
+$(EXEDIR)/$(TARGET): $(TARGET)
+	-mkdir -p $(dir $@)
+	SetFile -t APPL $(TARGET)
+	cp $< $@
+
+$(RCSDIR)/$(APPICON): res/macos.iconset
+	-mkdir -p $(dir $@)
+	iconutil -c icns -o $@ $<
+
+$(RCSDIR)/%.png: res/%.png
+	-mkdir -p $(dir $@)
+	cp $< $@
+
+$(RCSDIR)/%.lproj/ha.mo: i18n/%.mo
+	-mkdir -p $(dir $@)
+	cp $< $@
 else
 all: $(TARGET)
 endif
 
-ifeq ($(OS), Darwin)
-APP := $(TARGET).app
-APP_ICON := res/macos.icns
-
-$(APP): $(TARGET) res/Info.plist.in $(APP_ICON)
-	SetFile -t APPL $(TARGET)
-	-mkdir $@
-	-mkdir $@/Contents
-	-mkdir $@/Contents/MacOS
-	-mkdir $@/Contents/Resources
-	cat res/Info.plist.in \
-	  | sed -e 's/EXECUTABLE/$(TARGET)/' \
-	  | sed -e 's/VERSION/$(VERSION)/' \
-	  | sed -e 's/YEAR/$(YEAR)/' \
-	  > $@/Contents/Info.plist
-	echo "APPL????\c" > $@/Contents/PkgInfo
-	cp $(TARGET) $@/Contents/MacOS/
-	cp $(APP_ICON) $@/Contents/Resources
-	cp res/*.png $@/Contents/Resources
-
-$(APP_ICON): res/macos.iconset
-	iconutil -c icns -o $@ $^
-
-endif
+%.mo: %.po
+	msgfmt -o $@ $^
 
 $(TARGET): $(OBJS)
 	$(CXX) $(LDFLAGS) -o $@ $^
@@ -88,8 +114,7 @@ clean:
 	-rm -f $(TARGET)
 	-rm -f $(DEPFILE)
 ifeq ($(OS), Darwin)
-	-rm -rf $(APP)
-	-rm -f $(APP_ICON)
+	-rm -rf $(APPDIR)
 endif
 
 ifeq ($(DEPFILE), $(wildcard $(DEPFILE)))
