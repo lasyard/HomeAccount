@@ -7,11 +7,22 @@
             "request": "launch",
             "program": "${workspaceFolder}/HomeAccount",
             "args": [],
-            "stopAtEntry": true,
+            "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": false,
-            "MIMode": "lldb"
+            "externalConsole": true,
+            "logging": {
+                "trace": true,
+                "traceResponse": true
+            },
+            "setupCommands": [
+                {
+                    "text": "-enable-pretty-printing"
+                }
+            ],
+            "osx": {
+                "MIMode": "lldb"
+            }
         }
     ]
 }

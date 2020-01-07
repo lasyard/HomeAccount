@@ -25,7 +25,13 @@ wxString HaFile::m_dir;
 
 HaFile *HaFile::getNewestFile()
 {
-    if (m_dir.empty()) m_dir = wxStandardPaths::Get().GetDocumentsDir() + "/HA";
+    if (m_dir.empty()) {
+#ifdef DEBUG
+        m_dir = "HA";
+#else
+        m_dir = wxStandardPaths::Get().GetDocumentsDir() + "/HA";
+#endif
+    }
     wxDir dir(m_dir);
     if (!dir.IsOpened()) {
         if (!wxDir::Make(m_dir)) {

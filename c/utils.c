@@ -126,7 +126,7 @@ BOOL str_to_ymd(const char *str, int *year, int *month, int *day, char sep)
 {
     const char *p = str;
     if (!str_to_ym(str, year, month, sep)) return FALSE;
-    p += YEAR_LEN + MONEY_LEN;
+    p += YEAR_LEN + MONTH_LEN;
     if (sep != '\0') {
         if (*p != sep) return FALSE;
         p++;
