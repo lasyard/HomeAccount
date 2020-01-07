@@ -128,8 +128,8 @@ BOOL str_to_ymd(const char *str, int *year, int *month, int *day, char sep)
     if (!str_to_ym(str, year, month, sep)) return FALSE;
     p += YEAR_LEN + MONTH_LEN;
     if (sep != '\0') {
-        if (*p != sep) return FALSE;
         p++;
+        if (*p != sep) return FALSE;
         p++;
     }
     if ((*day = str_to_int(p, DAY_LEN)) < 1 || *day > last_day_of_month(*year, *month)) {
