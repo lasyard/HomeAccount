@@ -6,6 +6,12 @@ TARGET := HomeAccount
 VERSION := 1.0
 YEAR := 2020
 
+WX_VERSION := 3.1.3
+WX_DYLIBS_VERSION := 3.1.3.0.0
+WX_PATH := $(HOME)/workspace/devel/wxWidgets-$(WX_VERSION)
+CRYPTOPP_VERSION := CRYPTOPP_8_2_0
+CRYPTOPP_PATH := $(HOME)/workspace/devel/cryptopp-$(CRYPTOPP_VERSION)
+
 # Source files
 CPP_SRCS := \
   $(wildcard *.cpp) \
@@ -26,9 +32,9 @@ endif
 
 ifeq ($(OS), Darwin)
   ifeq ($(DEBUG), y)
-    WX_BUILD_PATH := $(HOME)/devel/wxWidgets/build-cocoa-debug
+    WX_BUILD_PATH := $(WX_PATH)/build-cocoa-debug
   else
-    WX_BUILD_PATH := $(HOME)/devel/wxWidgets/build-cocoa-release
+    WX_BUILD_PATH := $(WX_PATH)/build-cocoa-release
   endif
 endif
 
@@ -36,38 +42,40 @@ WX_CONFIG := $(WX_BUILD_PATH)/wx-config
 
 CXXFLAGS := $(CFLAGS)
 CXXFLAGS += -pipe -Wall -std=c++11 $(shell $(WX_CONFIG) --cxxflags) -DwxHAS_IMAGES_IN_RESOURCES
-CXXFLAGS += -I$(HOME)/devel/cryptopp
+CXXFLAGS += -I$(CRYPTOPP_PATH)
 LDFLAGS += $(shell $(WX_CONFIG) --libs)
-LDFLAGS += -L$(HOME)/devel/cryptopp -lcryptopp
+LDFLAGS += -L$(CRYPTOPP_PATH) -lcryptopp
 
 OBJS := $(CPP_SRCS:.cpp=.o) $(C_SRCS:.c=.o)
 
 DEPFILE := .depend
 
-.PHONY: all clean dep
+.PHONY: all clean dep clean-dep
 
 ifeq ($(OS), Darwin)
-.PHONY: app_bundle
+.PHONY: app-bundle
 
-APPDIR := $(TARGET).app
-CTSDIR := $(APPDIR)/Contents
-EXEDIR := $(CTSDIR)/MacOS
-RCSDIR := $(CTSDIR)/Resources
-APPICON := macos.icns
-PNGS := $(subst res,$(RCSDIR),$(wildcard res/*.png))
-APPLCS := $(subst .po,.lproj/ha.mo,$(subst i18n,$(RCSDIR),$(LCS)))
+APP_DIR := $(TARGET).app
+CTS_DIR := $(APP_DIR)/Contents
+EXE_DIR := $(CTS_DIR)/MacOS
+RCS_DIR := $(CTS_DIR)/Resources
+FRM_DIR := $(CTS_DIR)/Frameworks
+APP_ICON := macos.icns
+APP_PNGS := $(subst res,$(RCS_DIR),$(wildcard res/*.png))
+APP_LCS := $(subst .po,.lproj/ha.mo,$(subst i18n,$(RCS_DIR),$(LCS)))
 
-all: app_bundle
+all: app-bundle
 
-app_bundle: \
-  $(CTSDIR)/Info.plist \
-  $(CTSDIR)/PkgInfo \
-  $(EXEDIR)/$(TARGET) \
-  $(RCSDIR)/$(APPICON) \
-  $(PNGS) \
-  $(APPLCS)
+app-bundle: \
+  $(CTS_DIR)/Info.plist \
+  $(CTS_DIR)/PkgInfo \
+  $(EXE_DIR)/$(TARGET) \
+  $(APP_DYLIBS) \
+  $(RCS_DIR)/$(APP_ICON) \
+  $(APP_PNGS) \
+  $(APP_LCS)
 
-$(CTSDIR)/Info.plist: res/Info.plist.in
+$(CTS_DIR)/Info.plist: res/Info.plist.in
 	-mkdir -p $(dir $@)
 	cat $< \
 	  | sed -e 's/EXECUTABLE/$(TARGET)/' \
@@ -75,24 +83,24 @@ $(CTSDIR)/Info.plist: res/Info.plist.in
 	  | sed -e 's/YEAR/$(YEAR)/' \
 	  > $@
 
-$(CTSDIR)/PkgInfo:
+$(CTS_DIR)/PkgInfo:
 	-mkdir -p $(dir $@)
 	echo "APPL????\c" > $@
 
-$(EXEDIR)/$(TARGET): $(TARGET)
+$(EXE_DIR)/$(TARGET): $(TARGET)
 	-mkdir -p $(dir $@)
 	SetFile -t APPL $(TARGET)
 	cp $< $@
 
-$(RCSDIR)/$(APPICON): res/macos.iconset
+$(RCS_DIR)/$(APP_ICON): res/macos.iconset
 	-mkdir -p $(dir $@)
 	iconutil -c icns -o $@ $<
 
-$(RCSDIR)/%.png: res/%.png
+$(RCS_DIR)/%.png: res/%.png
 	-mkdir -p $(dir $@)
 	cp $< $@
 
-$(RCSDIR)/%.lproj/ha.mo: i18n/%.mo
+$(RCS_DIR)/%.lproj/ha.mo: i18n/%.mo
 	-mkdir -p $(dir $@)
 	cp $< $@
 else
@@ -112,10 +120,12 @@ dep:
 clean:
 	-rm -f $(OBJS)
 	-rm -f $(TARGET)
-	-rm -f $(DEPFILE)
 ifeq ($(OS), Darwin)
-	-rm -rf $(APPDIR)
+	-rm -rf $(APP_DIR)
 endif
+
+clean-dep:
+	-rm -f $(DEPFILE)
 
 ifeq ($(DEPFILE), $(wildcard $(DEPFILE)))
   include $(DEPFILE)
