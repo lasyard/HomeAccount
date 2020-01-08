@@ -13,11 +13,7 @@
             "res/*.icns": true
         },
         "files.associations": {
-            "algorithm": "cpp",
-            "iosfwd": "cpp",
-            "string": "cpp",
-            "exception": "cpp",
-            "sstream": "cpp"
+            "*.xrc": "xml"
         }
     }
 }

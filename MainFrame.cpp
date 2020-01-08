@@ -14,6 +14,7 @@
 #include <wx/sizer.h>
 #include <wx/stdpaths.h>
 #include <wx/textdlg.h>
+#include <wx/xrc/xmlres.h>
 
 #include "ConfigDialog.h"
 #include "DailyGrid.h"
@@ -43,8 +44,7 @@ MainFrame::MainFrame() : wxFrame(NULL, ID_FRAME, _("App name")), m_file(nullptr)
     font.SetPixelSize(wxSize(16, 32));
     wxBoxSizer *sizer_up = new wxBoxSizer(wxHORIZONTAL);
     // date
-    m_date = new wxDatePickerCtrl(
-        this, ID_DATE, wxDefaultDateTime, wxDefaultPosition, wxDefaultSize, wxDP_DROPDOWN | wxDP_SHOWCENTURY);
+    m_date = new wxDatePickerCtrl(this, ID_DATE, wxDefaultDateTime, wxDefaultPosition, wxDefaultSize);
     m_date->SetFont(font);
     m_date->SetMinSize(wxSize(210, 40));
     sizer_up->Add(m_date, wxSizerFlags().Border());
@@ -301,14 +301,14 @@ void MainFrame::onImportButton(wxCommandEvent &event)
 
 void MainFrame::onConfigButton(wxCommandEvent &event)
 {
-    ConfigDialog *dlg = new ConfigDialog(this, wxID_ANY, _("App name"), true);
+    ConfigDialog *dlg = new ConfigDialog();
     char buf[MONEY_LEN + 1];
     money_to_str(buf, m_file->getInitial());
-    dlg->m_initial->SetValue(buf);
+    dlg->setInitial(buf);
     while (dlg->ShowModal() == wxID_OK) {
         int sel = dlg->getSelection();
         if (sel == 0) {
-            m_file->setInitial(str_to_money(dlg->m_initial->GetValue()));
+            m_file->setInitial(str_to_money(dlg->getInitial()));
             if (m_grid->IsShownOnScreen()) {
                 loadView();
             } else if (m_cashGrid->IsShownOnScreen()) {
@@ -316,10 +316,10 @@ void MainFrame::onConfigButton(wxCommandEvent &event)
             }
             break;
         } else if (sel == 1) {
-            wxString passwd = dlg->m_input->GetValue();
-            wxString passwd1 = dlg->m_input1->GetValue();
-            if (passwd == passwd1) {
-                m_file->changeKey(std::string(passwd));
+            wxString passwd1 = dlg->getPass1();
+            wxString passwd2 = dlg->getPass2();
+            if (passwd1 == passwd2) {
+                m_file->changeKey(std::string(passwd1));
                 break;
             }
             wxMessageBox(_("Input passwords are not the same"), _("App name"), wxOK | wxICON_ERROR);

@@ -1,3 +1,7 @@
+#include <wx/fs_arc.h>
+#include <wx/stdpaths.h>
+#include <wx/xrc/xmlres.h>
+
 #include "HaApp.h"
 #include "MainFrame.h"
 
@@ -11,6 +15,9 @@ bool HaApp::OnInit()
         wxLogError("Couldn't find/load the \"ha\" catalog");
     }
     m_locale.AddCatalog("wxstd");
+    wxFileSystem::AddHandler(new wxArchiveFSHandler);
+    wxXmlResource::Get()->InitAllHandlers();
+    wxXmlResource::Get()->Load(wxFileName(wxStandardPaths::Get().GetResourcesDir(), "resources.xrs").GetFullPath());
     MainFrame *frame = new MainFrame;
     SetTopWindow(frame);
     frame->Show();

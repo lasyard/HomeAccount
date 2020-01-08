@@ -1,33 +1,59 @@
 #ifndef _CONFIG_DIALOG_H_
 #define _CONFIG_DIALOG_H_
 
-#include <wx/bookctrl.h>
 #include <wx/dialog.h>
-
-class wxTextCtrl;
+#include <wx/notebook.h>
+#include <wx/textctrl.h>
+#include <wx/xrc/xmlres.h>
 
 class ConfigDialog : public wxDialog
 {
+    wxDECLARE_DYNAMIC_CLASS(ConfigDialog);
+
 public:
-    ConfigDialog(wxWindow *parent, wxWindowID id, const wxString &title, bool change = false);
+    ConfigDialog()
+    {
+        wxXmlResource::Get()->LoadObject(this, NULL, "config", "wxDialog");
+        m_book = XRCCTRL(*this, "book", wxNotebook);
+        m_initial = XRCCTRL(*this, "initial", wxTextCtrl);
+        m_pass1 = XRCCTRL(*this, "pass1", wxTextCtrl);
+        m_pass2 = XRCCTRL(*this, "pass2", wxTextCtrl);
+    }
 
     virtual ~ConfigDialog()
     {
     }
-
-    wxBookCtrl *m_book;
-    wxTextCtrl *m_initial;
-    wxTextCtrl *m_input;
-    wxTextCtrl *m_input1;
 
     int getSelection() const
     {
         return m_book->GetSelection();
     }
 
+    wxString getInitial() const
+    {
+        return m_initial->GetValue();
+    }
+
+    void setInitial(const wxString &v)
+    {
+        m_initial->SetValue(v);
+    }
+
+    wxString getPass1() const
+    {
+        return m_pass1->GetValue();
+    }
+
+    wxString getPass2() const
+    {
+        return m_pass2->GetValue();
+    }
+
 private:
-    wxPanel *createInitialPanel(wxWindow *parent);
-    wxPanel *createPasswordPanel(wxWindow *parent);
+    wxNotebook *m_book;
+    wxTextCtrl *m_initial;
+    wxTextCtrl *m_pass1;
+    wxTextCtrl *m_pass2;
 
     DECLARE_EVENT_TABLE()
 };

@@ -35,8 +35,6 @@ ifeq ($(OS), Darwin)
   endif
 endif
 
-CFLAGS += -pipe
-
 ifeq ($(DEBUG), y)
   CFLAGS += -O0 -g -DDEBUG
   VER_STR := $(VER_STR)_debug
@@ -72,6 +70,7 @@ FRM_DIR := $(CTS_DIR)/Frameworks
 APP_ICON := macos.icns
 APP_PNGS := $(subst res,$(RCS_DIR),$(wildcard res/*.png))
 APP_LCS := $(subst .po,.lproj/ha.mo,$(subst i18n,$(RCS_DIR),$(LCS)))
+APP_XRS := $(RCS_DIR)/resources.xrs
 
 all: app-bundle
 
@@ -82,7 +81,8 @@ app-bundle: \
   $(APP_DYLIBS) \
   $(RCS_DIR)/$(APP_ICON) \
   $(APP_PNGS) \
-  $(APP_LCS)
+  $(APP_LCS) \
+  $(APP_XRS)
 
 $(CTS_DIR)/Info.plist: res/Info.plist.in
 	-mkdir -p $(dir $@)
@@ -112,12 +112,20 @@ $(RCS_DIR)/%.png: res/%.png
 $(RCS_DIR)/%.lproj/ha.mo: i18n/%.mo
 	-mkdir -p $(dir $@)
 	cp $< $@
+
+$(RCS_DIR)/%.xrs: res/%.xrs
+	-mkdir -p $(dir $@)
+	cp $< $@
+
 else
 all: $(TARGET)
 endif
 
 %.mo: %.po
 	msgfmt -o $@ $^
+
+%.xrs: %.xrc
+	$(WX_BUILD_PATH)/utils/wxrc/wxrc $^ -o $@
 
 $(TARGET): $(OBJS)
 	$(CXX) $(LDFLAGS) -o $@ $^

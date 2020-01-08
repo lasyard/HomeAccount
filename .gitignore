@@ -35,12 +35,11 @@ HA/
 *.out
 *.app
 
-# MacOS
+# Resources
 *.icns
-
-# i18n
 *.mo
 *.pot
+*.xrs
 
 # Logs
 *.log

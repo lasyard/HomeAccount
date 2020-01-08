@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+
+    <object class="wxDialog" name="config" subclass="ConfigDialog">
+        <title>App name</title>
+        <centered>1</centered>
+        <object class="wxBoxSizer">
+            <orient>wxVERTICAL</orient>
+            <object class="sizeritem">
+                <flag>wxEXPAND | wxALL</flag>
+                <border>5</border>
+                <object class="wxNotebook" name="book">
+                    <object class="notebookpage">
+                        <label>Initial balance</label>
+                        <object class="wxPanel">
+                            <object class="wxBoxSizer">
+                                <orient>wxVERTICAL</orient>
+                                <object class="sizeritem">
+                                    <flag>wxEXPAND | wxALL</flag>
+                                    <border>5</border>
+                                    <object class="wxTextCtrl" name="initial">
+                                        <size>300,-1</size>
+                                    </object>
+                                </object>
+                            </object>
+                        </object>
+                    </object>
+                    <object class="notebookpage">
+                        <label>Change password</label>
+                        <object class="wxPanel">
+                            <bg>#FF8888</bg>
+                            <object class="wxBoxSizer">
+                                <orient>wxVERTICAL</orient>
+                                <object class="sizeritem">
+                                    <flag>wxEXPAND | wxALL</flag>
+                                    <border>5</border>
+                                    <object class="wxStaticText">
+                                        <label>Input password</label>
+                                    </object>
+                                </object>
+                                <object class="sizeritem">
+                                    <flag>wxEXPAND | wxALL</flag>
+                                    <border>5</border>
+                                    <object class="wxTextCtrl" name="pass1">
+                                        <hint>Input password</hint>
+                                    </object>
+                                </object>
+                                <object class="sizeritem">
+                                    <flag>wxEXPAND | wxALL</flag>
+                                    <border>5</border>
+                                    <object class="wxStaticText">
+                                        <label>Input password again</label>
+                                    </object>
+                                </object>
+                                <object class="sizeritem">
+                                    <flag>wxEXPAND | wxALL</flag>
+                                    <border>5</border>
+                                    <object class="wxTextCtrl" name="pass2">
+                                        <hint>Input password again</hint>
+                                    </object>
+                                </object>
+                            </object>
+                        </object>
+                    </object>
+                </object>
+            </object>
+            <object class="sizeritem">
+                <flag>wxEXPAND | wxALL</flag>
+                <border>5</border>
+                <object class="wxStdDialogButtonSizer">
+                    <object class="button">
+                        <object class="wxButton" name="wxID_OK">
+                            <label>OK</label>
+                        </object>
+                    </object>
+                    <object class="button">
+                        <object class="wxButton" name="wxID_CANCEL">
+                            <label>Cancel</label>
+                        </object>
+                    </object>
+                </object>
+            </object>
+        </object>
+    </object>
+
+</resource>
