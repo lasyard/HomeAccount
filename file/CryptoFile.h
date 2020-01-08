@@ -5,6 +5,7 @@
 #include <map>
 #include <sstream>
 
+#include <wx/filefn.h>
 #include <wx/strconv.h>
 
 #include "../c/str.h"
@@ -49,6 +50,13 @@ public:
     }
 
     void copyFrom(CryptoFile *file);
+
+    bool copyTo(const char *dirName)
+    {
+        wxString path, name, ext;
+        wxFileName::SplitPath(m_fileName, &path, &name, &ext);
+        return wxCopyFile(m_fileName, wxFileName(dirName, name + "." + ext).GetFullPath(), true);
+    }
 
     bool exist(const std::string fileName) const
     {

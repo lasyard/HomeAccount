@@ -71,7 +71,7 @@ protected:
     static wxString newFileName()
     {
         wxDateTime date = wxDateTime::Now();
-        return date.Format("%Y%m%d_%H%M%S") + "." + EXT;
+        return date.Format("%Y%m%d_%H%M%S") + "_home_account." + EXT;
     }
 
     static void setDir(wxString dir)

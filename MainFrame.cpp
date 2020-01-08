@@ -12,6 +12,7 @@
 #include <wx/filefn.h>
 #include <wx/msgdlg.h>
 #include <wx/sizer.h>
+#include <wx/stdpaths.h>
 #include <wx/textdlg.h>
 
 #include "ConfigDialog.h"
@@ -329,6 +330,16 @@ void MainFrame::onClose(wxCloseEvent &event)
     dailyQuerySave();
     cashQuerySave();
     catQuerySave();
+#ifdef __WXMAC__
+#ifndef DEBUG
+    wxString path = wxStandardPaths::Get().GetUserConfigDir();
+    path = path.BeforeLast('/') + "/Mobile Documents/com~apple~CloudDocs/HA";
+    if (!wxDirExists(path)) {
+        wxMkdir(path);
+    }
+    m_file->copyTo(path);
+#endif
+#endif
     Destroy();
 }
 
