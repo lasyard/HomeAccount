@@ -127,8 +127,8 @@ void DataGrid::onKeyDown(wxKeyEvent &event)
             clearCellData(GetGridCursorRow(), GetGridCursorCol());
         }
     }
-    wxGrid::OnKeyDown(event);
     if (modified) updateData(true);
+    wxGrid::OnKeyDown(event);
 }
 
 void DataGrid::scrollToDay(int day)
