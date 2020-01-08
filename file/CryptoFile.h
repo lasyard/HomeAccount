@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include <wx/filefn.h>
+#include <wx/filename.h>
 #include <wx/strconv.h>
 
 #include "../c/str.h"

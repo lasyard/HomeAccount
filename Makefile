@@ -22,21 +22,30 @@ C_SRCS := \
 LCS := $(wildcard i18n/*.po)
 SRCS := $(CPP_SRCS) $(C_SRCS)
 
+VER_STR := v$(subst .,_,$(VERSION))
+
 OS := $(shell uname)
 
-ifeq ($(DEBUG), y)
-  CFLAGS += -O0 -g -DDEBUG
-else
-  CFLAGS += -O2
-endif
-
 ifeq ($(OS), Darwin)
+  VER_STR := $(VER_STR)_darwin
   ifeq ($(DEBUG), y)
     WX_BUILD_PATH := $(WX_PATH)/build-cocoa-debug
   else
     WX_BUILD_PATH := $(WX_PATH)/build-cocoa-release
   endif
 endif
+
+CFLAGS += -pipe
+
+ifeq ($(DEBUG), y)
+  CFLAGS += -O0 -g -DDEBUG
+  VER_STR := $(VER_STR)_debug
+else
+  CFLAGS += -O2
+  VER_STR := $(VER_STR)_release
+endif
+
+CFLAGS += -DVER_STR=\"$(VER_STR)\"
 
 WX_CONFIG := $(WX_BUILD_PATH)/wx-config
 

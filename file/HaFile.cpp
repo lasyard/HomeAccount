@@ -1,6 +1,7 @@
 #include <sstream>
 
 #include <wx/dir.h>
+#include <wx/filename.h>
 #include <wx/stdpaths.h>
 
 #include "AnnuallyFileRW.h"
@@ -21,25 +22,16 @@ const char *const HaFile::AnnuallyFileName = "annually";
 
 const char *const HaFile::EXT = "ha";
 
-wxString HaFile::m_dir;
-
-HaFile *HaFile::getNewestFile()
+wxArrayString HaFile::getFileList(const wxString &dirName)
 {
-    if (m_dir.empty()) {
-#ifdef DEBUG
-        m_dir = "HA";
-#else
-        m_dir = wxStandardPaths::Get().GetDocumentsDir() + "/HA";
-#endif
-    }
-    wxDir dir(m_dir);
-    if (!dir.IsOpened()) {
-        if (!wxDir::Make(m_dir)) {
-            return nullptr;
-        }
-        dir.Open(m_dir);
-    }
     wxArrayString fileNames;
+    wxDir dir(dirName);
+    if (!dir.IsOpened()) {
+        if (!wxDir::Make(dirName)) {
+            return fileNames;
+        }
+        dir.Open(dirName);
+    }
     wxString fileName;
     if (dir.GetFirst(&fileName, wxString("*.") + EXT)) {
         fileNames.Add(fileName);
@@ -47,13 +39,27 @@ HaFile *HaFile::getNewestFile()
             fileNames.Add(fileName);
         }
     }
+    return fileNames;
+}
+
+HaFile *HaFile::getNewestFile(const wxString &dirName)
+{
+    wxArrayString fileNames = getFileList(dirName);
+    wxString fileName;
     if (fileNames.IsEmpty()) {
-        HaFile *file = new HaFile(getPath(newFileName()).c_str(), false);
+        HaFile *file = new HaFile(wxFileName(dirName, newFileName()).GetFullPath().c_str(), false);
         file->makeNewFile();
         return file;
     }
     fileNames.Sort(true);
-    return new HaFile(getPath(fileNames[0]).c_str());
+    return new HaFile(wxFileName(dirName, fileNames[0]).GetFullPath().c_str());
+}
+
+HaFile *HaFile::newCopy(const wxString &dirName)
+{
+    HaFile *haFile = new HaFile(wxFileName(dirName, newFileName()).GetFullPath().c_str(), false);
+    haFile->copyFrom(this);
+    return haFile;
 }
 
 void HaFile::save(FileRW *file)
@@ -145,13 +151,6 @@ void HaFile::rawSave(const FileRW *file)
     std::stringstream content;
     file->writeStream(content);
     saveFile(file->fileName(), content);
-}
-
-HaFile *HaFile::newCopy()
-{
-    HaFile *haFile = new HaFile(getPath(newFileName()).c_str(), false);
-    haFile->copyFrom(this);
-    return haFile;
 }
 
 CatFileRW *HaFile::getCatFile()

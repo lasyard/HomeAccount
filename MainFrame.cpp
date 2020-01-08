@@ -105,7 +105,12 @@ END_EVENT_TABLE()
 
 void MainFrame::initView()
 {
-    m_file = HaFile::getNewestFile();
+#ifdef DEBUG
+    m_dir = "HA";
+#else
+    m_dir = wxStandardPaths::Get().GetDocumentsDir() + "/HA";
+#endif
+    m_file = HaFile::getNewestFile(m_dir);
     int count;
     for (count = 0; count < 3; count++) {
         if (loadCatFile()) break;
@@ -325,19 +330,34 @@ void MainFrame::onConfigButton(wxCommandEvent &event)
     dlg->Destroy();
 }
 
+void MainFrame::removeOldFiles(const wxString &dirName)
+{
+    wxArrayString fileNames = HaFile::getFileList(dirName);
+    if (fileNames.GetCount() > 10) {
+        fileNames.Sort(false);
+        for (int i = 0; i < fileNames.GetCount() - 10; i++) {
+            wxRemoveFile(wxFileName(dirName, fileNames[i]).GetFullPath());
+        }
+    }
+}
+
 void MainFrame::onClose(wxCloseEvent &event)
 {
     dailyQuerySave();
     cashQuerySave();
     catQuerySave();
-#ifdef __WXMAC__
 #ifndef DEBUG
-    wxString path = wxStandardPaths::Get().GetUserConfigDir();
-    path = path.BeforeLast('/') + "/Mobile Documents/com~apple~CloudDocs/HA";
-    if (!wxDirExists(path)) {
-        wxMkdir(path);
+    removeOldFiles(m_dir);
+#ifdef __WXMAC__
+    if (!m_file->isOld()) {
+        wxString path = wxStandardPaths::Get().GetUserConfigDir();
+        path = path.BeforeLast('/') + "/Mobile Documents/com~apple~CloudDocs/HA";
+        if (!wxDirExists(path)) {
+            wxMkdir(path);
+        }
+        m_file->copyTo(path);
+        removeOldFiles(path);
     }
-    m_file->copyTo(path);
 #endif
 #endif
     Destroy();
@@ -431,7 +451,7 @@ void MainFrame::cashQuerySave()
 void MainFrame::copyFile()
 {
     if (m_file->isOld()) {
-        HaFile *haFile = m_file->newCopy();
+        HaFile *haFile = m_file->newCopy(m_dir);
         delete m_file;
         m_file = haFile;
         if (m_grid->catFileRW() != nullptr) {

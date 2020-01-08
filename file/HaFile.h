@@ -1,8 +1,8 @@
 #ifndef _HA_FILE_H_
 #define _HA_FILE_H_
 
+#include <wx/arrstr.h>
 #include <wx/datetime.h>
-#include <wx/filename.h>
 #include <wx/string.h>
 
 #include "CryptoFile.h"
@@ -32,10 +32,11 @@ public:
     {
     }
 
-    static HaFile *getNewestFile();
+    static wxArrayString getFileList(const wxString &dirName);
+    static HaFile *getNewestFile(const wxString &dirName);
 
+    HaFile *newCopy(const wxString &dirName);
     void save(FileRW *file);
-    HaFile *newCopy();
     void calTotal(struct cat_root *cat, int sYear, int sMonth, int eYear, int eMonth);
     long calBalanceBefore(int year, int month);
     long calFinalBalance();
@@ -61,22 +62,11 @@ public:
 
 protected:
     static const char *const IV;
-    static wxString m_dir;
-
-    static wxString getPath(const wxString &fileName)
-    {
-        return wxFileName(m_dir, fileName).GetFullPath();
-    }
 
     static wxString newFileName()
     {
         wxDateTime date = wxDateTime::Now();
-        return date.Format("%Y%m%d_%H%M%S") + "_home_account." + EXT;
-    }
-
-    static void setDir(wxString dir)
-    {
-        m_dir = dir;
+        return date.Format("%Y%m%d_%H%M%S") + "_" + VER_STR + "." + EXT;
     }
 
     bool m_isOld;

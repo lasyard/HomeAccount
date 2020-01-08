@@ -54,6 +54,7 @@ private:
     int m_year;
     int m_month;
     int m_day;
+    wxString m_dir;
     HaFile *m_file;
 
     void loadView(bool showCash = false);
@@ -65,6 +66,7 @@ private:
     void cashQuerySave();
     void copyFile();
     void showOne(wxWindow *w);
+    void removeOldFiles(const wxString &dirName);
 
     void showUnknowErrorAndExit();
     void showDataFileError(const DataFileError &e);
