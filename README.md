@@ -1,6 +1,6 @@
 # README
 
-HomeAccount is an application to record and calculate personal finacial data.  The datum are saved in encrypted form but can be exported to plain text files.
+HomeAccount is an application to record and calculate personal financial data.  The datum are saved in encrypted form but can be exported to plain text files.
 
 ## Functions of buttons
 

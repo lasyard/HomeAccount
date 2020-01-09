@@ -20,6 +20,7 @@ CPP_SRCS := \
 C_SRCS := \
   $(wildcard c/*.c)
 LCS := $(wildcard i18n/*.po)
+XRCS := $(wildcard res/*.xrc)
 SRCS := $(CPP_SRCS) $(C_SRCS)
 
 VER_STR := v$(subst .,_,$(VERSION))
@@ -83,6 +84,7 @@ app-bundle: \
   $(APP_PNGS) \
   $(APP_LCS) \
   $(APP_XRS)
+	./cp-dylibs.sh
 
 $(CTS_DIR)/Info.plist: res/Info.plist.in
 	-mkdir -p $(dir $@)
@@ -113,9 +115,9 @@ $(RCS_DIR)/%.lproj/ha.mo: i18n/%.mo
 	-mkdir -p $(dir $@)
 	cp $< $@
 
-$(RCS_DIR)/%.xrs: res/%.xrs
+$(RCS_DIR)/%.xrs: $(XRCS)
 	-mkdir -p $(dir $@)
-	cp $< $@
+	$(WX_BUILD_PATH)/utils/wxrc/wxrc $^ -o $@
 
 else
 all: $(TARGET)
@@ -123,9 +125,6 @@ endif
 
 %.mo: %.po
 	msgfmt -o $@ $^
-
-%.xrs: %.xrc
-	$(WX_BUILD_PATH)/utils/wxrc/wxrc $^ -o $@
 
 $(TARGET): $(OBJS)
 	$(CXX) $(LDFLAGS) -o $@ $^

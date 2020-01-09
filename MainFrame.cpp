@@ -158,7 +158,8 @@ void MainFrame::onCashButton(wxCommandEvent &event)
 
 void MainFrame::onStatButton(wxCommandEvent &event)
 {
-    StatDialog *dlg = new StatDialog(this, wxID_ANY, _("App name"), m_file);
+    StatDialog *dlg = new StatDialog();
+    dlg->setFile(m_file);
     if (dlg->ShowModal() == wxID_OK) {
         dailyQuerySave();
         int sel = dlg->getSelection();
@@ -170,12 +171,8 @@ void MainFrame::onStatButton(wxCommandEvent &event)
                 dlg->Destroy();
                 return;
             }
-            int sYear, sMonth;
-            int eYear, eMonth;
-            sYear = dlg->m_sYear;
-            sMonth = dlg->m_sMonth;
-            eYear = dlg->m_eYear;
-            eMonth = dlg->m_eMonth;
+            int sYear, sMonth, eYear, eMonth;
+            dlg->getData(sYear, sMonth, eYear, eMonth);
             clear_total(cat);
             m_file->calTotal(cat, sYear, sMonth, eYear, eMonth);
             sum_total(mtree_first_child(&cat->root));
@@ -189,8 +186,7 @@ void MainFrame::onStatButton(wxCommandEvent &event)
             str.Printf(_("Annually statistics"), t()->minYear(), t()->maxYear());
             m_html->showIO(t(), str);
         } else if (sel == 2) {
-            int selection = dlg->m_year->GetSelection();
-            wxString yearStr = dlg->m_year->GetString(selection);
+            wxString yearStr = dlg->getSelectedYear();
             int year = str_to_int(yearStr, yearStr.Len());
             SubMonthlyFile t(m_file, year);
             wxString str;

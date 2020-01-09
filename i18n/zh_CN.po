@@ -223,8 +223,8 @@ msgstr "输入日期格式：yyyymm, 如 201202"
 
 #: StatDialog.cpp:130
 #, c-format
-msgid "Annually statistics from %1$d to %2$d"
-msgstr "从 %1$d 年到 %2$d 年的历年收支汇总"
+msgid "Annually statistics from %1$s to %2$s"
+msgstr "从 %1$s 年到 %2$s 年的历年收支汇总"
 
 #: StatHtml.cpp:10
 #, c-format

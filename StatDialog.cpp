@@ -1,44 +1,34 @@
-#include <wx/choice.h>
-#include <wx/radiobox.h>
-#include <wx/sizer.h>
-#include <wx/stattext.h>
-#include <wx/textctrl.h>
-
-#include "HaDefs.h"
-#include "MonthValidator.h"
 #include "StatDialog.h"
-#include "file/AnnuallyFileRW.h"
-#include "file/HaFile.h"
-#include "file/SubFiles.h"
+#include "MonthValidator.h"
 
-StatDialog::StatDialog(wxWindow *parent, wxWindowID id, const wxString &title, HaFile *cryptoFile)
-    : wxDialog(parent, id, title), m_file(cryptoFile)
+wxIMPLEMENT_DYNAMIC_CLASS(StatDialog, wxDialog);
+
+BEGIN_EVENT_TABLE(StatDialog, wxDialog)
+EVT_RADIOBOX(XRCID("radio"), StatDialog::onRadioBox)
+END_EVENT_TABLE()
+
+StatDialog::StatDialog()
 {
-    wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-    m_book = new wxBookCtrl(this, wxID_ANY);
-    m_book->AddPage(createStatPanel(m_book), _("Classified statistics"));
-    m_book->AddPage(createAnnuallyPanel(m_book), _("Annually statistics"));
-    m_book->AddPage(createMonthlyPanel(m_book), _("Monthly statistics"));
-    sizer->Add(m_book, wxSizerFlags().Border().Expand());
-    wxSizer *sizer_bt = CreateButtonSizer(wxOK | wxCANCEL);
-    if (sizer_bt != NULL) sizer->Add(sizer_bt, wxSizerFlags().Border().Expand());
-    SetSizer(sizer);
-    sizer->SetSizeHints(this);
+    wxXmlResource::Get()->LoadObject(this, NULL, "stat", "wxDialog");
+    wxPanel *panel = XRCCTRL(*this, "classified", wxPanel);
+    m_book = XRCCTRL(*this, "book", wxNotebook);
+    m_from = new wxTextCtrl(
+        panel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, MonthValidator(&m_sYear, &m_sMonth));
+    wxXmlResource::Get()->AttachUnknownControl("from", m_from);
+    m_to = new wxTextCtrl(
+        panel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, MonthValidator(&m_eYear, &m_eMonth));
+    wxXmlResource::Get()->AttachUnknownControl("to", m_to);
     // set radio button
-    wxCommandEvent event(wxEVT_COMMAND_RADIOBOX_SELECTED, ID_RADIO);
+    wxCommandEvent event(wxEVT_COMMAND_RADIOBOX_SELECTED, XRCID("radio"));
     event.SetInt(0);
     event.SetEventObject(this);
     wxPostEvent(this, event);
 }
 
-BEGIN_EVENT_TABLE(StatDialog, wxDialog)
-EVT_RADIOBOX(ID_RADIO, StatDialog::onRadioBox)
-END_EVENT_TABLE()
-
 void StatDialog::onRadioBox(wxCommandEvent &event)
 {
     int sel = event.GetInt();
-    if (sel < 4) {
+    if (sel < 5) {
         m_from->Disable();
         m_to->Disable();
     }
@@ -83,72 +73,19 @@ void StatDialog::onRadioBox(wxCommandEvent &event)
     m_book->GetPage(0)->TransferDataToWindow();
 }
 
-wxPanel *StatDialog::createStatPanel(wxWindow *parent)
+void StatDialog::setFile(HaFile *file)
 {
-    static wxString choices[] = {
-        _("Current month"),
-        _("Previous month"),
-        _("Current year"),
-        _("Previous year"),
-        _("All"),
-        _("Customized"),
-    };
-    wxPanel *panel = new wxPanel(parent);
-    wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-    // radio buttons
-    m_radio = new wxRadioBox(
-        panel, ID_RADIO, _("Choices"), wxDefaultPosition, wxDefaultSize, sizeof(choices) / sizeof(wxString), choices);
-    sizer->Add(m_radio, wxSizerFlags().Border().Expand());
-    // top controls end
-    wxBoxSizer *sizer_md = new wxBoxSizer(wxHORIZONTAL);
-    // from label
-    sizer_md->Add(new wxStaticText(panel, wxID_ANY, _("From")), wxSizerFlags().Border().Expand());
-    // from textctrl
-    m_from = new wxTextCtrl(
-        panel, ID_FROM, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, MonthValidator(&m_sYear, &m_sMonth));
-    sizer_md->Add(m_from, wxSizerFlags().Border().Expand());
-    // to label
-    sizer_md->Add(new wxStaticText(panel, wxID_ANY, _("To")), wxSizerFlags().Border().Expand());
-    // to textctrl
-    m_to = new wxTextCtrl(
-        panel, ID_TO, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, MonthValidator(&m_eYear, &m_eMonth));
-    sizer_md->Add(m_to, wxSizerFlags().Border().Expand());
-    // middle controls end
-    sizer->Add(sizer_md, wxSizerFlags().Border().Expand());
-    sizer->Add(new wxStaticText(panel, wxID_ANY, _("Input date as yyyymm, e.g. 201202")),
-               wxSizerFlags().Border().Expand());
-    panel->SetSizer(sizer);
-    sizer->SetSizeHints(panel);
-    return panel;
-}
-
-wxPanel *StatDialog::createAnnuallyPanel(wxWindow *parent)
-{
-    wxPanel *panel = new wxPanel(parent);
-    wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-    wxString str;
-    str.Printf(_("Annually statistics from %1$d to %2$d"), m_file->minYear(), m_file->maxYear());
-    sizer->Add(new wxStaticText(panel, wxID_ANY, str), wxSizerFlags().Border().Expand());
-    panel->SetSizer(sizer);
-    sizer->SetSizeHints(panel);
-    return panel;
-}
-
-wxPanel *StatDialog::createMonthlyPanel(wxWindow *parent)
-{
-    wxPanel *panel = new wxPanel(parent);
-    wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
+    m_file = file;
     wxArrayString years;
     SubAnnuallyFile t(m_file);
     for (AnnuallyFileRW::pageIterator i = t()->pageBegin(); i != t()->pageEnd(); ++i) {
         years.Add(i->title.str);
     }
+    years.Sort(true);
+    wxString str;
+    str.Printf(_("Annually statistics from %1$s to %2$s"), years.Last(), years[0]);
+    XRCCTRL(*this, "min_max_year", wxStaticText)->SetLabel(str);
+    wxPanel *panel = XRCCTRL(*this, "monthly", wxPanel);
     m_year = new wxChoice(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, years);
-    if (m_year->GetCount() > 0) {
-        m_year->SetSelection(m_year->GetCount() - 1);
-    }
-    sizer->Add(m_year, wxSizerFlags().Border().Expand());
-    panel->SetSizer(sizer);
-    sizer->SetSizeHints(panel);
-    return panel;
+    wxXmlResource::Get()->AttachUnknownControl("years", m_year);
 }
