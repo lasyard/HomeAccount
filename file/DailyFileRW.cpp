@@ -16,6 +16,9 @@ void DailyFileRW::setDateFromData()
             throw DailyDateError(title->str);
         }
     }
+    char buf[YEAR_LEN + 1 + MONEY_LEN + 1];
+    buf[ym_to_str(buf, m_year, m_month, '/')] = '\0';
+    m_fileName = buf;
 }
 
 void DailyFileRW::addEmptyPage()

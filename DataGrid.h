@@ -7,54 +7,66 @@
 
 class DataGrid : public wxGrid
 {
+    wxDECLARE_DYNAMIC_CLASS(DataGrid);
+
 public:
-    DataGrid(wxWindow *parent, wxWindowID id);
+    DataGrid();
 
     virtual ~DataGrid()
     {
-        if (m_data != NULL) delete m_data;
+        safeDeleteData();
     }
 
-    bool dataModified()
+    virtual void initGrid();
+
+    virtual bool dataModified()
     {
-        if (m_data == NULL) return false;
+        if (m_data == nullptr) return false;
         return m_data->modified();
     }
 
-    void setDataFileRW(DataFileRW *data)
+    virtual void setDataFileRW(DataFileRW *data)
     {
-        if (m_data != NULL) delete m_data;
+        safeDeleteData();
         m_data = data;
         showAllData();
     }
 
-    DataFileRW *dataFileRW() const
+    virtual void setHaFile(HaFile *file)
+    {
+        if (m_data != nullptr) {
+            m_data->setHaFile(file);
+        }
+    }
+
+    virtual DataFileRW *dataFileRW() const
     {
         return m_data;
     }
 
     virtual void onCellChange(wxGridEvent &event);
-    void onKeyDown(wxKeyEvent &event);
+    virtual void onKeyDown(wxKeyEvent &event);
 
-    void onResizeCol(wxCommandEvent &event)
-    {
-        int col = event.GetInt();
-        AutoSizeColumn(col, false);
-    }
-
-    void scrollToDay(int day);
+    virtual void scrollToDay(int day);
+    virtual void updateData();
 
 protected:
-    static const int ColumnNum = 5;
-    static const int IncomeIndex = 0;
-    static const int OutlayIndex = 1;
-    static const int DescIndex = 2;
-    static const int CommentIndex = 3;
-    static const int BalanceIndex = 4;
+    static const int COLUMN_NUM = 5;
+    static const int INCOME_COLUMN = 0;
+    static const int OUTLAY_COLUMN = 1;
+    static const int DESC_COLUMN = 2;
+    static const int COMMENTS_COLUMN = 3;
+    static const int BALANCE_COLUMN = 4;
+
+    static const wxFont MONO_FONT;
 
     DataFileRW *m_data;
 
-    virtual void updateData(bool setModified = false);
+    void safeDeleteData()
+    {
+        if (m_data != nullptr) delete m_data;
+        m_data = nullptr;
+    }
 
     void clearCell(int row, int col)
     {
@@ -64,6 +76,19 @@ protected:
     void clearRow(int row)
     {
         for (int i = 0; i < GetNumberCols(); i++) clearCell(row, i);
+    }
+
+    void setNumberCell(int row, int col)
+    {
+        SetCellAlignment(row, col, wxALIGN_RIGHT, wxALIGN_CENTER);
+        SetCellFont(row, col, MONO_FONT);
+        SetCellTextColour(row, col, GetDefaultCellTextColour());
+    }
+
+    void setNormalCell(int row, int col)
+    {
+        SetCellFont(row, col, GetDefaultCellFont());
+        SetCellTextColour(row, col, GetDefaultCellTextColour());
     }
 
     void setRow(int row);

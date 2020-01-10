@@ -1,32 +1,19 @@
 #include <wx/msgdlg.h>
 
 #include "DataGrid.h"
-#include "HaDefs.h"
 
-DataGrid::DataGrid(wxWindow *parent, wxWindowID id) : wxGrid(parent, id), m_data(NULL)
-{
-    SetColMinimalAcceptableWidth(70);
-    DisableDragRowSize();
-    CreateGrid(0, ColumnNum);
-    SetColLabelValue(IncomeIndex, _("Income"));
-    SetColLabelValue(OutlayIndex, _("Outlay"));
-    SetColLabelValue(BalanceIndex, _("Balance"));
-    SetColLabelValue(DescIndex, _("Description"));
-    SetColLabelValue(CommentIndex, _("Comments"));
-    SetColFormatFloat(IncomeIndex, MONEY_LEN, 2);
-    SetColFormatFloat(OutlayIndex, MONEY_LEN, 2);
-    SetColFormatFloat(BalanceIndex, MONEY_LEN, 2);
-    AppendRows(2);
-    for (int i = 0; i < ColumnNum; i++) SetReadOnly(0, i);
-}
+const wxFont DataGrid::MONO_FONT(14, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 
-DEFINE_EVENT_TYPE(wxEVT_RESIZE_COL)
+wxIMPLEMENT_DYNAMIC_CLASS(DataGrid, wxGrid);
 
 BEGIN_EVENT_TABLE(DataGrid, wxGrid)
 EVT_GRID_CELL_CHANGED(DataGrid::onCellChange)
 EVT_KEY_DOWN(DataGrid::onKeyDown)
-EVT_COMMAND(ID_GRID, wxEVT_RESIZE_COL, DataGrid::onResizeCol)
 END_EVENT_TABLE()
+
+DataGrid::DataGrid() : m_data(nullptr)
+{
+}
 
 void DataGrid::onCellChange(wxGridEvent &event)
 {
@@ -40,45 +27,42 @@ void DataGrid::processItemChange(struct item *it, int row, int col)
     if (m_data == NULL || row == 0) return;
     wxString text;
     long money = 0, moneyI = 0, moneyO = 0;
-    if (!(text = GetCellValue(row, IncomeIndex)).IsEmpty()) {
+    if (!(text = GetCellValue(row, INCOME_COLUMN)).IsEmpty()) {
         moneyI = -str_to_money(text);
     }
-    if (!(text = GetCellValue(row, OutlayIndex)).IsEmpty()) {
+    if (!(text = GetCellValue(row, OUTLAY_COLUMN)).IsEmpty()) {
         moneyO = str_to_money(text);
     }
     if (moneyI != 0 && moneyO != 0) {
         wxMessageBox(_("Cannot set both income and outlay in one line"), _("App name"), wxOK | wxICON_ERROR);
-        if (col == IncomeIndex) {
+        if (col == INCOME_COLUMN) {
             money = moneyI;
-            SetCellValue(row, OutlayIndex, "");
-        } else if (col == OutlayIndex) {
+            SetCellValue(row, OUTLAY_COLUMN, "");
+        } else if (col == OUTLAY_COLUMN) {
             money = moneyO;
-            SetCellValue(row, IncomeIndex, "");
+            SetCellValue(row, INCOME_COLUMN, "");
         }
     } else if (moneyI != 0) {
         money = moneyI;
-        SetCellValue(row, OutlayIndex, "");
+        SetCellValue(row, OUTLAY_COLUMN, "");
     } else {
         money = moneyO;
-        SetCellValue(row, IncomeIndex, "");
+        SetCellValue(row, INCOME_COLUMN, "");
     }
-    wxString desc = GetCellValue(row, DescIndex);
+    wxString desc = GetCellValue(row, DESC_COLUMN);
     desc.Trim(true).Trim(false);
-    wxString comment = GetCellValue(row, CommentIndex);
+    wxString comment = GetCellValue(row, COMMENTS_COLUMN);
     comment.Trim(true).Trim(false);
     struct string s_desc, s_comment;
     string_mock_slice(&s_desc, desc, '\0');
     string_mock_slice(&s_comment, comment, '\0');
     if (item_set(it, money, &s_desc, &s_comment) == NULL) throw std::bad_alloc();
     m_data->setModified();
-    if (col == IncomeIndex || col == OutlayIndex) {
+    if (col == INCOME_COLUMN || col == OUTLAY_COLUMN) {
         updateBalanceAndTotal();
     }
     if (is_dummy_item(it)) clearRow(row);
-    wxCommandEvent ev(wxEVT_RESIZE_COL, GetId());
-    ev.SetEventObject(this);
-    ev.SetInt(col);
-    wxPostEvent(this, ev);
+    AutoSizeColumn(col);
 }
 
 void DataGrid::onKeyDown(wxKeyEvent &event)
@@ -127,7 +111,10 @@ void DataGrid::onKeyDown(wxKeyEvent &event)
             clearCellData(GetGridCursorRow(), GetGridCursorCol());
         }
     }
-    if (modified) updateData(true);
+    if (modified) {
+        m_data->setModified();
+        updateData();
+    }
     wxGrid::OnKeyDown(event);
 }
 
@@ -147,31 +134,46 @@ void DataGrid::scrollToDay(int day)
     }
 }
 
-void DataGrid::updateData(bool setModified)
+void DataGrid::initGrid()
 {
-    if (setModified) m_data->setModified();
+    SetColMinimalAcceptableWidth(70);
+    DisableDragRowSize();
+    CreateGrid(0, COLUMN_NUM);
+    SetColLabelValue(INCOME_COLUMN, _("Income"));
+    SetColLabelValue(OUTLAY_COLUMN, _("Outlay"));
+    SetColLabelValue(BALANCE_COLUMN, _("Balance"));
+    SetColLabelValue(DESC_COLUMN, _("Description"));
+    SetColLabelValue(COMMENTS_COLUMN, _("Comments"));
+    SetColFormatFloat(INCOME_COLUMN, MONEY_LEN, 2);
+    SetColFormatFloat(OUTLAY_COLUMN, MONEY_LEN, 2);
+    SetColFormatFloat(BALANCE_COLUMN, MONEY_LEN, 2);
+    AppendRows(2);
+    for (int i = 0; i < COLUMN_NUM; i++) SetReadOnly(0, i);
+    SetCellFont(0, BALANCE_COLUMN, MONO_FONT);
+}
+
+void DataGrid::updateData()
+{
     showMainData();
     updateBalanceAndTotal();
-    SetGridCursor(GetGridCursorRow(), OutlayIndex);
+    SetGridCursor(GetGridCursorRow(), OUTLAY_COLUMN);
 }
 
 void DataGrid::setRow(int row)
 {
-    SetCellAlignment(row, IncomeIndex, wxALIGN_RIGHT, wxALIGN_CENTER);
-    SetCellAlignment(row, OutlayIndex, wxALIGN_RIGHT, wxALIGN_CENTER);
-    SetCellAlignment(row, BalanceIndex, wxALIGN_RIGHT, wxALIGN_CENTER);
-    SetReadOnly(row, IncomeIndex, false);
-    SetReadOnly(row, OutlayIndex, false);
-    SetReadOnly(row, DescIndex, false);
-    SetReadOnly(row, CommentIndex, false);
-    SetReadOnly(row, BalanceIndex);
-    SetCellEditor(row, IncomeIndex, new wxGridCellFloatEditor(MONEY_LEN, 2));
-    SetCellEditor(row, OutlayIndex, new wxGridCellFloatEditor(MONEY_LEN, 2));
+    setNumberCell(row, INCOME_COLUMN);
+    setNumberCell(row, OUTLAY_COLUMN);
+    setNumberCell(row, BALANCE_COLUMN);
+    setNormalCell(row, DESC_COLUMN);
+    setNormalCell(row, COMMENTS_COLUMN);
+    SetReadOnly(row, INCOME_COLUMN, false);
+    SetReadOnly(row, OUTLAY_COLUMN, false);
+    SetReadOnly(row, DESC_COLUMN, false);
+    SetReadOnly(row, COMMENTS_COLUMN, false);
+    SetReadOnly(row, BALANCE_COLUMN);
+    SetCellEditor(row, INCOME_COLUMN, new wxGridCellFloatEditor(MONEY_LEN, 2));
+    SetCellEditor(row, OUTLAY_COLUMN, new wxGridCellFloatEditor(MONEY_LEN, 2));
     clearRow(row);
-    for (int i = 0; i < ColumnNum; i++) {
-        SetCellFont(row, i, GetDefaultCellFont());
-        SetCellTextColour(row, i, GetDefaultCellTextColour());
-    }
 }
 
 void DataGrid::showMainData()
@@ -187,7 +189,7 @@ void DataGrid::showMainData()
     }
     SetRowLabelValue(0, _("Initial balance"));
     money_to_str(buf, m_data->getInitial());
-    SetCellValue(0, BalanceIndex, buf);
+    SetCellValue(0, BALANCE_COLUMN, buf);
     int row = 1;
     for (DataFileRW::ItemIterator i = m_data->ItemBegin(); i != m_data->ItemEnd(); ++i, row++) {
         if (ulist_is_first(&i->owner->items, &i->ulist)) {
@@ -199,20 +201,20 @@ void DataGrid::showMainData()
         if (is_dummy_item(&*i)) continue;
         if (i->money < 0) {
             money_to_str(buf, -i->money);
-            SetCellValue(row, IncomeIndex, buf);
+            SetCellValue(row, INCOME_COLUMN, buf);
         } else {
             money_to_str(buf, i->money);
-            SetCellValue(row, OutlayIndex, buf);
+            SetCellValue(row, OUTLAY_COLUMN, buf);
         }
-        SetCellValue(row, DescIndex, i->desc.str);
-        SetCellValue(row, CommentIndex, i->comment.str);
+        SetCellValue(row, DESC_COLUMN, i->desc.str);
+        SetCellValue(row, COMMENTS_COLUMN, i->comment.str);
     }
-    SetRowLabelValue(row, _("strTotal"));
-    for (int i = 0; i < ColumnNum; i++) SetReadOnly(row, i);
-    wxFont font = GetCellFont(row, 0);
+    SetRowLabelValue(row, _("Total"));
+    for (int i = 0; i < COLUMN_NUM; i++) SetReadOnly(row, i);
+    wxFont font = MONO_FONT;
     font.MakeBold();
-    SetCellFont(row, IncomeIndex, font);
-    SetCellFont(row, OutlayIndex, font);
+    SetCellFont(row, INCOME_COLUMN, font);
+    SetCellFont(row, OUTLAY_COLUMN, font);
     EndBatch();
 }
 
@@ -228,7 +230,7 @@ void DataGrid::updateBalanceAndTotal()
         if (is_dummy_item(&*i)) continue;
         balance = cal_item_balance(&*i, balance);
         money_to_str(buf, balance);
-        SetCellValue(row, BalanceIndex, buf);
+        SetCellValue(row, BALANCE_COLUMN, buf);
         if (i->money < 0) {
             income -= i->money;
         } else {
@@ -236,9 +238,9 @@ void DataGrid::updateBalanceAndTotal()
         }
     }
     money_to_str(buf, income);
-    SetCellValue(row, IncomeIndex, buf);
+    SetCellValue(row, INCOME_COLUMN, buf);
     money_to_str(buf, outlay);
-    SetCellValue(row, OutlayIndex, buf);
+    SetCellValue(row, OUTLAY_COLUMN, buf);
     EndBatch();
 }
 

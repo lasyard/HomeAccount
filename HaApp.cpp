@@ -22,10 +22,15 @@ bool HaApp::OnInit()
     wxFileSystem::AddHandler(new wxArchiveFSHandler);
     wxXmlResource::Get()->InitAllHandlers();
     (this->*m_loadXmlResource)();
-    MainFrame *frame = new MainFrame();
+    MainFrame* frame = new MainFrame();
     SetTopWindow(frame);
     frame->Show();
-    frame->initView();
+#ifdef DEBUG
+    wxString dir = "HA";
+#else
+    wxString dir = wxStandardPaths::Get().GetDocumentsDir() + "/HA";
+#endif
+    frame->initView(dir);
     return true;
 }
 

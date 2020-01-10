@@ -2,44 +2,34 @@
 #define _MAIN_FRAME_H_
 
 #include <wx/frame.h>
+#include <wx/notebook.h>
+
+#include "DailyGrid.h"
+#include "file/HaFile.h"
 
 class wxDatePickerCtrl;
 class wxDateEvent;
-class wxFrame;
-class wxStaticBoxSizer;
 
+class wxNotebook;
 class DataGrid;
 class DailyGrid;
 class StatHtml;
-class HaDir;
-class HaFile;
 
 class DataFileError;
-class DailyFileEmpty;
-class DailyDateError;
-class CatFileError;
-class CatDupItem;
 
 class MainFrame : public wxFrame
 {
+    wxDECLARE_DYNAMIC_CLASS(MainFrame);
+
 public:
     MainFrame();
-    virtual ~MainFrame();
 
-    wxDatePickerCtrl *m_date;
-    wxStaticBoxSizer *m_box;
-    DailyGrid *m_grid;
-    DataGrid *m_cashGrid;
-    StatHtml *m_html;
-    wxButton *m_monthly;
-    wxButton *m_cash;
-    wxButton *m_save;
-    wxButton *m_stat;
-    wxButton *m_export;
-    wxButton *m_import;
-    wxButton *m_config;
+    virtual ~MainFrame()
+    {
+        safeDeleteFile();
+    }
 
-    void initView();
+    void initView(const wxString &dir);
     void onDateChanged(wxDateEvent &event);
     void onMonthlyButton(wxCommandEvent &event);
     void onCashButton(wxCommandEvent &event);
@@ -49,23 +39,54 @@ public:
     void onImportButton(wxCommandEvent &event);
     void onConfigButton(wxCommandEvent &event);
     void onClose(wxCloseEvent &event);
+    void onPageChanging(wxBookCtrlEvent &event);
 
 private:
+    static const int DAILY_PAGE = 0;
+    static const int CASH_PAGE = 1;
+    static const int STATISTICS_PAGE = 2;
+
     int m_year;
     int m_month;
     int m_day;
     wxString m_dir;
     HaFile *m_file;
 
-    void loadView(bool showCash = false);
-    bool loadCatFile();
+    wxNotebook *m_book;
+    DailyGrid *m_grid;
+    DataGrid *m_cashGrid;
+    StatHtml *m_html;
+    wxDatePickerCtrl *m_date;
+
+    void safeDeleteFile()
+    {
+        if (m_file != nullptr) delete m_file;
+        m_file = nullptr;
+    }
+
+    void showDaily()
+    {
+        m_grid->scrollToDay(m_day);
+        m_book->SetSelection(DAILY_PAGE);
+    }
+
+    void showCash()
+    {
+        m_book->SetSelection(CASH_PAGE);
+    }
+
+    void showStatistics()
+    {
+        m_book->SetSelection(STATISTICS_PAGE);
+    }
+
+    void loadCatFile();
     void loadDailyFile();
     void loadCashFile();
     void catQuerySave();
     void dailyQuerySave();
     void cashQuerySave();
     void copyFile();
-    void showOne(wxWindow *w);
     void removeOldFiles(const wxString &dirName);
 
     void showUnknowErrorAndExit();

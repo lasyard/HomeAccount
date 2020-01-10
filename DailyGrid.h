@@ -6,52 +6,70 @@
 
 class DailyGrid : public DataGrid
 {
+    wxDECLARE_DYNAMIC_CLASS(DailyGrid);
+
 public:
-    DailyGrid(wxWindow *parent, wxWindowID id);
+    DailyGrid() : DataGrid(), m_cat(NULL)
+    {
+    }
 
     virtual ~DailyGrid()
     {
-        if (m_cat != NULL) delete m_cat;
-        delete m_catChoiceI;
-        delete m_catChoiceO;
+        safeDeleteCat();
     }
 
-    bool catModified()
+    virtual void initGrid();
+
+    virtual bool catModified()
     {
         if (m_cat == NULL) return false;
         return m_cat->modified();
     }
 
-    void setCatFileRW(CatFileRW *cat)
+    virtual void setCatFileRW(CatFileRW *cat)
     {
-        if (m_cat != NULL) delete m_cat;
+        safeDeleteCat();
         m_cat = cat;
         setCatChoices();
     }
 
-    CatFileRW *catFileRW() const
+    virtual CatFileRW *catFileRW() const
     {
         return m_cat;
     }
 
-    virtual void onCellChange(wxGridEvent &event);
-    void updateCat();
-
-protected:
-    static const int ColumnNum = DataGrid::ColumnNum + 1;
-    static const int ClassIndex = DataGrid::ColumnNum;
-
-    CatFileRW *m_cat;
-    wxArrayString *m_catChoiceI;
-    wxArrayString *m_catChoiceO;
-
-    virtual void updateData(bool setModified = false)
+    virtual void setHaFile(HaFile *file)
     {
-        DataGrid::updateData(setModified);
+        DataGrid::setHaFile(file);
+        if (m_cat != nullptr) {
+            m_cat->setHaFile(file);
+        }
+    }
+
+    virtual void onCellChange(wxGridEvent &event);
+    virtual void updateCat();
+
+    virtual void updateData()
+    {
+        DataGrid::updateData();
         updateCat();
     }
 
-    void setCatChoice(wxArrayString *arr, struct mtree_node *root);
+protected:
+    static const int COLUMN_NUM = DataGrid::COLUMN_NUM + 1;
+    static const int CLASS_COLUMN = DataGrid::COLUMN_NUM;
+
+    CatFileRW *m_cat;
+    wxArrayString m_catChoiceI;
+    wxArrayString m_catChoiceO;
+
+    void safeDeleteCat()
+    {
+        if (m_cat != nullptr) delete m_cat;
+        m_cat = nullptr;
+    }
+
+    void setCatChoice(wxArrayString &arr, struct mtree_node *root);
 
     void setCatChoices()
     {
@@ -67,7 +85,6 @@ protected:
     struct cat_node *getCatNode(struct mtree_node *root, const char *name) const;
     struct cat_node *getCatNode(long money, wxString str) const;
     void updateCat(int row, struct item *it);
-    void showAllData();
     void changeCat(int row, long money);
 
     DECLARE_EVENT_TABLE()

@@ -1,5 +1,4 @@
 #include <fstream>
-#include <string>
 
 #include <wx/app.h>
 #include <wx/bmpbuttn.h>
@@ -11,14 +10,11 @@
 #include <wx/filedlg.h>
 #include <wx/filefn.h>
 #include <wx/msgdlg.h>
-#include <wx/sizer.h>
 #include <wx/stdpaths.h>
 #include <wx/textdlg.h>
 #include <wx/xrc/xmlres.h>
 
 #include "ConfigDialog.h"
-#include "DailyGrid.h"
-#include "HaDefs.h"
 #include "MainFrame.h"
 #include "StatDialog.h"
 #include "StatHtml.h"
@@ -36,97 +32,62 @@
 #include "file/except/DataFileError.h"
 #include "file/except/FileCorrupt.h"
 
-MainFrame::MainFrame() : wxFrame(NULL, ID_FRAME, _("App name")), m_file(nullptr)
-{
-    wxImage::AddHandler(new wxPNGHandler);
-    wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-    wxFont font = GetFont();
-    font.SetPixelSize(wxSize(16, 32));
-    wxBoxSizer *sizer_up = new wxBoxSizer(wxHORIZONTAL);
-    // date
-    m_date = new wxDatePickerCtrl(this, ID_DATE, wxDefaultDateTime, wxDefaultPosition, wxDefaultSize);
-    m_date->SetFont(font);
-    m_date->SetMinSize(wxSize(210, 40));
-    sizer_up->Add(m_date, wxSizerFlags().Border());
-    // monthly button
-    m_monthly = new wxButton(this, ID_MONTHLY, _("Monthly"));
-    sizer_up->Add(m_monthly, wxSizerFlags().Border().Expand());
-    // cash button
-    m_cash = new wxButton(this, ID_CASH, _("Cash"));
-    sizer_up->Add(m_cash, wxSizerFlags().Border().Expand());
-    // total button
-    m_stat = new wxButton(this, ID_STAT, _("Statistics"));
-    sizer_up->Add(m_stat, wxSizerFlags().Border().Expand());
-    // export button
-    m_export = new wxButton(this, ID_EXPORT, _("Export"));
-    sizer_up->Add(m_export, wxSizerFlags().Border().Expand());
-    // import button
-    m_import = new wxButton(this, ID_IMPORT, _("Import"));
-    sizer_up->Add(m_import, wxSizerFlags().Border().Expand());
-    // config button
-    m_config = new wxBitmapButton(this, ID_CONFIG, wxBITMAP_PNG(CONFIG));
-    sizer_up->Add(m_config, wxSizerFlags().Border().Expand());
-    // Add top sizer to sizer
-    sizer->Add(sizer_up, wxSizerFlags().Border());
-    // box
-    m_box = new wxStaticBoxSizer(wxVERTICAL, this);
-    m_box->SetMinSize(wxSize(960, 720));
-    // grid
-    m_grid = new DailyGrid(this, ID_GRID);
-    m_box->Add(m_grid, wxSizerFlags(1).Border().Expand());
-    // cash grid
-    m_cashGrid = new DataGrid(this, ID_CASH_GRID);
-    m_box->Add(m_cashGrid, wxSizerFlags(1).Border().Expand());
-    // html
-    m_html = new StatHtml(this, ID_HTML);
-    m_box->Add(m_html, wxSizerFlags(1).Border().Expand());
-    // controls end
-    sizer->Add(m_box, wxSizerFlags(1).Border().Expand());
-    SetSizer(sizer);
-    sizer->SetSizeHints(this);
-    showOne(NULL);
-}
-
-MainFrame::~MainFrame()
-{
-    if (m_file != nullptr) delete m_file;
-}
+wxIMPLEMENT_DYNAMIC_CLASS(MainFrame, wxFrame);
 
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
-EVT_DATE_CHANGED(ID_DATE, MainFrame::onDateChanged)
-EVT_BUTTON(ID_MONTHLY, MainFrame::onMonthlyButton)
-EVT_BUTTON(ID_CASH, MainFrame::onCashButton)
-EVT_BUTTON(ID_STAT, MainFrame::onStatButton)
-EVT_BUTTON(ID_EXPORT, MainFrame::onExportButton)
-EVT_BUTTON(ID_IMPORT, MainFrame::onImportButton)
-EVT_BUTTON(ID_CONFIG, MainFrame::onConfigButton)
+EVT_DATE_CHANGED(XRCID("date"), MainFrame::onDateChanged)
+EVT_BUTTON(XRCID("statistics"), MainFrame::onStatButton)
+EVT_BUTTON(XRCID("export"), MainFrame::onExportButton)
+EVT_BUTTON(XRCID("import"), MainFrame::onImportButton)
+EVT_BUTTON(XRCID("config"), MainFrame::onConfigButton)
+EVT_NOTEBOOK_PAGE_CHANGING(XRCID("book"), MainFrame::onPageChanging)
 EVT_CLOSE(MainFrame::onClose)
 END_EVENT_TABLE()
 
-void MainFrame::initView()
+MainFrame::MainFrame() : m_dir(), m_file(nullptr)
 {
-#ifdef DEBUG
-    m_dir = "HA";
-#else
-    m_dir = wxStandardPaths::Get().GetDocumentsDir() + "/HA";
-#endif
+    wxXmlResource::Get()->LoadObject(this, nullptr, "main", "wxFrame");
+    m_book = XRCCTRL(*this, "book", wxNotebook);
+    m_grid = XRCCTRL(*this, "daily", DailyGrid);
+    m_cashGrid = XRCCTRL(*this, "cash", DataGrid);
+    m_date = XRCCTRL(*this, "date", wxDatePickerCtrl);
+    m_html = XRCCTRL(*this, "html", StatHtml);
+}
+
+void MainFrame::initView(const wxString &dir)
+{
+    m_dir = dir;
+    safeDeleteFile();
     m_file = HaFile::getNewestFile(m_dir);
-    int count;
-    for (count = 0; count < 3; count++) {
-        if (loadCatFile()) break;
-        wxPasswordEntryDialog *dlg = new wxPasswordEntryDialog(this, _("Input password"), _("App name"));
-        if (dlg->ShowModal() == wxID_OK) {
-            m_file->setKey(std::string(dlg->GetValue()));
-        } else {
-            count = 3;
+    m_grid->initGrid();
+    m_cashGrid->initGrid();
+    int count = 0;
+    while (true) {
+        try {
+            loadCatFile();
+            break;
+        } catch (FileCorrupt &) {
+            wxMessageBox(_("File corrupted"), _("App name"), wxOK | wxICON_ERROR);
+            wxExit();
+        } catch (BadPassword &) {
+            if (count == 3) break;
+            count++;
+            wxPasswordEntryDialog *dlg = new wxPasswordEntryDialog(this, _("Input password"), _("App name"));
+            if (dlg->ShowModal() == wxID_OK) {
+                m_file->setKey(dlg->GetValue().ToStdString());
+            } else {
+                wxExit();
+            }
+            dlg->Destroy();
         }
-        dlg->Destroy();
     }
     if (count >= 3) wxExit();
     m_year = wxDateTime::Today().GetYear();
     m_month = wxDateTime::Today().GetMonth() + 1;
     m_day = wxDateTime::Today().GetDay();
-    loadView();
+    loadDailyFile();
+    loadCashFile();
+    showDaily();
 }
 
 void MainFrame::onDateChanged(wxDateEvent &event)
@@ -139,21 +100,31 @@ void MainFrame::onDateChanged(wxDateEvent &event)
         m_year = year;
         m_month = month;
         m_day = day;
-        loadView();
+        dailyQuerySave();
+        loadDailyFile();
     } else {
         m_day = day;
-        if (m_box->IsShown(m_grid)) m_grid->scrollToDay(m_day);
     }
+    showDaily();
 }
 
-void MainFrame::onMonthlyButton(wxCommandEvent &event)
+void MainFrame::onPageChanging(wxBookCtrlEvent &event)
 {
-    loadView();
-}
-
-void MainFrame::onCashButton(wxCommandEvent &event)
-{
-    loadView(true);
+    int sel = event.GetOldSelection();
+    switch (sel) {
+        case DAILY_PAGE:
+            m_grid->SaveEditControlValue();
+            dailyQuerySave();
+            loadCashFile();
+            m_cashGrid->updateData();
+            break;
+        case CASH_PAGE:
+            m_cashGrid->SaveEditControlValue();
+            cashQuerySave();
+            break;
+        default:
+            break;
+    }
 }
 
 void MainFrame::onStatButton(wxCommandEvent &event)
@@ -193,7 +164,7 @@ void MainFrame::onStatButton(wxCommandEvent &event)
             str.Printf(_("Monthly statistics"), year);
             m_html->showIO(t(), str);
         }
-        showOne(m_html);
+        showStatistics();
     }
     dlg->Destroy();
 }
@@ -206,25 +177,33 @@ void MainFrame::onExportButton(wxCommandEvent &event)
     wxSingleChoiceDialog *dlg = new wxSingleChoiceDialog(this, _("Choose one to export"), _("App name"), choices);
     if (dlg->ShowModal() == wxID_OK) {
         int index = dlg->GetSelection();
+        wxString wildCardString;
+        if (index == 0 && m_book->GetSelection() == STATISTICS_PAGE) {
+            wildCardString = "HTML files (*.html)|*.html";
+        } else {
+            wildCardString = "Text files (*.txt)|*.txt";
+        }
         wxFileDialog *fileDlg = new wxFileDialog(this,
                                                  wxFileSelectorPromptStr,
                                                  wxEmptyString,
                                                  wxEmptyString,
-                                                 wxFileSelectorDefaultWildcardStr,
+                                                 wildCardString,
                                                  wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
         if (fileDlg->ShowModal() == wxID_OK) {
-            wxString path = fileDlg->GetPath();
+            std::string path = fileDlg->GetPath().ToStdString();
             if (index == 0) {
-                if (m_box->IsShown(m_grid)) {
+                if (m_book->GetSelection() == DAILY_PAGE) {
                     dailyQuerySave();
-                    m_grid->dataFileRW()->saveAs(std::string(path));
-                } else if (m_box->IsShown(m_cashGrid)) {
+                    m_grid->dataFileRW()->saveAs(path);
+                } else if (m_book->GetSelection() == CASH_PAGE) {
                     cashQuerySave();
-                    m_cashGrid->dataFileRW()->saveAs(std::string(path));
+                    m_cashGrid->dataFileRW()->saveAs(path);
+                } else if (m_book->GetSelection() == STATISTICS_PAGE) {
+                    m_html->saveAs(path);
                 }
             } else if (index == 1) {
                 catQuerySave();
-                m_grid->catFileRW()->saveAs(std::string(path));
+                m_grid->catFileRW()->saveAs(path);
             }
         }
         fileDlg->Destroy();
@@ -265,7 +244,6 @@ void MainFrame::onImportButton(wxCommandEvent &event)
                 }
                 file.setHaFile(m_file);
                 file.save();
-                // TODO
                 m_year = file.year();
                 m_month = file.month();
                 m_day = 1;
@@ -278,10 +256,11 @@ void MainFrame::onImportButton(wxCommandEvent &event)
                 tm.sec = 0;
                 tm.msec = 0;
                 m_date->SetValue(tm);
-                loadView();
+                loadDailyFile();
+                loadCashFile();
             } else if (index == 1) {
                 SubCashFile(m_file, true)()->import(path);
-                loadView(true);
+                loadCashFile();
             } else if (index == 2) {
                 CatFileRW *catFile = m_file->getCatFile();
                 catFile->import(path);
@@ -305,17 +284,16 @@ void MainFrame::onConfigButton(wxCommandEvent &event)
         int sel = dlg->getSelection();
         if (sel == 0) {
             m_file->setInitial(str_to_money(dlg->getInitial()));
-            if (m_grid->IsShownOnScreen()) {
-                loadView();
-            } else if (m_cashGrid->IsShownOnScreen()) {
-                loadView(true);
-            }
+            dailyQuerySave();
+            loadDailyFile();
+            cashQuerySave();
+            loadCashFile();
             break;
         } else if (sel == 1) {
             wxString passwd1 = dlg->getPass1();
             wxString passwd2 = dlg->getPass2();
             if (passwd1 == passwd2) {
-                m_file->changeKey(std::string(passwd1));
+                m_file->changeKey(passwd1.ToStdString());
                 break;
             }
             wxMessageBox(_("Input passwords are not the same"), _("App name"), wxOK | wxICON_ERROR);
@@ -324,17 +302,6 @@ void MainFrame::onConfigButton(wxCommandEvent &event)
         }
     }
     dlg->Destroy();
-}
-
-void MainFrame::removeOldFiles(const wxString &dirName)
-{
-    wxArrayString fileNames = HaFile::getFileList(dirName);
-    if (fileNames.GetCount() > 10) {
-        fileNames.Sort(false);
-        for (int i = 0; i < fileNames.GetCount() - 10; i++) {
-            wxRemoveFile(wxFileName(dirName, fileNames[i]).GetFullPath());
-        }
-    }
 }
 
 void MainFrame::onClose(wxCloseEvent &event)
@@ -359,18 +326,18 @@ void MainFrame::onClose(wxCloseEvent &event)
     Destroy();
 }
 
-void MainFrame::loadView(bool showCash)
+void MainFrame::removeOldFiles(const wxString &dirName)
 {
-    dailyQuerySave();
-    cashQuerySave();
-    if (showCash) {
-        loadCashFile();
-    } else {
-        loadDailyFile();
+    wxArrayString fileNames = HaFile::getFileList(dirName);
+    if (fileNames.GetCount() > 10) {
+        fileNames.Sort(false);
+        for (int i = 0; i < fileNames.GetCount() - 10; i++) {
+            wxRemoveFile(wxFileName(dirName, fileNames[i]).GetFullPath());
+        }
     }
 }
 
-bool MainFrame::loadCatFile()
+void MainFrame::loadCatFile()
 {
     CatFileRW *cat;
     try {
@@ -383,14 +350,8 @@ bool MainFrame::loadCatFile()
         wxString str;
         str.Printf(_("Duplicate words in categories config at line %1$d"), e.lineNo());
         wxMessageBox(str, _("App name"), wxOK | wxICON_ERROR);
-    } catch (FileCorrupt &) {
-        wxMessageBox(_("File corrupted"), _("App name"), wxOK | wxICON_ERROR);
-        wxExit();
-    } catch (BadPassword &) {
-        return false;
     }
     m_grid->setCatFileRW(cat);
-    return true;
 }
 
 void MainFrame::loadDailyFile()
@@ -403,8 +364,6 @@ void MainFrame::loadDailyFile()
     }
     file->afterLoad();
     m_grid->setDataFileRW(file);
-    m_grid->scrollToDay(m_day);
-    showOne(m_grid);
 }
 
 void MainFrame::loadCashFile()
@@ -417,7 +376,6 @@ void MainFrame::loadCashFile()
     }
     file->afterLoad();
     m_cashGrid->setDataFileRW(file);
-    showOne(m_cashGrid);
 }
 
 void MainFrame::catQuerySave()
@@ -450,34 +408,8 @@ void MainFrame::copyFile()
         HaFile *haFile = m_file->newCopy(m_dir);
         delete m_file;
         m_file = haFile;
-        if (m_grid->catFileRW() != nullptr) {
-            m_grid->catFileRW()->setHaFile(m_file);
-        }
-        if (m_grid->dataFileRW() != nullptr) {
-            m_grid->dataFileRW()->setHaFile(m_file);
-        }
-        if (m_cashGrid->dataFileRW() != nullptr) {
-            m_cashGrid->dataFileRW()->setHaFile(m_file);
-        }
-    }
-}
-
-void MainFrame::showOne(wxWindow *w)
-{
-    wxSizerItemList::iterator iter;
-    wxSizerItemList items = m_box->GetChildren();
-    for (iter = items.begin(); iter != items.end(); ++iter) {
-        wxSizerItem *item = *iter;
-        if (item->IsWindow() && item->IsShown() && item->GetWindow() != w) {
-            m_box->Hide(item->GetWindow());
-        }
-    }
-    if (w != NULL && !m_box->IsShown(w)) m_box->Show(w);
-    m_box->Layout();
-    if (w == m_html) {
-        m_export->Disable();
-    } else {
-        m_export->Enable();
+        m_grid->setHaFile(m_file);
+        m_cashGrid->setHaFile(m_file);
     }
 }
 

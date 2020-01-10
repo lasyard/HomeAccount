@@ -1,14 +1,19 @@
 #ifndef _STAT_HTML_H_
 #define _STAT_HTML_H_
 
+#include <fstream>
+#include <string>
+
 #include <wx/html/htmlwin.h>
 
 class DataFileRW;
 
 class StatHtml : public wxHtmlWindow
 {
+    wxDECLARE_DYNAMIC_CLASS(StatHtml);
+
 public:
-    StatHtml(wxWindow *parent, wxWindowID id) : wxHtmlWindow(parent, id)
+    StatHtml() : m_src()
     {
     }
 
@@ -18,6 +23,12 @@ public:
 
     void showTotal(struct cat_root *cat, int sYear, int sMonth, int eYear, int eMonth);
     void showIO(DataFileRW *data, const wxString &title);
+
+    void saveAs(const std::string &path)
+    {
+        std::ofstream file(path);
+        file << m_src.mbc_str();
+    }
 
 private:
     wxString m_src;
@@ -32,6 +43,9 @@ private:
     void firstCatStatHtml(struct mtree_node *root);
     void secondCatStatHtml(struct mtree_node *root);
 
+    void htmlHeader(const wxString &title);
+    void htmlFooter();
+
     wxString calCent(long sub, long total)
     {
         wxString tmp;
@@ -43,9 +57,7 @@ private:
 
     void h2(const wxString &text)
     {
-        m_src += "<h2>";
-        m_src += text;
-        m_src += "</h2>";
+        m_src += "<h2>" + text + "</h2>\n";
     }
 
     void bu(const wxString &text, bool isBu = true)
