@@ -6,7 +6,7 @@
 class CashFileRW : public DataFileRW
 {
 public:
-    CashFileRW(const char *fileName, HaFile *file = NULL) : DataFileRW(fileName, file)
+    CashFileRW(const char *fileName, HaFile *file = nullptr) : DataFileRW(fileName, file)
     {
     }
 

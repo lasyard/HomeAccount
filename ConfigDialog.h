@@ -13,7 +13,7 @@ class ConfigDialog : public wxDialog
 public:
     ConfigDialog()
     {
-        wxXmlResource::Get()->LoadObject(this, NULL, "config", "wxDialog");
+        wxXmlResource::Get()->LoadObject(this, nullptr, "config", "wxDialog");
         m_book = XRCCTRL(*this, "book", wxNotebook);
         m_initial = XRCCTRL(*this, "initial", wxTextCtrl);
         m_pass1 = XRCCTRL(*this, "pass1", wxTextCtrl);

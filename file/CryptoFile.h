@@ -154,8 +154,8 @@ protected:
     void saveFile(const std::string &fileName, std::stringstream &content);
     void rawSaveFile(const std::string fileName, std::istream &content, unsigned char key[KEY_LEN]);
     char *readSection(off_t offset, size_t length);
-    void decSection(off_t offset, size_t length, std::ostream &output, unsigned char key[KEY_LEN] = NULL);
-    void encStream(std::istream &input, std::string &output, unsigned char key[KEY_LEN] = NULL);
+    void decSection(off_t offset, size_t length, std::ostream &output, unsigned char key[KEY_LEN] = nullptr);
+    void encStream(std::istream &input, std::string &output, unsigned char key[KEY_LEN] = nullptr);
     void digest(const std::string &input, std::string &output);
     void encrypt(const std::string &input, std::string &output, unsigned char key[KEY_LEN]);
     void decrypt(const char *buf, size_t length, std::string &output, unsigned char key[KEY_LEN]);

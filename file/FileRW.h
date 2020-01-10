@@ -10,7 +10,7 @@ class FileRW
 public:
     static const int LINE_LEN = 256;
 
-    FileRW(const char *fileName, HaFile *file = NULL) : m_fileName(fileName), m_modified(false), m_file(file)
+    FileRW(const char *fileName, HaFile *file = nullptr) : m_fileName(fileName), m_modified(false), m_file(file)
     {
     }
 
@@ -20,7 +20,7 @@ public:
 
     void save()
     {
-        if (m_file == NULL) return;
+        if (m_file == nullptr) return;
         m_file->save(this);
         m_modified = false;
     }

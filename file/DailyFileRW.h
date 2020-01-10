@@ -12,7 +12,7 @@ public:
     {
     }
 
-    DailyFileRW(const char *name, HaFile *file = NULL) : DataFileRW(name, file)
+    DailyFileRW(const char *name, HaFile *file = nullptr) : DataFileRW(name, file)
     {
         str_to_ym(name, &m_year, &m_month, '/');
     }

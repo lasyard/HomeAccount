@@ -9,7 +9,7 @@ END_EVENT_TABLE()
 
 StatDialog::StatDialog()
 {
-    wxXmlResource::Get()->LoadObject(this, NULL, "stat", "wxDialog");
+    wxXmlResource::Get()->LoadObject(this, nullptr, "stat", "wxDialog");
     wxPanel *panel = XRCCTRL(*this, "classified", wxPanel);
     m_book = XRCCTRL(*this, "book", wxNotebook);
     m_from = new wxTextCtrl(

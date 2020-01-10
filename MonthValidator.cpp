@@ -23,7 +23,7 @@ bool MonthValidator::TransferToWindow()
     char buf[YEAR_LEN + MONTH_LEN + 1];
     char *p = buf;
     wxTextCtrl *text = getTextCtrl();
-    if (text == NULL) return false;
+    if (text == nullptr) return false;
     p += int_to_str_len(p, *m_year, YEAR_LEN);
     p += int_to_str_len(p, *m_month, MONTH_LEN);
     *p = '\0';
@@ -39,7 +39,7 @@ wxTextCtrl *MonthValidator::getTextCtrl()
     } else {
         wxFAIL_MSG("MonthValidator can only be used with wxTextCtrl");
     }
-    return NULL;
+    return nullptr;
 }
 
 bool MonthValidator::tryTransfer()

@@ -9,7 +9,7 @@
 class DataFileRW : public FileRW
 {
 public:
-    DataFileRW(const char *fileName, HaFile *file = NULL) : FileRW(fileName, file), m_dt(new struct data)
+    DataFileRW(const char *fileName, HaFile *file = nullptr) : FileRW(fileName, file), m_dt(new struct data)
     {
         init_data(m_dt);
     }

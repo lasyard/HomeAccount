@@ -6,7 +6,7 @@
 class AnnuallyFileRW : public DataFileRW
 {
 public:
-    AnnuallyFileRW(const char *name, HaFile *file = NULL) : DataFileRW(name, file)
+    AnnuallyFileRW(const char *name, HaFile *file = nullptr) : DataFileRW(name, file)
     {
         m_title[YEAR_LEN] = '\0';
     }

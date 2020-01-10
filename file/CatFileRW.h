@@ -8,7 +8,7 @@
 class CatFileRW : public FileRW
 {
 public:
-    CatFileRW(const char *fileName, HaFile *file = NULL) : FileRW(fileName, file)
+    CatFileRW(const char *fileName, HaFile *file = nullptr) : FileRW(fileName, file)
     {
         m_cr = new struct cat_root;
         init_cat_root(m_cr);

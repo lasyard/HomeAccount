@@ -6,7 +6,7 @@
 class MonthlyFileRW : public DataFileRW
 {
 public:
-    MonthlyFileRW(const char *name, HaFile *file = NULL) : DataFileRW(name, file)
+    MonthlyFileRW(const char *name, HaFile *file = nullptr) : DataFileRW(name, file)
     {
         m_year = str_to_int(name, YEAR_LEN);
         m_title[YEAR_LEN + 1 + MONTH_LEN] = '\0';

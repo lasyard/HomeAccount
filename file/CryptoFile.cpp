@@ -163,7 +163,7 @@ char *CryptoFile::readSection(off_t offset, size_t length)
 
 void CryptoFile::decSection(off_t offset, size_t length, std::ostream &output, unsigned char key[KEY_LEN])
 {
-    if (key == NULL) key = m_key;
+    if (key == nullptr) key = m_key;
     char *buf = readSection(offset, length);
     std::string tmp;
     try {
@@ -178,7 +178,7 @@ void CryptoFile::decSection(off_t offset, size_t length, std::ostream &output, u
 
 void CryptoFile::encStream(std::istream &input, std::string &output, unsigned char key[KEY_LEN])
 {
-    if (key == NULL) key = m_key;
+    if (key == nullptr) key = m_key;
     std::string tmp;
     compress(input, tmp);
     encrypt(tmp, output, key);
