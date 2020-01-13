@@ -28,29 +28,40 @@ public:
         pageIterator(struct ulist_item *p) : m_p(p)
         {
         }
+
         pageIterator &operator++()
         {
             m_p = m_p->next;
             return *this;
         }
+
         pageIterator &operator++(int)
         {
             ++(*this);
             return *this;
         }
+
         bool operator==(const pageIterator &obj)
         {
             return m_p == obj.m_p;
         }
+
         bool operator!=(const pageIterator &obj)
         {
             return !(*this == obj);
         }
+
         struct page &operator*()
         {
             return *get_page(m_p);
         }
+
         struct page *operator->()
+        {
+            return get_page(m_p);
+        }
+
+        operator struct page *()
         {
             return get_page(m_p);
         }
@@ -77,6 +88,7 @@ public:
         ItemIterator(struct ulist_item *p, struct ulist_item *q) : m_p(p), m_q(q)
         {
         }
+
         ItemIterator &operator++()
         {
             m_q = m_q->next;
@@ -86,24 +98,34 @@ public:
             }
             return *this;
         }
+
         ItemIterator &operator++(int)
         {
             ++(*this);
             return *this;
         }
+
         bool operator==(const ItemIterator &obj)
         {
             return m_p == obj.m_p && m_q == obj.m_q;
         }
+
         bool operator!=(const ItemIterator &obj)
         {
             return !(*this == obj);
         }
+
         struct item &operator*()
         {
             return *get_item(m_q);
         }
+
         struct item *operator->()
+        {
+            return get_item(m_q);
+        }
+
+        operator struct item *()
         {
             return get_item(m_q);
         }
