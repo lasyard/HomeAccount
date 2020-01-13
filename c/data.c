@@ -106,8 +106,29 @@ struct item *insert_dummy_item_head(struct page *pg)
 
 struct item *item_set(struct item *it, long money, struct string *desc, struct string *comment)
 {
+    if (item_set_desc(it, desc) == NULL) return NULL;
+    if (item_set_comment(it, comment) == NULL) return NULL;
+    return item_set_money(it, money);
+}
+
+struct item *item_set_money(struct item *it, long money)
+{
     it->money = money;
-    if (string_copy(&it->desc, desc) != NULL && string_copy(&it->comment, comment) != NULL) {
+    return it;
+}
+
+struct item *item_set_desc(struct item *it, struct string *desc)
+{
+    if (string_copy(&it->desc, desc) != NULL) {
+        return it;
+    }
+    __release_item(it);
+    return NULL;
+}
+
+struct item *item_set_comment(struct item *it, struct string *comment)
+{
+    if (string_copy(&it->comment, comment) != NULL) {
         return it;
     }
     __release_item(it);

@@ -47,6 +47,9 @@ struct item *insert_dummy_item(struct item *pos);
 struct item *insert_dummy_item_head(struct page *pg);
 
 struct item *item_set(struct item *it, long money, struct string *desc, struct string *comment);
+struct item *item_set_money(struct item *it, long money);
+struct item *item_set_desc(struct item *it, struct string *desc);
+struct item *item_set_comment(struct item *it, struct string *comment);
 
 void delete_item(struct item *it);
 void set_item_delete(struct item *it);
