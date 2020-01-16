@@ -11,7 +11,6 @@ static void __init_item(struct item *it)
     string_init(&it->desc);
     string_init(&it->comment);
     it->cat = NULL;
-    it->flag = ITEM_NORMAL;
 }
 
 static void __release_item(struct item *it)
@@ -135,6 +134,14 @@ struct item *item_set_comment(struct item *it, struct string *comment)
     return NULL;
 }
 
+void clear_item(struct item *it)
+{
+    it->money = 0;
+    string_init(&it->desc);
+    string_init(&it->comment);
+    it->cat = NULL;
+}
+
 void delete_item(struct item *it)
 {
     ulist_del(&it->owner->items, &it->ulist);
@@ -143,14 +150,14 @@ void delete_item(struct item *it)
     free(it);
 }
 
-void set_item_delete(struct item *it)
-{
-    set_bit(it->flag, ITEM_TO_BE_DELETED);
-}
-
-int is_dummy_item(const struct item *it)
+BOOL is_dummy_item(const struct item *it)
 {
     return it->money == 0 && string_is_empty(&it->desc) && string_is_empty(&it->comment);
+}
+
+BOOL is_single_item(const struct item *it)
+{
+    return ulist_is_single(&it->owner->items, &it->ulist);
 }
 
 static void __init_page(struct page *pg)
@@ -290,24 +297,6 @@ BOOL is_empty_data(const struct data *dt)
     return ulist_is_empty(&dt->pages);
 }
 
-struct item *nth_item_of_data(struct data *dt, int n)
-{
-    int i = 1; /* the first line is the initial balance */
-    struct ulist_item *p, *q;
-    if (dt == NULL) return NULL;
-    for (p = dt->pages.first; p != NULL; p = p->next) {
-        struct page *pg = get_page(p);
-        if (n > i + pg->items_num) {
-            i += pg->items_num;
-            continue;
-        }
-        for (q = pg->items.first; q != NULL; q = q->next) {
-            if (i++ == n) return get_item(q);
-        }
-    }
-    return NULL;
-}
-
 struct data *add_dummy_item_to_empty_page(struct data *dt)
 {
     struct ulist_item *p;
@@ -317,20 +306,6 @@ struct data *add_dummy_item_to_empty_page(struct data *dt)
         }
     }
     return dt;
-}
-
-void delete_items_from_data(struct data *dt)
-{
-    struct ulist_item *p, *q, *t;
-    for (p = dt->pages.first; p != NULL; p = p->next) {
-        struct page *pg = get_page(p);
-        for (q = pg->items.first; q != NULL; q = t) {
-            struct item *it = get_item(q);
-            t = q->next;
-            if (is_set(it->flag, ITEM_TO_BE_DELETED)) delete_item(it);
-        }
-        if (ulist_is_empty(&pg->items)) add_dummy_item(pg);
-    }
 }
 
 long cal_item_balance(const struct item *it, long initial)

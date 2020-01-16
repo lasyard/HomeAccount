@@ -22,6 +22,7 @@ struct string *string_mock(struct string *dst, char *buf, size_t len);
 size_t string_mock_slice(struct string *dst, const char *buf, char end);
 
 int string_compare(const struct string *str1, const struct string *str2);
+int string_strcmp(const struct string *str1, const char *str2);
 
 BOOL string_is_empty(const struct string *str);
 

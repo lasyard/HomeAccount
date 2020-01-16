@@ -3,7 +3,7 @@ DEBUG ?= y
 
 # Application name
 TARGET := HomeAccount
-VERSION := 1.0
+VERSION := 1.1
 YEAR := 2020
 
 WX_VERSION := 3.1.3

@@ -19,9 +19,6 @@ struct page {
     struct string title;
 };
 
-#define ITEM_NORMAL 0x00000000
-#define ITEM_TO_BE_DELETED 0x00000001
-
 struct item {
     struct ulist_item ulist;
     struct page *owner;
@@ -29,7 +26,6 @@ struct item {
     struct string desc;
     struct string comment;
     struct cat_node *cat;
-    int flag;
 };
 
 #define get_item(ptr) ulist_entry(ptr, struct item, ulist)
@@ -50,11 +46,11 @@ struct item *item_set(struct item *it, long money, struct string *desc, struct s
 struct item *item_set_money(struct item *it, long money);
 struct item *item_set_desc(struct item *it, struct string *desc);
 struct item *item_set_comment(struct item *it, struct string *comment);
-
+void clear_item(struct item *it);
 void delete_item(struct item *it);
-void set_item_delete(struct item *it);
 
 BOOL is_dummy_item(const struct item *it);
+BOOL is_single_item(const struct item *it);
 
 void clear_page(struct page *pg);
 struct page *add_page(struct data *dt, struct string *title);
@@ -66,10 +62,7 @@ void init_data(struct data *dt);
 void clear_data(struct data *dt);
 BOOL is_empty_data(const struct data *dt);
 
-struct item *nth_item_of_data(struct data *dt, int n);
-
 struct data *add_dummy_item_to_empty_page(struct data *dt);
-void delete_items_from_data(struct data *dt);
 
 long cal_item_balance(const struct item *it, long initial);
 long cal_page_balance(const struct page *pg, long initial);

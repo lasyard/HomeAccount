@@ -1,6 +1,8 @@
 ConfigDialog.cpp
 DailyGrid.cpp
+DailyTable.cpp
 DataGrid.cpp
+DataTable.cpp
 MainFrame.cpp
 MonthValidator.cpp
 StatDialog.cpp

@@ -42,6 +42,7 @@ void delete_word(struct cat_node *node, const struct string *word);
 
 struct cat_node *get_cat_from_word(struct mtree_node *root, const struct string *word);
 struct cat_node *get_cat_from_name(struct mtree_node *root, const struct string *name);
+struct cat_node *get_cat_from_cstr_name(struct mtree_node *root, const char *name);
 
 void clear_total(struct cat_root *cat);
 void sum_total(struct mtree_node *root);

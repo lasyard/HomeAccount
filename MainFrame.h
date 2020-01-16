@@ -11,8 +11,8 @@ class wxDatePickerCtrl;
 class wxDateEvent;
 
 class wxNotebook;
-class DataGrid;
-class DailyGrid;
+class DataTable;
+class DailyTable;
 class StatHtml;
 
 class DataFileError;
@@ -46,17 +46,17 @@ private:
     static const int CASH_PAGE = 1;
     static const int STATISTICS_PAGE = 2;
 
-    int m_year;
-    int m_month;
-    int m_day;
+    wxDateTime m_date;
     wxString m_dir;
     HaFile *m_file;
+    DailyTable *m_daily;
+    DataTable *m_cash;
 
     wxNotebook *m_book;
     DailyGrid *m_grid;
     DataGrid *m_cashGrid;
     StatHtml *m_html;
-    wxDatePickerCtrl *m_date;
+    wxDatePickerCtrl *m_datePicker;
 
     void safeDeleteFile()
     {
@@ -66,7 +66,7 @@ private:
 
     void showDaily()
     {
-        m_grid->scrollToDay(m_day);
+        m_grid->scrollToDay(m_date.GetDay());
         m_book->SetSelection(DAILY_PAGE);
     }
 
@@ -80,10 +80,8 @@ private:
         m_book->SetSelection(STATISTICS_PAGE);
     }
 
-    void loadCatFile();
     void loadDailyFile();
     void loadCashFile();
-    void catQuerySave();
     void dailyQuerySave();
     void cashQuerySave();
     void copyFile();

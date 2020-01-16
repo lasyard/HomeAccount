@@ -3,7 +3,7 @@
 DIR="i18n"
 POT="${DIR}/messages.pot"
 
-xgettext --c++ -k_ -f xgettext.list -o "${POT}" \
+xgettext --c++ --no-location -k_ -f xgettext.list -o "${POT}" \
     --copyright-holder=Lasyard \
     --package-name=HomeAccount \
     --package-version=1.0 \

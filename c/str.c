@@ -79,6 +79,26 @@ int string_compare(const struct string *str1, const struct string *str2)
     return result;
 }
 
+int string_strcmp(const struct string *str1, const char *str2)
+{
+    const char *p1, *p2;
+    for (p1 = str1->str, p2 = str2; *p2 != '\0' && p1 - str1->str < str1->len; p1++, p2++) {
+        if (*p1 > *p2) {
+            return 1;
+        } else if (*p1 < *p2) {
+            return -1;
+        }
+    }
+    if (*p2 == '\0') {
+        if (p1 - str1->str == str1->len) {
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+    return -1;
+}
+
 BOOL string_is_empty(const struct string *str)
 {
     return (str->str == NULL) || str->len == 0;

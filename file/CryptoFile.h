@@ -50,6 +50,7 @@ public:
         m_file.flush();
     }
 
+    void tryLoadFile();
     void copyFrom(CryptoFile *file);
 
     bool copyTo(const char *dirName)
@@ -140,7 +141,6 @@ protected:
     wxMBConv *m_mbConv;
 
     off_t findSlot(size_t length);
-    void tryLoadFile();
     void loadCatalog();
     void saveCatalog();
 

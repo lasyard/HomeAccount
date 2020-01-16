@@ -190,6 +190,16 @@ struct cat_node *get_cat_from_name(struct mtree_node *root, const struct string 
     return NULL;
 }
 
+struct cat_node *get_cat_from_cstr_name(struct mtree_node *root, const char *name)
+{
+    struct mtree_node *node;
+    if (root == NULL) return NULL;
+    for (node = mtree_pf_first(root); node != NULL; node = mtree_pf_next(root, node)) {
+        if (string_strcmp(&get_cat_node(node)->name, name) == 0) return get_cat_node(node);
+    }
+    return NULL;
+}
+
 void clear_total(struct cat_root *cat)
 {
     struct mtree_node *node = mtree_pf_first(&cat->root);

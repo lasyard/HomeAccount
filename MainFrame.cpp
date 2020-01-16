@@ -15,6 +15,7 @@
 #include <wx/xrc/xmlres.h>
 
 #include "ConfigDialog.h"
+#include "DailyTable.h"
 #include "MainFrame.h"
 #include "StatDialog.h"
 #include "StatHtml.h"
@@ -44,27 +45,31 @@ EVT_NOTEBOOK_PAGE_CHANGING(XRCID("book"), MainFrame::onPageChanging)
 EVT_CLOSE(MainFrame::onClose)
 END_EVENT_TABLE()
 
-MainFrame::MainFrame() : m_dir(), m_file(nullptr)
+MainFrame::MainFrame() : m_dir(), m_file(nullptr), m_daily(nullptr), m_cash(nullptr)
 {
     wxXmlResource::Get()->LoadObject(this, nullptr, "main", "wxFrame");
     m_book = XRCCTRL(*this, "book", wxNotebook);
     m_grid = XRCCTRL(*this, "daily", DailyGrid);
     m_cashGrid = XRCCTRL(*this, "cash", DataGrid);
-    m_date = XRCCTRL(*this, "date", wxDatePickerCtrl);
+    m_datePicker = XRCCTRL(*this, "date", wxDatePickerCtrl);
     m_html = XRCCTRL(*this, "html", StatHtml);
 }
 
 void MainFrame::initView(const wxString &dir)
 {
-    m_dir = dir;
     safeDeleteFile();
+    m_dir = dir;
     m_file = HaFile::getNewestFile(m_dir);
-    m_grid->initGrid();
-    m_cashGrid->initGrid();
+    // Must do SetTable, for the grid is painted when showing the dialog.
+    m_daily = new DailyTable();
+    m_grid->SetTable(m_daily, true);
+    m_cash = new DataTable();
+    m_cashGrid->SetTable(m_cash, true);
+    m_cashGrid->setGrid();
     int count = 0;
     while (true) {
         try {
-            loadCatFile();
+            m_file->tryLoadFile();
             break;
         } catch (FileCorrupt &) {
             wxMessageBox(_("File corrupted"), _("App name"), wxOK | wxICON_ERROR);
@@ -82,9 +87,7 @@ void MainFrame::initView(const wxString &dir)
         }
     }
     if (count >= 3) wxExit();
-    m_year = wxDateTime::Today().GetYear();
-    m_month = wxDateTime::Today().GetMonth() + 1;
-    m_day = wxDateTime::Today().GetDay();
+    m_date.SetToCurrent();
     loadDailyFile();
     loadCashFile();
     showDaily();
@@ -92,18 +95,15 @@ void MainFrame::initView(const wxString &dir)
 
 void MainFrame::onDateChanged(wxDateEvent &event)
 {
-    int year, month, day;
-    year = event.GetDate().GetYear();
-    month = event.GetDate().GetMonth() + 1;
-    day = event.GetDate().GetDay();
-    if (month != m_month || year != m_year) {
-        m_year = year;
-        m_month = month;
-        m_day = day;
+    wxDateTime tm = event.GetDate();
+    bool loadNew = false;
+    if (tm.GetMonth() != m_date.GetMonth() || tm.GetYear() != m_date.GetYear()) {
+        loadNew = true;
+    }
+    m_date = tm;
+    if (loadNew) {
         dailyQuerySave();
         loadDailyFile();
-    } else {
-        m_day = day;
     }
     showDaily();
 }
@@ -116,7 +116,6 @@ void MainFrame::onPageChanging(wxBookCtrlEvent &event)
             m_grid->SaveEditControlValue();
             dailyQuerySave();
             loadCashFile();
-            m_cashGrid->updateData();
             break;
         case CASH_PAGE:
             m_cashGrid->SaveEditControlValue();
@@ -135,8 +134,7 @@ void MainFrame::onStatButton(wxCommandEvent &event)
         dailyQuerySave();
         int sel = dlg->getSelection();
         if (sel == 0) {
-            catQuerySave();
-            struct cat_root *cat = m_grid->catFileRW()->getCatRoot();
+            struct cat_root *cat = m_daily->getCatRoot();
             if (mtree_is_leaf(&cat->root)) {
                 wxMessageBox(_("Category config is empty"), _("App name"), wxOK | wxICON_ERROR);
                 dlg->Destroy();
@@ -190,20 +188,18 @@ void MainFrame::onExportButton(wxCommandEvent &event)
                                                  wildCardString,
                                                  wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
         if (fileDlg->ShowModal() == wxID_OK) {
+            dailyQuerySave();
             std::string path = fileDlg->GetPath().ToStdString();
             if (index == 0) {
                 if (m_book->GetSelection() == DAILY_PAGE) {
-                    dailyQuerySave();
-                    m_grid->dataFileRW()->saveAs(path);
+                    m_daily->saveAs(path);
                 } else if (m_book->GetSelection() == CASH_PAGE) {
-                    cashQuerySave();
-                    m_cashGrid->dataFileRW()->saveAs(path);
+                    m_cash->saveAs(path);
                 } else if (m_book->GetSelection() == STATISTICS_PAGE) {
                     m_html->saveAs(path);
                 }
             } else if (index == 1) {
-                catQuerySave();
-                m_grid->catFileRW()->saveAs(path);
+                m_daily->saveCatAs(path);
             }
         }
         fileDlg->Destroy();
@@ -242,31 +238,20 @@ void MainFrame::onImportButton(wxCommandEvent &event)
                     wxMessageBox(str, _("App name"), wxOK | wxICON_ERROR);
                     return;
                 }
+                dailyQuerySave();
                 file.setHaFile(m_file);
                 file.save();
-                m_year = file.year();
-                m_month = file.month();
-                m_day = 1;
-                wxDateTime::Tm tm;
-                tm.year = m_year;
-                tm.mon = wxDateTime::Month(m_month - 1);
-                tm.mday = m_day;
-                tm.hour = 0;
-                tm.min = 0;
-                tm.sec = 0;
-                tm.msec = 0;
-                m_date->SetValue(tm);
+                m_date = wxDateTime(1, wxDateTime::Month(file.month() - 1), file.year());
+                m_datePicker->SetValue(m_date);
                 loadDailyFile();
                 loadCashFile();
             } else if (index == 1) {
                 SubCashFile(m_file, true)()->import(path);
                 loadCashFile();
             } else if (index == 2) {
-                CatFileRW *catFile = m_file->getCatFile();
-                catFile->import(path);
-                catFile->setModified();
-                m_grid->setCatFileRW(catFile);
-                m_grid->updateCat();
+                dailyQuerySave();
+                SubCatFile(m_file, true)()->import(path);
+                loadDailyFile();
             }
         }
         dlg->Destroy();
@@ -308,7 +293,6 @@ void MainFrame::onClose(wxCloseEvent &event)
 {
     dailyQuerySave();
     cashQuerySave();
-    catQuerySave();
 #ifndef DEBUG
     removeOldFiles(m_dir);
 #ifdef __WXMAC__
@@ -337,11 +321,15 @@ void MainFrame::removeOldFiles(const wxString &dirName)
     }
 }
 
-void MainFrame::loadCatFile()
+void MainFrame::loadDailyFile()
 {
     CatFileRW *cat;
+    DailyFileRW *file;
     try {
+        file = m_file->getDailyFile(m_date.GetYear(), m_date.GetMonth() + 1);
         cat = m_file->getCatFile();
+    } catch (DataFileError &e) {
+        showDataFileError(e);
     } catch (CatFileError &e) {
         wxString str;
         str.Printf(_("Error in category config file at line %1$d"), e.lineNo());
@@ -351,19 +339,13 @@ void MainFrame::loadCatFile()
         str.Printf(_("Duplicate words in categories config at line %1$d"), e.lineNo());
         wxMessageBox(str, _("App name"), wxOK | wxICON_ERROR);
     }
-    m_grid->setCatFileRW(cat);
-}
-
-void MainFrame::loadDailyFile()
-{
-    DailyFileRW *file;
-    try {
-        file = m_file->getDailyFile(m_year, m_month);
-    } catch (DataFileError &e) {
-        showDataFileError(e);
-    }
     file->afterLoad();
-    m_grid->setDataFileRW(file);
+    // The number of cols and rows are only updated in SetTable, so make new table each time.
+    m_daily = new DailyTable(file, cat);
+    m_grid->SetTable(m_daily, true);
+    // Row labels are not updated even by SetTable, so do this.
+    m_grid->ForceRefresh();
+    m_grid->setGrid();
 }
 
 void MainFrame::loadCashFile()
@@ -375,30 +357,29 @@ void MainFrame::loadCashFile()
         showDataFileError(e);
     }
     file->afterLoad();
-    m_cashGrid->setDataFileRW(file);
-}
-
-void MainFrame::catQuerySave()
-{
-    if (m_grid->catModified()) {
-        copyFile();
-        m_grid->catFileRW()->save();
-    }
+    m_cash = new DataTable(file);
+    m_cashGrid->SetTable(m_cash, true);
+    m_cashGrid->ForceRefresh();
+    m_cashGrid->setGrid();
 }
 
 void MainFrame::dailyQuerySave()
 {
-    if (m_grid->dataModified()) {
+    if (m_daily->catModified()) {
         copyFile();
-        m_grid->dataFileRW()->save();
+        m_daily->saveCat();
+    }
+    if (m_daily->dataModified()) {
+        copyFile();
+        m_daily->save();
     }
 }
 
 void MainFrame::cashQuerySave()
 {
-    if (m_cashGrid->dataModified()) {
+    if (m_cash->dataModified()) {
         copyFile();
-        m_cashGrid->dataFileRW()->save();
+        m_cash->save();
     }
 }
 
@@ -408,8 +389,8 @@ void MainFrame::copyFile()
         HaFile *haFile = m_file->newCopy(m_dir);
         delete m_file;
         m_file = haFile;
-        m_grid->setHaFile(m_file);
-        m_cashGrid->setHaFile(m_file);
+        m_daily->setHaFile(m_file);
+        m_cash->setHaFile(m_file);
     }
 }
 
