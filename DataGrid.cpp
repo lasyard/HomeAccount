@@ -6,6 +6,21 @@ BEGIN_EVENT_TABLE(DataGrid, wxGrid)
 EVT_KEY_DOWN(DataGrid::onKeyDown)
 END_EVENT_TABLE()
 
+void DataGrid::setGrid()
+{
+    BeginBatch();
+    SetColMinimalAcceptableWidth(80);
+    SetRowMinimalAcceptableHeight(18);
+    SetRowLabelSize(wxGRID_AUTOSIZE);
+    SetColLabelSize(wxGRID_AUTOSIZE);
+    if (GetRowLabelSize() < m_logo.GetWidth() + 2) SetRowLabelSize(m_logo.GetWidth() + 2);
+    if (GetColLabelSize() < m_logo.GetHeight() + 2) SetColLabelSize(m_logo.GetHeight() + 2);
+    AutoSizeColumns(false);
+    AutoSizeRows(false);
+    DisableDragColMove();
+    EndBatch();
+}
+
 void DataGrid::onKeyDown(wxKeyEvent &event)
 {
     if (event.GetKeyCode() == WXK_RETURN || event.GetKeyCode() == WXK_NUMPAD_ENTER) {
@@ -69,4 +84,9 @@ void DataGrid::onKeyDown(wxKeyEvent &event)
     } else {
         wxGrid::OnKeyDown(event);
     }
+}
+
+void DataGrid::DrawCornerLabel(wxDC &dc)
+{
+    dc.DrawBitmap(m_logo, 1, 1);
 }

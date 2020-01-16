@@ -51,6 +51,7 @@ void delete_item(struct item *it);
 
 BOOL is_dummy_item(const struct item *it);
 BOOL is_single_item(const struct item *it);
+BOOL is_last_item(const struct item *it);
 
 void clear_page(struct page *pg);
 struct page *add_page(struct data *dt, struct string *title);

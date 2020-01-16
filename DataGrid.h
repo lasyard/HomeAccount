@@ -1,6 +1,8 @@
 #ifndef _DATA_GRID_H_
 #define _DATA_GRID_H_
 
+#include <wx/artprov.h>
+#include <wx/bitmap.h>
 #include <wx/grid.h>
 
 #include "c/utils.h"
@@ -12,22 +14,14 @@ class DataGrid : public wxGrid
 public:
     DataGrid()
     {
+        m_logo = wxArtProvider::GetBitmap("logo");
     }
 
     virtual ~DataGrid()
     {
     }
 
-    void setGrid()
-    {
-        SetColMinimalAcceptableWidth(80);
-        SetRowMinimalAcceptableHeight(18);
-        SetRowLabelSize(wxGRID_AUTOSIZE);
-        SetColLabelSize(wxGRID_AUTOSIZE);
-        AutoSizeColumns(false);
-        AutoSizeRows(false);
-        DisableDragColMove();
-    }
+    void setGrid();
 
     void scrollToDay(int day)
     {
@@ -46,8 +40,22 @@ public:
     }
 
     virtual void onKeyDown(wxKeyEvent &event);
+    virtual void DrawCornerLabel(wxDC &dc);
+
+    virtual wxPen GetRowGridLinePen(int row)
+    {
+        if (GetRowLabelValue(row + 1) != "") return *wxLIGHT_GREY_PEN;
+        return *wxWHITE_PEN;
+    }
+
+    virtual wxPen GetColGridLinePen(int col)
+    {
+        return *wxLIGHT_GREY_PEN;
+    }
 
 protected:
+    wxBitmap m_logo;
+
     void safeClearCell(int row, int col)
     {
         if (!IsReadOnly(row, col)) SetCellValue(row, col, "");

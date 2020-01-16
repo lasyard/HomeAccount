@@ -160,6 +160,11 @@ BOOL is_single_item(const struct item *it)
     return ulist_is_single(&it->owner->items, &it->ulist);
 }
 
+BOOL is_last_item(const struct item *it)
+{
+    return ulist_is_last(&it->owner->items, &it->ulist);
+}
+
 static void __init_page(struct page *pg)
 {
     ulist_item_init(&pg->ulist);
