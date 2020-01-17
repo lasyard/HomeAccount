@@ -52,9 +52,9 @@ void StatHtml::showIO(DataFileRW *data, const wxString &title)
     m_src += "<th>" + _("Outlay") + "</th>\n";
     m_src += "<th>" + _("Net Income") + "</th>\n";
     m_src += "</tr>\n";
-    long totalI = 0, totalO = 0;
+    money_t totalI = 0, totalO = 0;
     for (DataFileRW::pageIterator i = data->pageBegin(); i != data->pageEnd(); ++i) {
-        long income, outlay;
+        money_t income, outlay;
         cal_page_income_outlay(&(*i), &income, &outlay);
         showIOLine(i->title.str, income, outlay);
         totalI += income;
@@ -66,7 +66,7 @@ void StatHtml::showIO(DataFileRW *data, const wxString &title)
     SetPage(m_src);
 }
 
-void StatHtml::firstLevelRow(const wxString &label, long money, const wxString &centLabel, const wxString &cent)
+void StatHtml::firstLevelRow(const wxString &label, money_t money, const wxString &centLabel, const wxString &cent)
 {
     m_src += "<tr>\n";
     m_src += "<td width=\"25%\" align=\"center\">" + label + "</td>\n";
@@ -77,7 +77,7 @@ void StatHtml::firstLevelRow(const wxString &label, long money, const wxString &
 }
 
 void StatHtml::secondLevelRow(
-    const wxString &label, long money, const wxString &centLabel, const wxString &cent, bool isBu)
+    const wxString &label, money_t money, const wxString &centLabel, const wxString &cent, bool isBu)
 {
     char buf[MONEY_LEN];
     m_src += "<tr><td width=\"25%\">";
@@ -92,7 +92,7 @@ void StatHtml::secondLevelRow(
     m_src += "</td></tr>\n";
 }
 
-void StatHtml::totalTableHtml(struct mtree_node *root, long no_cat_sum)
+void StatHtml::totalTableHtml(struct mtree_node *root, money_t no_cat_sum)
 {
     struct cat_node *cat = get_cat_node(root);
     m_src += "<table border=\"1\" cellspacing=\"0\" width=\"100%\">\n";
@@ -142,7 +142,7 @@ void StatHtml::secondCatStatHtml(struct mtree_node *root)
     }
 }
 
-void StatHtml::showIOLine(const wxString &label, long income, long outlay)
+void StatHtml::showIOLine(const wxString &label, money_t income, money_t outlay)
 {
     char buf[MONEY_LEN];
     m_src += "<tr>\n";

@@ -82,7 +82,7 @@ void HaFile::calTotal(struct cat_root *cat, int sYear, int sMonth, int eYear, in
     }
 }
 
-long HaFile::calBalanceBefore(int year, int month)
+money_t HaFile::calBalanceBefore(int year, int month)
 {
     if (month == 1) {
         return SubAnnuallyFile(this)()->calBalanceToYear(year - 1);
@@ -93,17 +93,17 @@ long HaFile::calBalanceBefore(int year, int month)
     }
 }
 
-long HaFile::calFinalBalance()
+money_t HaFile::calFinalBalance()
 {
     return SubAnnuallyFile(this)()->calFinalBalance();
 }
 
-void HaFile::setInitial(long money)
+void HaFile::setInitial(money_t money)
 {
     SubAnnuallyFile(this, true)()->setInitial(money);
 }
 
-long HaFile::getInitial()
+money_t HaFile::getInitial()
 {
     return SubAnnuallyFile(this)()->getInitial();
 }
@@ -128,12 +128,12 @@ int HaFile::maxMonth(int year)
     return SubMonthlyFile(this, year)()->maxMonth();
 }
 
-void HaFile::updateMonthly(int year, int month, int income, int outlay)
+void HaFile::updateMonthly(int year, int month, money_t income, money_t outlay)
 {
     SubMonthlyFile(this, year, true)()->setIncomeOutlay(month, income, outlay);
 }
 
-void HaFile::updateAnnually(int year, int income, int outlay)
+void HaFile::updateAnnually(int year, money_t income, money_t outlay)
 {
     SubAnnuallyFile(this, true)()->setIncomeOutlay(year, income, outlay);
 }

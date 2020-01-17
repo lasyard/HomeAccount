@@ -1,4 +1,5 @@
 #include "DataGrid.h"
+#include "DataTable.h"
 
 wxIMPLEMENT_DYNAMIC_CLASS(DataGrid, wxGrid);
 
@@ -24,6 +25,7 @@ void DataGrid::setGrid()
 void DataGrid::onKeyDown(wxKeyEvent &event)
 {
     if (event.GetKeyCode() == WXK_RETURN || event.GetKeyCode() == WXK_NUMPAD_ENTER) {
+        BeginBatch();
         int row = GetGridCursorRow();
         InsertRows(row);
         if (event.RawControlDown()) {
@@ -36,9 +38,11 @@ void DataGrid::onKeyDown(wxKeyEvent &event)
                 }
             }
         } else {
-            SetGridCursor(row + 1, GetGridCursorCol());
+            SetGridCursor(row + 1, static_cast<DataTable *>(GetTable())->getOutlayColumn());
         }
+        EndBatch();
     } else if (event.GetKeyCode() == WXK_DELETE) {
+        BeginBatch();
         if (IsSelection()) {
             wxGridCellCoordsArray cells = GetSelectedCells();
             for (size_t i = 0; i < cells.Count(); ++i) {
@@ -81,9 +85,9 @@ void DataGrid::onKeyDown(wxKeyEvent &event)
         } else {
             safeClearCell(GetGridCursorRow(), GetGridCursorCol());
         }
-    } else {
-        wxGrid::OnKeyDown(event);
+        EndBatch();
     }
+    wxGrid::OnKeyDown(event);
 }
 
 void DataGrid::DrawCornerLabel(wxDC &dc)

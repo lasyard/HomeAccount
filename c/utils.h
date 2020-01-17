@@ -19,13 +19,13 @@ extern "C" {
 #endif
 
 int str_to_int(const char *str, size_t len);
-size_t int_to_str_len(char *buf, int num, size_t len);
-size_t int_to_str(char *buf, int num);
+size_t int_to_str_len(char *buf, long long num, size_t len);
+size_t int_to_str(char *buf, long long num);
 
-size_t money_to_str(char *buf, long x);
-long str_to_money(const char *buf);
+size_t money_to_str(char *buf, money_t x);
+money_t str_to_money(const char *buf);
 
-size_t parse_str_to_money(const char *buf, long *money);
+size_t parse_str_to_money(const char *buf, money_t *money);
 
 int last_day_of_month(int year, int month);
 

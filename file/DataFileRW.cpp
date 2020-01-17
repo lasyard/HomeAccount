@@ -13,7 +13,7 @@ void DataFileRW::parseLine(const char *line)
         return;
     }
     int len;
-    long money = 0;
+    money_t money = 0;
     if ((len = parse_str_to_money(p, &money)) <= 0) {
         throw DataFileError();
     }

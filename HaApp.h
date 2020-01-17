@@ -17,6 +17,7 @@ protected:
     // This must be long lived.
     wxLocale m_locale;
     wxString m_resDir;
+    wxString m_dataDir;
     void (HaApp::*m_loadXmlResource)();
 
     void loadXrcsInRes();

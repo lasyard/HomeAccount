@@ -4,6 +4,7 @@
 #include <stddef.h>
 
 typedef int BOOL;
+typedef long long money_t;
 
 #ifndef TRUE
 #define TRUE ((BOOL)1);

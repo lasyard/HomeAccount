@@ -26,7 +26,7 @@ public:
 
     virtual void afterSave() const
     {
-        long i, o;
+        money_t i, o;
         cal_data_income_outlay(m_dt, &i, &o);
         m_file->updateMonthly(m_year, m_month, i, o);
     }
@@ -47,10 +47,6 @@ protected:
     int m_year;
     int m_month;
     mutable char m_title[DATE_LEN + 1];
-
-    virtual void writeInitial(std::ostream &os, long initial) const
-    {
-    }
 
     const char *makeTitle(int day) const
     {

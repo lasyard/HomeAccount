@@ -162,12 +162,12 @@ public:
         return m_dt->items_num;
     }
 
-    void setInitial(long value)
+    void setInitial(money_t value)
     {
         m_dt->initial = value;
     }
 
-    long getInitial() const
+    money_t getInitial() const
     {
         return m_dt->initial;
     }
@@ -187,11 +187,8 @@ protected:
 
     virtual void parseLine(const char *line);
 
-    virtual void writeInitial(std::ostream &os, long initial) const
+    virtual void writeInitial(std::ostream &os, money_t initial) const
     {
-        char buf[MONEY_LEN];
-        money_to_str(buf, -initial);
-        os << buf << std::endl;
     }
 
 private:

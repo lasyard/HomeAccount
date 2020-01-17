@@ -44,9 +44,6 @@ void DailyTable::SetValue(int row, int col, const wxString &value)
         } else {
             changeCat(it, value);
             updateCat();
-            if (GetView() != nullptr) {
-                GetView()->ForceRefresh();
-            }
         }
     } else if (doSetValue(row, col, value) || col == m_descColumn) {
         update_item_cat(it, m_cat->getCatRoot());

@@ -38,16 +38,16 @@ public:
     HaFile *newCopy(const wxString &dirName);
     void save(FileRW *file);
     void calTotal(struct cat_root *cat, int sYear, int sMonth, int eYear, int eMonth);
-    long calBalanceBefore(int year, int month);
-    long calFinalBalance();
-    void setInitial(long money);
-    long getInitial();
+    money_t calBalanceBefore(int year, int month);
+    money_t calFinalBalance();
+    void setInitial(money_t money);
+    money_t getInitial();
     int minYear();
     int maxYear();
     int minMonth(int year);
     int maxMonth(int year);
-    void updateMonthly(int year, int month, int income, int outlay);
-    void updateAnnually(int year, int income, int outlay);
+    void updateMonthly(int year, int month, money_t income, money_t outlay);
+    void updateAnnually(int year, money_t income, money_t outlay);
 
     CatFileRW *getCatFile();
     CashFileRW *getCashFile();

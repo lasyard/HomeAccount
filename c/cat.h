@@ -15,14 +15,14 @@ struct cat_node {
     struct string name;
     int level;
     struct rbtree_root words;
-    long total;
-    long sub_total;
+    money_t total;
+    money_t sub_total;
 };
 
 struct cat_root {
     struct mtree_node root;
-    long no_cat_in_sum;
-    long no_cat_out_sum;
+    money_t no_cat_in_sum;
+    money_t no_cat_out_sum;
 };
 
 #define get_word(ptr) rbtree_entry(ptr, struct word, rbtree)

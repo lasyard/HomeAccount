@@ -14,7 +14,7 @@ int str_to_int(const char *str, size_t len)
     return num;
 }
 
-size_t int_to_str_len(char *buf, int num, size_t len)
+size_t int_to_str_len(char *buf, long long num, size_t len)
 {
     char *p;
     for (p = buf + len - 1; p >= buf; p--) {
@@ -24,16 +24,16 @@ size_t int_to_str_len(char *buf, int num, size_t len)
     return len;
 }
 
-size_t int_to_str(char *buf, int num)
+size_t int_to_str(char *buf, long long num)
 {
     int len = 1;
-    for (int power = 1; power <= num / 10; power *= 10) {
+    for (long long power = 1; power <= num / 10; power *= 10) {
         len++;
     }
     return int_to_str_len(buf, num, len);
 }
 
-size_t money_to_str(char *buf, long x)
+size_t money_to_str(char *buf, money_t x)
 {
     char *p = buf;
     if (x < 0) {
@@ -48,31 +48,32 @@ size_t money_to_str(char *buf, long x)
     return p - buf;
 }
 
-long str_to_money(const char *buf)
+money_t str_to_money(const char *buf)
 {
-    long money;
+    money_t money = 0;
     parse_str_to_money(buf, &money);
     return money;
 }
 
-size_t parse_str_to_money(const char *buf, long *money)
+size_t parse_str_to_money(const char *buf, money_t *money)
 {
-    int neg = 0;
+    BOOL neg = FALSE;
     int decimal = 0;
-    int money_parsed = 0;
+    BOOL money_parsed = FALSE;
     int m = 0;
     const char *p;
     for (p = buf; is_space(*p) && !is_line_end(*p); p++)
         ;
+    if (is_line_end(*p)) return 0;
     if (*p == '-') {
-        neg = 1;
+        neg = TRUE;
         p++;
     } else if (*p == '+') {
         p++;
     }
     for (; is_digit(*p); p++) {
         m = m * 10 + (long)(*p & 0x0F);
-        money_parsed = 1;
+        money_parsed = TRUE;
     }
     m *= MUL_NUM;
     if (*p == '.') {
@@ -85,7 +86,7 @@ size_t parse_str_to_money(const char *buf, long *money)
             for (i = decimal; i < PRECISION; i++) tmp *= 10;
             m += tmp;
             decimal++;
-            money_parsed = 1;
+            money_parsed = TRUE;
         }
     }
     if (!money_parsed) return 0;

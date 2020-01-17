@@ -29,14 +29,14 @@ public:
         return str_to_int(title.str, YEAR_LEN);
     }
 
-    long calBalanceToYear(int year) const;
+    money_t calBalanceToYear(int year) const;
 
-    long calFinalBalance() const
+    money_t calFinalBalance() const
     {
         return cal_data_balance(m_dt, m_dt->initial);
     }
 
-    void setIncomeOutlay(int year, int income, int outlay)
+    void setIncomeOutlay(int year, money_t income, money_t outlay)
     {
         struct page *pg = getPage(year);
         clear_page(pg);
@@ -51,6 +51,13 @@ protected:
     {
         int_to_str_len(m_title, year, YEAR_LEN);
         return m_title;
+    }
+
+    virtual void writeInitial(std::ostream &os, money_t initial) const
+    {
+        char buf[MONEY_LEN];
+        money_to_str(buf, -initial);
+        os << buf << std::endl;
     }
 
     struct page *getPage(int year);

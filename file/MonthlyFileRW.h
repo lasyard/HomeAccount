@@ -20,7 +20,7 @@ public:
 
     virtual void afterSave() const
     {
-        long i, o;
+        money_t i, o;
         cal_data_income_outlay(m_dt, &i, &o);
         m_file->updateAnnually(m_year, i, o);
     }
@@ -44,9 +44,9 @@ public:
         return str_to_int(title.str + YEAR_LEN + 1, MONTH_LEN);
     }
 
-    long calBalanceToMonth(int month) const;
+    money_t calBalanceToMonth(int month) const;
 
-    void setIncomeOutlay(int month, int income, int outlay)
+    void setIncomeOutlay(int month, money_t income, money_t outlay)
     {
         struct page *pg = getPage(month);
         clear_page(pg);
@@ -57,10 +57,6 @@ public:
 protected:
     int m_year;
     mutable char m_title[YEAR_LEN + 1 + MONTH_LEN + 1];
-
-    virtual void writeInitial(std::ostream &os, long initial) const
-    {
-    }
 
     const char *makeTitle(int month) const
     {

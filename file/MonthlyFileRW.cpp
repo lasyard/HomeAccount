@@ -1,8 +1,8 @@
 #include "MonthlyFileRW.h"
 
-long MonthlyFileRW::calBalanceToMonth(int month) const
+money_t MonthlyFileRW::calBalanceToMonth(int month) const
 {
-    int balance = m_dt->initial;
+    money_t balance = m_dt->initial;
     struct ulist_item *p;
     for (p = m_dt->pages.first; p != NULL; p = p->next) {
         struct page *o_pg = get_page(p);

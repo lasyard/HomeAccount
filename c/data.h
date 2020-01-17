@@ -8,7 +8,7 @@ struct data {
     struct ulist_head pages;
     int pages_num;
     int items_num;
-    long initial;
+    money_t initial;
 };
 
 struct page {
@@ -22,7 +22,7 @@ struct page {
 struct item {
     struct ulist_item ulist;
     struct page *owner;
-    long money;
+    money_t money;
     struct string desc;
     struct string comment;
     struct cat_node *cat;
@@ -36,14 +36,14 @@ extern "C" {
 #endif
 
 struct item *add_dummy_item(struct page *pg);
-struct item *add_item(struct page *pg, long money, struct string *desc, struct string *comment);
-struct item *add_simple_item(struct page *pg, long money);
+struct item *add_item(struct page *pg, money_t money, struct string *desc, struct string *comment);
+struct item *add_simple_item(struct page *pg, money_t money);
 
 struct item *insert_dummy_item(struct item *pos);
 struct item *insert_dummy_item_head(struct page *pg);
 
-struct item *item_set(struct item *it, long money, struct string *desc, struct string *comment);
-struct item *item_set_money(struct item *it, long money);
+struct item *item_set(struct item *it, money_t money, struct string *desc, struct string *comment);
+struct item *item_set_money(struct item *it, money_t money);
 struct item *item_set_desc(struct item *it, struct string *desc);
 struct item *item_set_comment(struct item *it, struct string *comment);
 void clear_item(struct item *it);
@@ -65,12 +65,12 @@ BOOL is_empty_data(const struct data *dt);
 
 struct data *add_dummy_item_to_empty_page(struct data *dt);
 
-long cal_item_balance(const struct item *it, long initial);
-long cal_page_balance(const struct page *pg, long initial);
-long cal_data_balance(const struct data *dt, long initial);
+money_t cal_item_balance(const struct item *it, money_t initial);
+money_t cal_page_balance(const struct page *pg, money_t initial);
+money_t cal_data_balance(const struct data *dt, money_t initial);
 
-void cal_page_income_outlay(const struct page *pg, long *income, long *outlay);
-void cal_data_income_outlay(const struct data *dt, long *income, long *outlay);
+void cal_page_income_outlay(const struct page *pg, money_t *income, money_t *outlay);
+void cal_data_income_outlay(const struct data *dt, money_t *income, money_t *outlay);
 
 #ifdef __cplusplus
 }

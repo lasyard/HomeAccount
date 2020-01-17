@@ -22,7 +22,7 @@ void DataTable::updateBalanceAndTotal()
 {
     m_income = 0;
     m_outlay = 0;
-    long balance = m_initial;
+    money_t balance = m_initial;
     for (int i = 0; i < m_rows.size(); ++i) {
         struct item *p = m_rows[i];
         balance = cal_item_balance(p, balance);
@@ -89,7 +89,7 @@ bool DataTable::doSetValue(int row, int col, const wxString &value)
 {
     wxASSERT(row >= 1 && row <= m_rows.size());
     struct item *it = m_rows[row - 1];
-    long money = 0;
+    money_t money = 0;
     bool showMsg = false;
     bool setMoney = false;
     if (col == m_incomeColumn) {
@@ -109,7 +109,7 @@ bool DataTable::doSetValue(int row, int col, const wxString &value)
         updateBalanceAndTotal();
         m_data->setModified();
         if (GetView() != nullptr) {
-            GetView()->ForceRefresh();
+            GetView()->AutoSizeColumn(m_balanceColumn);
         }
         return showMsg;
     }

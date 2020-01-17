@@ -6,6 +6,8 @@
 
 #include <wx/html/htmlwin.h>
 
+#include "c/core_defs.h"
+
 class DataFileRW;
 
 class StatHtml : public wxHtmlWindow
@@ -33,27 +35,27 @@ public:
 private:
     wxString m_src;
 
-    void firstLevelRow(const wxString &label, long money, const wxString &centLabel = "", const wxString &cent = "");
+    void firstLevelRow(const wxString &label, money_t money, const wxString &centLabel = "", const wxString &cent = "");
     void secondLevelRow(const wxString &label,
-                        long money,
+                        money_t money,
                         const wxString &centLabel = "",
                         const wxString &cent = "",
                         bool isBu = false);
-    void totalTableHtml(struct mtree_node *root, long no_cat_sum);
+    void totalTableHtml(struct mtree_node *root, money_t no_cat_sum);
     void firstCatStatHtml(struct mtree_node *root);
     void secondCatStatHtml(struct mtree_node *root);
 
     void htmlHeader(const wxString &title);
     void htmlFooter();
 
-    wxString calCent(long sub, long total)
+    wxString calCent(money_t sub, money_t total)
     {
         wxString tmp;
         tmp.Printf("%.2f%%", (total <= 0) ? 0.0 : (float)sub / (float)total * 100.0);
         return tmp;
     }
 
-    void showIOLine(const wxString &label, long income, long outlay);
+    void showIOLine(const wxString &label, money_t income, money_t outlay);
 
     void h2(const wxString &text)
     {

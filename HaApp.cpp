@@ -28,11 +28,9 @@ bool HaApp::OnInit()
     SetTopWindow(frame);
     frame->Show();
 #ifdef DEBUG
-    wxString dir = "HA";
-#else
-    wxString dir = wxStandardPaths::Get().GetDocumentsDir() + "/HA";
+    m_dataDir = "HA";
 #endif
-    frame->initView(dir);
+    frame->initView(m_dataDir);
     return true;
 }
 
@@ -51,9 +49,11 @@ bool HaApp::OnCmdLineParsed(wxCmdLineParser& parser)
 {
     if (!wxApp::OnCmdLineParsed(parser)) return false;
     if (parser.Found(RESOURCE_IN_RES)) {
+        m_dataDir = "HA";
         m_resDir = "res";
         m_loadXmlResource = &HaApp::loadXrcsInRes;
     } else {
+        m_dataDir = wxStandardPaths::Get().GetDocumentsDir() + "/HA";
         m_resDir = wxStandardPaths::Get().GetResourcesDir();
         m_loadXmlResource = &HaApp::loadXrsInResouceDir;
     }

@@ -68,7 +68,7 @@ struct item *add_dummy_item(struct page *pg)
     return p;
 }
 
-struct item *add_item(struct page *pg, long money, struct string *desc, struct string *comment)
+struct item *add_item(struct page *pg, money_t money, struct string *desc, struct string *comment)
 {
     struct item *p;
     if ((p = add_dummy_item(pg)) == NULL) return NULL;
@@ -79,7 +79,7 @@ struct item *add_item(struct page *pg, long money, struct string *desc, struct s
     return p;
 }
 
-struct item *add_simple_item(struct page *pg, long money)
+struct item *add_simple_item(struct page *pg, money_t money)
 {
     struct item *p;
     if ((p = add_dummy_item(pg)) == NULL) return NULL;
@@ -103,14 +103,14 @@ struct item *insert_dummy_item_head(struct page *pg)
     return p;
 }
 
-struct item *item_set(struct item *it, long money, struct string *desc, struct string *comment)
+struct item *item_set(struct item *it, money_t money, struct string *desc, struct string *comment)
 {
     if (item_set_desc(it, desc) == NULL) return NULL;
     if (item_set_comment(it, comment) == NULL) return NULL;
     return item_set_money(it, money);
 }
 
-struct item *item_set_money(struct item *it, long money)
+struct item *item_set_money(struct item *it, money_t money)
 {
     it->money = money;
     return it;
@@ -313,14 +313,14 @@ struct data *add_dummy_item_to_empty_page(struct data *dt)
     return dt;
 }
 
-long cal_item_balance(const struct item *it, long initial)
+money_t cal_item_balance(const struct item *it, money_t initial)
 {
     return initial - it->money;
 }
 
-long cal_page_balance(const struct page *pg, long initial)
+money_t cal_page_balance(const struct page *pg, money_t initial)
 {
-    int balance = initial;
+    money_t balance = initial;
     struct ulist_item *p;
     for (p = pg->items.first; p != NULL; p = p->next) {
         balance = cal_item_balance(get_item(p), balance);
@@ -328,9 +328,9 @@ long cal_page_balance(const struct page *pg, long initial)
     return balance;
 }
 
-long cal_data_balance(const struct data *dt, long initial)
+money_t cal_data_balance(const struct data *dt, money_t initial)
 {
-    int balance = initial;
+    money_t balance = initial;
     struct ulist_item *p;
     for (p = dt->pages.first; p != NULL; p = p->next) {
         balance = cal_page_balance(get_page(p), balance);
@@ -338,10 +338,10 @@ long cal_data_balance(const struct data *dt, long initial)
     return balance;
 }
 
-void cal_page_income_outlay(const struct page *pg, long *income, long *outlay)
+void cal_page_income_outlay(const struct page *pg, money_t *income, money_t *outlay)
 {
     struct ulist_item *p;
-    long i = 0, o = 0;
+    money_t i = 0, o = 0;
     for (p = pg->items.first; p != NULL; p = p->next) {
         struct item *it = get_item(p);
         if (it->money < 0) {
@@ -354,10 +354,10 @@ void cal_page_income_outlay(const struct page *pg, long *income, long *outlay)
     *outlay = o;
 }
 
-void cal_data_income_outlay(const struct data *dt, long *income, long *outlay)
+void cal_data_income_outlay(const struct data *dt, money_t *income, money_t *outlay)
 {
     struct ulist_item *p;
-    long i = 0, o = 0;
+    money_t i = 0, o = 0;
     for (p = dt->pages.first; p != NULL; p = p->next) {
         long ii, oo;
         cal_page_income_outlay(get_page(p), &ii, &oo);

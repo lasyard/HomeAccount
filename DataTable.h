@@ -82,6 +82,11 @@ public:
     {
     }
 
+    int getOutlayColumn() const
+    {
+        return m_outlayColumn;
+    }
+
 protected:
     wxArrayString m_columnLabels;
     int m_incomeColumn;
@@ -99,10 +104,10 @@ protected:
     DataFileRW *m_data;
 
     std::vector<struct item *> m_rows;
-    std::vector<long> m_balance;
-    long m_initial;
-    long m_income;
-    long m_outlay;
+    std::vector<money_t> m_balance;
+    money_t m_initial;
+    money_t m_income;
+    money_t m_outlay;
 
     void safeDeleteData()
     {
