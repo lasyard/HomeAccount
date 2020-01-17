@@ -60,7 +60,7 @@ size_t parse_str_to_money(const char *buf, money_t *money)
     BOOL neg = FALSE;
     int decimal = 0;
     BOOL money_parsed = FALSE;
-    int m = 0;
+    money_t m = 0;
     const char *p;
     for (p = buf; is_space(*p) && !is_line_end(*p); p++)
         ;
@@ -72,7 +72,7 @@ size_t parse_str_to_money(const char *buf, money_t *money)
         p++;
     }
     for (; is_digit(*p); p++) {
-        m = m * 10 + (long)(*p & 0x0F);
+        m = m * 10 + (money_t)(*p & 0x0F);
         money_parsed = TRUE;
     }
     m *= MUL_NUM;
@@ -80,9 +80,9 @@ size_t parse_str_to_money(const char *buf, money_t *money)
         decimal = 1;
         for (p++; is_digit(*p); p++) {
             int i;
-            long tmp;
+            money_t tmp;
             if (decimal > PRECISION) return -1;
-            tmp = (long)(*p & 0x0F);
+            tmp = (money_t)(*p & 0x0F);
             for (i = decimal; i < PRECISION; i++) tmp *= 10;
             m += tmp;
             decimal++;

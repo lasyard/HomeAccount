@@ -37,9 +37,8 @@ void DataGrid::onKeyDown(wxKeyEvent &event)
                     }
                 }
             }
-        } else {
-            SetGridCursor(row + 1, static_cast<DataTable *>(GetTable())->getOutlayColumn());
         }
+        SetGridCursor(row, static_cast<DataTable *>(GetTable())->getOutlayColumn());
         EndBatch();
     } else if (event.GetKeyCode() == WXK_DELETE) {
         BeginBatch();

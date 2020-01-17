@@ -9,7 +9,7 @@
 #define DATE_LEN (YEAR_LEN + 1 + MONTH_LEN + 1 + DAY_LEN)
 #define PATH_LEN (YEAR_LEN + 1 + MONTH_LEN + 4)
 
-#define MONEY_LEN (12 + 1)
+#define MONEY_LEN (21 + 1)
 
 #define PRECISION 2
 #define MUL_NUM 100

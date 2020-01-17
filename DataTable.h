@@ -129,7 +129,7 @@ protected:
         m_moneyRoAttr->SetReadOnly();
         m_moneyRedRoAttr = m_moneyRoAttr->Clone();
         m_moneyRedRoAttr->SetTextColour(wxColor(0x000000CC));
-        m_floatEditor = new wxGridCellFloatEditor(12, 2);
+        m_floatEditor = new wxGridCellFloatEditor(7, 2);
         // SetEditor will take the editor ownership, so inc the ref to keep it.
         m_floatEditor->IncRef();
         m_moneyAttr->SetEditor(m_floatEditor);
