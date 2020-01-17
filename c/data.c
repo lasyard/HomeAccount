@@ -359,7 +359,7 @@ void cal_data_income_outlay(const struct data *dt, money_t *income, money_t *out
     struct ulist_item *p;
     money_t i = 0, o = 0;
     for (p = dt->pages.first; p != NULL; p = p->next) {
-        long ii, oo;
+        money_t ii, oo;
         cal_page_income_outlay(get_page(p), &ii, &oo);
         i += ii;
         o += oo;
