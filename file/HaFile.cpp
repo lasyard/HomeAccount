@@ -15,9 +15,9 @@
 
 const char *const HaFile::IV = "Home Account IV";
 
-const char *const HaFile::CatFileName = "cat";
-const char *const HaFile::CashFileName = "cash";
-const char *const HaFile::AnnuallyFileName = "annually";
+const char *const HaFile::CAT_FILE_NAME = "cat";
+const char *const HaFile::CASH_FILE_NAME = "cash";
+const char *const HaFile::ANNUALLY_FILE_NAME = "annually";
 
 const char *const HaFile::EXT = "ha";
 
@@ -67,6 +67,21 @@ void HaFile::save(FileRW *file)
     file->afterSave();
     saveCatalog();
     flush();
+}
+
+FileRW *HaFile::import(const std::string &path)
+{
+    std::ifstream ifs(path);
+    char line[FileRW::LINE_LEN];
+    ifs.getline(line, FileRW::LINE_LEN);
+    FileRW *file;
+    if ((file = new CatFileRW())->import(line, ifs) || (file = new CashFileRW())->import(line, ifs) ||
+        (file = new DailyFileRW())->import(line, ifs)) {
+        file->setHaFile(this);
+        file->save();
+        return file;
+    }
+    return nullptr;
 }
 
 void HaFile::calTotal(struct cat_root *cat, int sYear, int sMonth, int eYear, int eMonth)
@@ -154,17 +169,17 @@ void HaFile::rawSave(const FileRW *file)
 
 CatFileRW *HaFile::getCatFile()
 {
-    return getFile<CatFileRW>(CatFileName);
+    return getFile<CatFileRW>(CAT_FILE_NAME);
 }
 
 CashFileRW *HaFile::getCashFile()
 {
-    return getFile<CashFileRW>(CashFileName);
+    return getFile<CashFileRW>(CASH_FILE_NAME);
 }
 
 AnnuallyFileRW *HaFile::getAnnuallyFile()
 {
-    return getFile<AnnuallyFileRW>(AnnuallyFileName);
+    return getFile<AnnuallyFileRW>(ANNUALLY_FILE_NAME);
 }
 
 MonthlyFileRW *HaFile::getMonthlyFile(int year)

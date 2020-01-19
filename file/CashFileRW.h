@@ -6,6 +6,10 @@
 class CashFileRW : public DataFileRW
 {
 public:
+    CashFileRW() : CashFileRW(HaFile::CASH_FILE_NAME)
+    {
+    }
+
     CashFileRW(const char *fileName, HaFile *file = nullptr) : DataFileRW(fileName, file)
     {
     }
@@ -20,8 +24,13 @@ public:
     {
     }
 
+    virtual const HaFile::FileType type()
+    {
+        return HaFile::CASH;
+    }
+
 protected:
-    virtual wxString header() const
+    virtual const char *header() const
     {
         return "HACS";
     }

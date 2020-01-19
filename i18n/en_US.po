@@ -56,15 +56,6 @@ msgstr "Categories config"
 msgid "Choose one to export"
 msgstr "Choose one to export"
 
-msgid "Monthly datum"
-msgstr "Monthly datum"
-
-msgid "Cash datum"
-msgstr "Cash datum"
-
-msgid "Choose one to import into"
-msgstr "Choose one to import into"
-
 msgid "File is empty"
 msgstr "File is empty"
 

@@ -8,14 +8,16 @@
 class InternalError : public std::exception
 {
 public:
-    static InternalError *create(const char *format, ...)
+    InternalError(const char *format, ...)
     {
-        InternalError *m = new InternalError();
         va_list args;
         va_start(args, format);
-        vsprintf(m->m_msg, format, args);
+        vsprintf(m_msg, format, args);
         va_end(args);
-        return m;
+    }
+
+    ~InternalError()
+    {
     }
 
     virtual const char *what() const _NOEXCEPT
@@ -25,14 +27,6 @@ public:
 
 protected:
     char m_msg[1024];
-
-    InternalError()
-    {
-    }
-
-    ~InternalError()
-    {
-    }
 };
 
 #endif

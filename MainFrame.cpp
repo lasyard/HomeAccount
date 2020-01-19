@@ -210,49 +210,47 @@ void MainFrame::onImportButton(wxCommandEvent &event)
     wxFileDialog *fileDlg = new wxFileDialog(
         this, wxFileSelectorPromptStr, wxEmptyString, wxEmptyString, wxFileSelectorDefaultWildcardStr, wxFD_OPEN);
     if (fileDlg->ShowModal() == wxID_OK) {
+        dailyQuerySave();
+        cashQuerySave();
         std::string path = fileDlg->GetPath().ToStdString();
-        wxArrayString choices;
-        choices.Add(_("Monthly datum"));
-        choices.Add(_("Cash datum"));
-        choices.Add(_("Categories config"));
-        wxSingleChoiceDialog *dlg =
-            new wxSingleChoiceDialog(this, _("Choose one to import into"), _("App name"), choices);
-        if (dlg->ShowModal() == wxID_OK) {
-            int index = dlg->GetSelection();
-            if (index == 0) {
-                DailyFileRW file;
-                try {
-                    file.import(path);
-                    file.setDateFromData();
-                } catch (DataFileError &e) {
-                    showDataFileError(e);
-                    return;
-                } catch (DailyFileEmpty &e) {
-                    wxMessageBox(_("File is empty"), _("App name"), wxOK | wxICON_ERROR);
-                    return;
-                } catch (DailyDateError &e) {
-                    wxString str;
-                    str.Printf(_("Invalid date \"%1$s\""), e.title());
-                    wxMessageBox(str, _("App name"), wxOK | wxICON_ERROR);
-                    return;
-                }
-                dailyQuerySave();
-                file.setHaFile(m_file);
-                file.save();
-                m_date = wxDateTime(1, wxDateTime::Month(file.month() - 1), file.year());
+        FileRW *file;
+        try {
+            file = m_file->import(path);
+        } catch (DataFileError &e) {
+            showDataFileError(e);
+            return;
+        } catch (DailyFileEmpty &e) {
+            wxMessageBox(_("File is empty"), _("App name"), wxOK | wxICON_ERROR);
+            return;
+        } catch (DailyDateError &e) {
+            wxString str;
+            str.Printf(_("Invalid date \"%1$s\""), e.title());
+            wxMessageBox(str, _("App name"), wxOK | wxICON_ERROR);
+            return;
+        }
+        if (file == nullptr) {
+            wxMessageBox(_("Not a valid file."), _("App name"), wxOK | wxICON_ERROR);
+            return;
+        }
+        switch (file->type()) {
+            case HaFile::DAILY: {
+                DailyFileRW *daily = static_cast<DailyFileRW *>(file);
+                m_date = wxDateTime(1, wxDateTime::Month(daily->month() - 1), daily->year());
                 m_datePicker->SetValue(m_date);
                 loadDailyFile();
+                showDaily();
+            } break;
+            case HaFile::CASH:
                 loadCashFile();
-            } else if (index == 1) {
-                SubCashFile(m_file, true)()->import(path);
-                loadCashFile();
-            } else if (index == 2) {
-                dailyQuerySave();
-                SubCatFile(m_file, true)()->import(path);
+                showCash();
+                break;
+            case HaFile::CAT:
                 loadDailyFile();
-            }
+                break;
+            case HaFile::INVALID:
+                break;
         }
-        dlg->Destroy();
+        delete file;
     }
     fileDlg->Destroy();
 }

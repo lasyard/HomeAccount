@@ -8,6 +8,10 @@
 class CatFileRW : public FileRW
 {
 public:
+    CatFileRW() : CatFileRW(HaFile::CAT_FILE_NAME)
+    {
+    }
+
     CatFileRW(const char *fileName, HaFile *file = nullptr) : FileRW(fileName, file)
     {
         m_cr = new struct cat_root;
@@ -34,6 +38,11 @@ public:
     {
     }
 
+    virtual const HaFile::FileType type()
+    {
+        return HaFile::CAT;
+    }
+
 protected:
     struct cat_root *m_cr;
 
@@ -44,7 +53,7 @@ private:
     void writeNode(std::ostream &os, const struct cat_node *node) const;
     virtual void writeData(std::ostream &os) const;
 
-    virtual wxString header() const
+    virtual const char *header() const
     {
         return "HACT";
     }

@@ -3,13 +3,12 @@
 
 void FileRW::readStream(std::istream &is)
 {
-    int lineNo(0);
-    char buf[LINE_LEN];
-    while (is.getline(buf, LINE_LEN)) {
+    int lineNo = 0;
+    while (is.getline(m_buf, LINE_LEN)) {
         lineNo++;
         try {
-            if (is_line_end(buf[0])) continue;
-            parseLine(buf);
+            if (is_line_end(m_buf[0])) continue;
+            parseLine(m_buf);
         } catch (FileError &e) {
             e.setFileName(m_fileName);
             e.setLineNo(lineNo);

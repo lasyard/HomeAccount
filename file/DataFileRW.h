@@ -184,9 +184,9 @@ protected:
     virtual void parseLine(const char *line);
     virtual void writeData(std::ostream &os) const;
 
-    virtual wxString header() const
+    virtual const char *header() const
     {
-        throw InternalError::create("Should not run to here: %s : %d", __FILE__, __LINE__);
+        throw InternalError("Should not run to here: %s : %d", __FILE__, __LINE__);
     }
 
     virtual void writeInitial(std::ostream &os, money_t initial) const

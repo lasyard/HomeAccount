@@ -2,8 +2,9 @@
 #include "except/DailyDateError.h"
 #include "except/DailyFileEmpty.h"
 
-void DailyFileRW::setDateFromData()
+bool DailyFileRW::import(const char *header, std::ifstream &ifs)
 {
+    if (!DataFileRW::import(header, ifs)) return false;
     if (is_empty_data(m_dt)) throw DailyFileEmpty();
     struct ulist_item *p = m_dt->pages.first;
     const struct string *title = &(get_page(p)->title);
@@ -19,6 +20,7 @@ void DailyFileRW::setDateFromData()
     char buf[YEAR_LEN + 1 + MONEY_LEN + 1];
     buf[ym_to_str(buf, m_year, m_month, '/')] = '\0';
     m_fileName = buf;
+    return true;
 }
 
 void DailyFileRW::addEmptyPage()

@@ -56,15 +56,6 @@ msgstr "分类配置"
 msgid "Choose one to export"
 msgstr "选择导出的内容"
 
-msgid "Monthly datum"
-msgstr "月度数据"
-
-msgid "Cash datum"
-msgstr "现金数据"
-
-msgid "Choose one to import into"
-msgstr "选择导入的目标"
-
 msgid "File is empty"
 msgstr "文件是空的"
 

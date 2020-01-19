@@ -41,7 +41,12 @@ public:
         return m_month;
     }
 
-    void setDateFromData();
+    virtual bool import(const char *header, std::ifstream &ifs);
+
+    virtual const HaFile::FileType type()
+    {
+        return HaFile::DAILY;
+    }
 
 protected:
     int m_year;
@@ -54,7 +59,7 @@ protected:
         return m_title;
     }
 
-    virtual wxString header() const
+    virtual const char *header() const
     {
         return "HADL";
     }

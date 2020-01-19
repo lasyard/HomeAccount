@@ -37,7 +37,7 @@ protected:
 class SubAnnuallyFile : public SubFile<AnnuallyFileRW>
 {
 public:
-    SubAnnuallyFile(HaFile *ha, bool save = false) : SubFile(ha, HaFile::AnnuallyFileName, save)
+    SubAnnuallyFile(HaFile *ha, bool save = false) : SubFile(ha, HaFile::ANNUALLY_FILE_NAME, save)
     {
     }
 };
@@ -61,7 +61,7 @@ public:
 class SubCashFile : public SubFile<CashFileRW>
 {
 public:
-    SubCashFile(HaFile *ha, bool save = false) : SubFile(ha, HaFile::CashFileName, save)
+    SubCashFile(HaFile *ha, bool save = false) : SubFile(ha, HaFile::CASH_FILE_NAME, save)
     {
     }
 };
@@ -69,7 +69,7 @@ public:
 class SubCatFile : public SubFile<CatFileRW>
 {
 public:
-    SubCatFile(HaFile *ha, bool save = false) : SubFile(ha, HaFile::CatFileName, save)
+    SubCatFile(HaFile *ha, bool save = false) : SubFile(ha, HaFile::CAT_FILE_NAME, save)
     {
     }
 };

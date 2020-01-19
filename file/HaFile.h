@@ -18,11 +18,12 @@ class DailyFileRW;
 class HaFile : public CryptoFile
 {
 public:
-    static const char *const CatFileName;
-    static const char *const CashFileName;
-    static const char *const AnnuallyFileName;
-    static const char *const DIR;
+    static const char *const CAT_FILE_NAME;
+    static const char *const CASH_FILE_NAME;
+    static const char *const ANNUALLY_FILE_NAME;
     static const char *const EXT;
+
+    enum FileType { DAILY, CASH, CAT, INVALID };
 
     HaFile(const char *fileName, bool isOld = true) : CryptoFile(fileName, IV), m_isOld(isOld)
     {
@@ -65,6 +66,8 @@ public:
     {
         return m_isOld;
     }
+
+    FileRW *import(const std::string &path);
 
 protected:
     static const char *const IV;
