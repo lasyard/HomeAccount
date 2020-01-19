@@ -8,18 +8,18 @@
 #include "CatFileRW.h"
 #include "DailyFileRW.h"
 #include "HaFile.h"
+#include "MonthIterator.h"
 #include "MonthlyFileRW.h"
 #include "SubFiles.h"
 
 #include "../c/cal.h"
 
 const char *const HaFile::IV = "Home Account IV";
-
 const char *const HaFile::CAT_FILE_NAME = "cat";
 const char *const HaFile::CASH_FILE_NAME = "cash";
 const char *const HaFile::ANNUALLY_FILE_NAME = "annually";
-
 const char *const HaFile::EXT = "ha";
+const char *const HaFile::HEADER = "HAAD";
 
 wxArrayString HaFile::getFileList(const wxString &dirName)
 {
@@ -47,7 +47,7 @@ HaFile *HaFile::getNewestFile(const wxString &dirName)
     wxString fileName;
     if (fileNames.IsEmpty()) {
         HaFile *file = new HaFile(wxFileName(dirName, newFileName()).GetFullPath().c_str(), false);
-        file->makeNewFile();
+        file->clearFile();
         return file;
     }
     fileNames.Sort(true);
@@ -74,9 +74,27 @@ FileRW *HaFile::import(const std::string &path)
     std::ifstream ifs(path);
     char line[FileRW::LINE_LEN];
     ifs.getline(line, FileRW::LINE_LEN);
+    if (strncmp(line, HEADER, FileRW::TYPE_HEADER_LEN) == 0) {
+        clearFile();
+        FileRW *file;
+        while (true) {
+            ifs.getline(line, FileRW::LINE_LEN);
+            file = importOne(line, ifs);
+            if (file == nullptr) return nullptr;
+            if (ifs.eof()) break;
+            delete file;
+        }
+        return file;
+    } else {
+        return importOne(line, ifs);
+    }
+}
+
+FileRW *HaFile::importOne(const char *header, std::istream &is)
+{
     FileRW *file;
-    if ((file = new CatFileRW())->import(line, ifs) || (file = new CashFileRW())->import(line, ifs) ||
-        (file = new DailyFileRW())->import(line, ifs)) {
+    if ((file = new CatFileRW())->import(header, is) || (file = new CashFileRW())->import(header, is) ||
+        (file = new DailyFileRW())->import(header, is)) {
         file->setHaFile(this);
         file->save();
         return file;
@@ -84,16 +102,27 @@ FileRW *HaFile::import(const std::string &path)
     return nullptr;
 }
 
+void HaFile::exportAll(const std::string &path)
+{
+    std::ofstream ofs(path);
+    ofs << HEADER << ": exported by " << idString() << std::endl;
+    for (MonthIterator i(minYear(), minMonth(minYear())); i < MonthIterator(maxYear(), maxMonth(maxYear())); ++i) {
+        if (exist(DailyFileName(i.year(), i.month())())) {
+            SubDailyFile t(this, i.year(), i.month());
+            t()->saveAs(ofs);
+            t()->writeSeparator(ofs);
+        }
+    }
+    SubCashFile t(this);
+    t()->saveAs(ofs);
+    t()->writeSeparator(ofs);
+    SubCatFile(this)()->saveAs(ofs);
+}
+
 void HaFile::calTotal(struct cat_root *cat, int sYear, int sMonth, int eYear, int eMonth)
 {
-    int year, month;
-    for (year = sYear, month = sMonth; year < eYear || (year == eYear && month <= eMonth);) {
-        cal_data_total(SubDailyFile(this, year, month)()->getData(), cat);
-        month++;
-        if (month > 12) {
-            year++;
-            month = 1;
-        }
+    for (MonthIterator i(sYear, sMonth); i < MonthIterator(eYear, eMonth); ++i) {
+        cal_data_total(SubDailyFile(this, i.year(), i.month())()->getData(), cat);
     }
 }
 

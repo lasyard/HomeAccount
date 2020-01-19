@@ -53,7 +53,7 @@ private:
     void writeNode(std::ostream &os, const struct cat_node *node) const;
     virtual void writeData(std::ostream &os) const;
 
-    virtual const char *header() const
+    virtual const char *typeHeader() const
     {
         return "HACT";
     }

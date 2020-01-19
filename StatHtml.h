@@ -15,7 +15,7 @@ class StatHtml : public wxHtmlWindow
     wxDECLARE_DYNAMIC_CLASS(StatHtml);
 
 public:
-    StatHtml() : m_src()
+    StatHtml() : m_src(), m_fileName()
     {
     }
 
@@ -32,8 +32,19 @@ public:
         file << m_src.mbc_str();
     }
 
+    const wxString &fileName() const
+    {
+        return m_fileName;
+    }
+
+    void setFileName(const wxString &fileName)
+    {
+        m_fileName = fileName;
+    }
+
 private:
     wxString m_src;
+    wxString m_fileName;
 
     void firstLevelRow(const wxString &label, money_t money, const wxString &centLabel = "", const wxString &cent = "");
     void secondLevelRow(const wxString &label,

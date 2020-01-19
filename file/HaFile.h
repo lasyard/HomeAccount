@@ -22,6 +22,7 @@ public:
     static const char *const CASH_FILE_NAME;
     static const char *const ANNUALLY_FILE_NAME;
     static const char *const EXT;
+    static const char *const HEADER;
 
     enum FileType { DAILY, CASH, CAT, INVALID };
 
@@ -68,6 +69,7 @@ public:
     }
 
     FileRW *import(const std::string &path);
+    void exportAll(const std::string &path);
 
 protected:
     static const char *const IV;
@@ -95,6 +97,7 @@ protected:
 
     void loadFileRW(FileRW *fileRW);
     void rawSave(const FileRW *file);
+    FileRW *importOne(const char *header, std::istream &is);
 
     template <typename>
     friend class SubFile;

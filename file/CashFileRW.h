@@ -30,7 +30,7 @@ public:
     }
 
 protected:
-    virtual const char *header() const
+    virtual const char *typeHeader() const
     {
         return "HACS";
     }

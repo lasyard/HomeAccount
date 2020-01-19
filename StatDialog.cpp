@@ -78,7 +78,7 @@ void StatDialog::setFile(HaFile *file)
     m_file = file;
     wxArrayString years;
     SubAnnuallyFile t(m_file);
-    for (AnnuallyFileRW::pageIterator i = t()->pageBegin(); i != t()->pageEnd(); ++i) {
+    for (AnnuallyFileRW::PageIterator i = t()->pageBegin(); i != t()->pageEnd(); ++i) {
         years.Add(i->title.str);
     }
     years.Sort(true);

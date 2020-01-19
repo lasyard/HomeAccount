@@ -2,9 +2,9 @@
 #include "except/DailyDateError.h"
 #include "except/DailyFileEmpty.h"
 
-bool DailyFileRW::import(const char *header, std::ifstream &ifs)
+bool DailyFileRW::import(const char *header, std::istream &is)
 {
-    if (!DataFileRW::import(header, ifs)) return false;
+    if (!DataFileRW::import(header, is)) return false;
     if (is_empty_data(m_dt)) throw DailyFileEmpty();
     struct ulist_item *p = m_dt->pages.first;
     const struct string *title = &(get_page(p)->title);

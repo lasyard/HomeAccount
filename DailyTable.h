@@ -57,6 +57,11 @@ public:
         if (m_cat != nullptr) m_cat->saveAs(path);
     }
 
+    const char *catFileName() const
+    {
+        return m_cat->fileName();
+    }
+
     virtual wxString GetValue(int row, int col);
     virtual void SetValue(int row, int col, const wxString &value);
     virtual wxGridCellAttr *GetAttr(int row, int col, wxGridCellAttr::wxAttrKind kind);

@@ -41,7 +41,7 @@ public:
         return m_month;
     }
 
-    virtual bool import(const char *header, std::ifstream &ifs);
+    virtual bool import(const char *header, std::istream &is);
 
     virtual const HaFile::FileType type()
     {
@@ -59,7 +59,7 @@ protected:
         return m_title;
     }
 
-    virtual const char *header() const
+    virtual const char *typeHeader() const
     {
         return "HADL";
     }

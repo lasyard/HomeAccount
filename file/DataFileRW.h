@@ -21,33 +21,33 @@ public:
         delete m_dt;
     }
 
-    class pageIterator;
-    friend class pageIterator;
-    class pageIterator
+    class PageIterator;
+    friend class PageIterator;
+    class PageIterator
     {
     public:
-        pageIterator(struct ulist_item *p) : m_p(p)
+        PageIterator(struct ulist_item *p) : m_p(p)
         {
         }
 
-        pageIterator &operator++()
+        PageIterator &operator++()
         {
             m_p = m_p->next;
             return *this;
         }
 
-        pageIterator &operator++(int)
+        PageIterator &operator++(int)
         {
             ++(*this);
             return *this;
         }
 
-        bool operator==(const pageIterator &obj)
+        bool operator==(const PageIterator &obj)
         {
             return m_p == obj.m_p;
         }
 
-        bool operator!=(const pageIterator &obj)
+        bool operator!=(const PageIterator &obj)
         {
             return !(*this == obj);
         }
@@ -71,14 +71,14 @@ public:
         struct ulist_item *m_p;
     };
 
-    pageIterator pageBegin()
+    PageIterator pageBegin()
     {
-        return pageIterator(m_dt->pages.first);
+        return PageIterator(m_dt->pages.first);
     }
 
-    pageIterator pageEnd()
+    PageIterator pageEnd()
     {
-        return pageIterator(NULL);
+        return PageIterator(NULL);
     }
 
     class ItemIterator;
@@ -184,7 +184,7 @@ protected:
     virtual void parseLine(const char *line);
     virtual void writeData(std::ostream &os) const;
 
-    virtual const char *header() const
+    virtual const char *typeHeader() const
     {
         throw InternalError("Should not run to here: %s : %d", __FILE__, __LINE__);
     }

@@ -10,7 +10,8 @@ class FileRW
 {
 public:
     static const int LINE_LEN = 256;
-    static const int HEADER_LEN = 4;
+    static const int TYPE_HEADER_LEN = 4;
+    static const char *const FILE_SEPARATOR;
 
     FileRW(const char *fileName, HaFile *file = nullptr) : m_fileName(fileName), m_modified(false), m_file(file)
     {
@@ -32,8 +33,13 @@ public:
     void saveAs(const std::string &path) const
     {
         std::ofstream file(path);
-        file << header() << ": exported by " << HaFile::idString() << std::endl;
-        writeStream(file);
+        saveAs(file);
+    }
+
+    void saveAs(std::ostream &os) const
+    {
+        os << typeHeader() << ": exported by " << HaFile::idString() << std::endl;
+        writeStream(os);
     }
 
     void readStream(std::istream &is);
@@ -65,11 +71,11 @@ public:
 
     virtual void clearData() = 0;
 
-    virtual bool import(const char *header, std::ifstream &ifs)
+    virtual bool import(const char *header, std::istream &is)
     {
         if (!parseHeader(header)) return false;
         clearData();
-        readStream(ifs);
+        readStream(is);
         return true;
     }
 
@@ -78,19 +84,24 @@ public:
         throw InternalError("Should not run to here: %s : %d", __FILE__, __LINE__);
     }
 
+    void writeSeparator(std::ostream &os)
+    {
+        os << FILE_SEPARATOR << std::endl;
+    }
+
 protected:
     std::string m_fileName;
     bool m_modified;
     HaFile *m_file;
     char m_buf[LINE_LEN];
 
-    virtual const char *header() const = 0;
+    virtual const char *typeHeader() const = 0;
     virtual void parseLine(const char *line) = 0;
     virtual void writeData(std::ostream &os) const = 0;
 
     virtual bool parseHeader(const char *line)
     {
-        if (strncmp(line, header(), HEADER_LEN) == 0) return true;
+        if (strncmp(line, typeHeader(), TYPE_HEADER_LEN) == 0) return true;
         return false;
     }
 };

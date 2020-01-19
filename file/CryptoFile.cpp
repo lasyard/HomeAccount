@@ -31,8 +31,10 @@ off_t CryptoFile::findSlot(size_t length)
     return offset;
 }
 
-void CryptoFile::makeNewFile()
+void CryptoFile::clearFile()
 {
+    m_catalog.clear();
+    m_file.close();
     std::ofstream file(m_fileName, std::ios::binary);
     file.write(UTF8_HEADER, HEADER_LEN);
     std::stringstream stream;
@@ -43,11 +45,12 @@ void CryptoFile::makeNewFile()
     file.seekp(offset, std::ios::beg);
     file.write(output.c_str(), length);
     writeOffsetSize(file, offset, length);
+    file.close();
 }
 
 void CryptoFile::copyFrom(CryptoFile *file)
 {
-    makeNewFile();
+    clearFile();
     tryLoadFile();
     file->tryLoadFile();
     memcpy(m_key, file->m_key, KEY_LEN);

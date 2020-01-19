@@ -9,13 +9,12 @@
 
 class wxDatePickerCtrl;
 class wxDateEvent;
-
 class wxNotebook;
+
 class DataTable;
 class DailyTable;
 class StatHtml;
-
-class DataFileError;
+class FileError;
 
 class MainFrame : public wxFrame
 {
@@ -88,7 +87,7 @@ private:
     void removeOldFiles(const wxString &dirName);
 
     void showUnknowErrorAndExit();
-    void showDataFileError(const DataFileError &e);
+    void showFileError(const FileError &e);
 
     DECLARE_EVENT_TABLE()
 };

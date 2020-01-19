@@ -53,6 +53,11 @@ public:
         if (m_data != nullptr) m_data->saveAs(path);
     }
 
+    const char *dataFileName() const
+    {
+        return m_data->fileName();
+    }
+
     int GetNumberRows()
     {
         return m_rows.size() + 2;

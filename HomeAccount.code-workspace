@@ -14,7 +14,14 @@
         },
         "files.associations": {
             "*.xrc": "xml",
-            "exception": "cpp"
+            "exception": "cpp",
+            "__config": "cpp",
+            "__undef_macros": "cpp",
+            "hash_map": "cpp",
+            "hash_set": "cpp",
+            "algorithm": "cpp",
+            "fstream": "cpp",
+            "locale": "cpp"
         }
     }
 }

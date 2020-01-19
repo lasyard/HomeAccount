@@ -29,6 +29,7 @@ void StatHtml::showTotal(struct cat_root *cat, int sYear, int sMonth, int eYear,
 {
     wxString title;
     title.Printf(_("Classified statistics from %1$d/%2$d to %3$d/%4$d"), sYear, sMonth, eYear, eMonth);
+    m_fileName = wxString::Format("statistics_from_%1$d_%2$d_to_%3$d_%4$d", sYear, sMonth, eYear, eMonth);
     htmlHeader(title);
     h2(title);
     if (!mtree_is_leaf(&cat->root)) {
@@ -53,7 +54,7 @@ void StatHtml::showIO(DataFileRW *data, const wxString &title)
     m_src += "<th>" + _("Net Income") + "</th>\n";
     m_src += "</tr>\n";
     money_t totalI = 0, totalO = 0;
-    for (DataFileRW::pageIterator i = data->pageBegin(); i != data->pageEnd(); ++i) {
+    for (DataFileRW::PageIterator i = data->pageBegin(); i != data->pageEnd(); ++i) {
         money_t income, outlay;
         cal_page_income_outlay(&(*i), &income, &outlay);
         showIOLine(i->title.str, income, outlay);

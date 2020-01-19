@@ -60,12 +60,12 @@ public:
         return wxCopyFile(m_fileName, wxFileName(dirName, name + "." + ext).GetFullPath(), true);
     }
 
-    bool exist(const std::string fileName) const
+    bool exist(const std::string &fileName) const
     {
         return m_catalog.find(fileName) != m_catalog.end();
     }
 
-    void makeNewFile();
+    void clearFile();
 
     void flush()
     {

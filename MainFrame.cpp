@@ -152,6 +152,7 @@ void MainFrame::onStatButton(wxCommandEvent &event)
             wxString str;
             str.Printf(_("Annually statistics"), t()->minYear(), t()->maxYear());
             m_html->showIO(t(), str);
+            m_html->setFileName("annually_statistics");
         } else if (sel == 2) {
             wxString yearStr = dlg->getSelectedYear();
             int year = str_to_int(yearStr, yearStr.Len());
@@ -159,6 +160,7 @@ void MainFrame::onStatButton(wxCommandEvent &event)
             wxString str;
             str.Printf(_("Monthly statistics"), year);
             m_html->showIO(t(), str);
+            m_html->setFileName(wxString::Format("monthly_statistics_of_year_%1$d", year));
         }
         showStatistics();
     }
@@ -170,19 +172,36 @@ void MainFrame::onExportButton(wxCommandEvent &event)
     wxArrayString choices;
     choices.Add(_("Current datum"));
     choices.Add(_("Categories config"));
+    choices.Add(_("All datum"));
     wxSingleChoiceDialog *dlg = new wxSingleChoiceDialog(this, _("Choose one to export"), _("App name"), choices);
     if (dlg->ShowModal() == wxID_OK) {
         int index = dlg->GetSelection();
         wxString wildCardString;
-        if (index == 0 && m_book->GetSelection() == STATISTICS_PAGE) {
-            wildCardString = "HTML files (*.html)|*.html";
-        } else {
-            wildCardString = "Text files (*.txt)|*.txt";
+        wxString defaultFileName;
+        wildCardString = "Text files (*.txt)|*.txt";
+        if (index == 0) {
+            if (m_book->GetSelection() == STATISTICS_PAGE) {
+                if (m_html->fileName().IsEmpty()) {
+                    wxMessageBox(_("Nothing to export"), _("App name"), wxOK | wxICON_INFORMATION);
+                    return;
+                }
+                wildCardString = "HTML files (*.html)|*.html";
+                defaultFileName = m_html->fileName();
+            } else if (m_book->GetSelection() == DAILY_PAGE) {
+                defaultFileName = wxString::Format("daily_%s", m_daily->dataFileName());
+            } else if (m_book->GetSelection() == CASH_PAGE) {
+                defaultFileName = m_cash->dataFileName();
+            }
+        } else if (index == 1) {
+            defaultFileName = "category";
+        } else if (index == 2) {
+            defaultFileName = "ha_all_data";
         }
+        defaultFileName.Replace("/", "_");
         wxFileDialog *fileDlg = new wxFileDialog(this,
                                                  wxFileSelectorPromptStr,
                                                  wxEmptyString,
-                                                 wxEmptyString,
+                                                 defaultFileName,
                                                  wildCardString,
                                                  wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
         if (fileDlg->ShowModal() == wxID_OK) {
@@ -198,6 +217,8 @@ void MainFrame::onExportButton(wxCommandEvent &event)
                 }
             } else if (index == 1) {
                 m_daily->saveCatAs(path);
+            } else if (index == 2) {
+                m_file->exportAll(path);
             }
         }
         fileDlg->Destroy();
@@ -214,10 +235,11 @@ void MainFrame::onImportButton(wxCommandEvent &event)
         cashQuerySave();
         std::string path = fileDlg->GetPath().ToStdString();
         FileRW *file;
+        copyFile();
         try {
             file = m_file->import(path);
         } catch (DataFileError &e) {
-            showDataFileError(e);
+            showFileError(e);
             return;
         } catch (DailyFileEmpty &e) {
             wxMessageBox(_("File is empty"), _("App name"), wxOK | wxICON_ERROR);
@@ -325,7 +347,7 @@ void MainFrame::loadDailyFile()
         file = m_file->getDailyFile(m_date.GetYear(), m_date.GetMonth() + 1);
         cat = m_file->getCatFile();
     } catch (DataFileError &e) {
-        showDataFileError(e);
+        showFileError(e);
     } catch (CatFileError &e) {
         wxString str;
         str.Printf(_("Error in category config file at line %1$d"), e.lineNo());
@@ -350,7 +372,7 @@ void MainFrame::loadCashFile()
     try {
         file = m_file->getCashFile();
     } catch (DataFileError &e) {
-        showDataFileError(e);
+        showFileError(e);
     }
     file->afterLoad();
     m_cash = new DataTable(file);
@@ -398,7 +420,7 @@ void MainFrame::showUnknowErrorAndExit()
     wxExit();
 }
 
-void MainFrame::showDataFileError(const DataFileError &e)
+void MainFrame::showFileError(const FileError &e)
 {
     wxString str;
     str.Printf(_("Error in file \"%1$s\" at line %2$d"), e.fileName(), e.lineNo());
