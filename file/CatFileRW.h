@@ -37,17 +37,17 @@ public:
 protected:
     struct cat_root *m_cr;
 
-    virtual void writeStream(std::ostream &os) const
-    {
-        writeCat(os, m_cr);
-    }
-
     virtual void parseLine(const char *line);
 
 private:
     void writeWords(std::ostream &os, const struct rbtree_root *root) const;
     void writeNode(std::ostream &os, const struct cat_node *node) const;
-    void writeCat(std::ostream &os, struct cat_root *cr) const;
+    virtual void writeData(std::ostream &os) const;
+
+    virtual wxString header() const
+    {
+        return "HACT";
+    }
 };
 
 #endif

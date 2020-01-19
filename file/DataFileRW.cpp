@@ -62,10 +62,10 @@ void DataFileRW::writePage(std::ostream &os, const struct page *pg) const
     for (p = pg->items.first; p != NULL; p = p->next) writeItem(os, get_item(p));
 }
 
-void DataFileRW::writeData(std::ostream &os, const struct data *dt) const
+void DataFileRW::writeData(std::ostream &os) const
 {
     struct ulist_item *p;
-    writeInitial(os, dt->initial);
+    writeInitial(os, m_dt->initial);
     if (is_empty_data(m_dt)) return;
     for (p = m_dt->pages.first; p != NULL; p = p->next) writePage(os, get_page(p));
 }

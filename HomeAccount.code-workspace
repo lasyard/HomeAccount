@@ -13,7 +13,8 @@
             "res/*.icns": true
         },
         "files.associations": {
-            "*.xrc": "xml"
+            "*.xrc": "xml",
+            "exception": "cpp"
         }
     }
 }

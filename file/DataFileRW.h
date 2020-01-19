@@ -2,6 +2,7 @@
 #define _DATA_FILE_R_W_H_
 
 #include "FileRW.h"
+#include "except/InternalError.h"
 
 #include "../c/data.h"
 #include "../c/utils.h"
@@ -147,11 +148,6 @@ public:
         return ItemIterator(NULL, NULL);
     }
 
-    virtual void writeStream(std::ostream &os) const
-    {
-        writeData(os, m_dt);
-    }
-
     struct data *getData() const
     {
         return m_dt;
@@ -186,6 +182,12 @@ protected:
     struct data *m_dt;
 
     virtual void parseLine(const char *line);
+    virtual void writeData(std::ostream &os) const;
+
+    virtual wxString header() const
+    {
+        throw InternalError::create("Should not run to here: %s : %d", __FILE__, __LINE__);
+    }
 
     virtual void writeInitial(std::ostream &os, money_t initial) const
     {
@@ -194,7 +196,6 @@ protected:
 private:
     void writeItem(std::ostream &os, const struct item *it) const;
     void writePage(std::ostream &os, const struct page *pg) const;
-    void writeData(std::ostream &os, const struct data *dt) const;
 };
 
 #endif

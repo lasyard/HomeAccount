@@ -32,6 +32,12 @@ public:
     {
     }
 
+    static wxString idString()
+    {
+        wxDateTime date = wxDateTime::Now();
+        return date.Format("%Y%m%d_%H%M%S") + "_" + VER_STR;
+    }
+
     static wxArrayString getFileList(const wxString &dirName);
     static HaFile *getNewestFile(const wxString &dirName);
 
@@ -65,8 +71,7 @@ protected:
 
     static wxString newFileName()
     {
-        wxDateTime date = wxDateTime::Now();
-        return date.Format("%Y%m%d_%H%M%S") + "_" + VER_STR + "." + EXT;
+        return idString() + "." + EXT;
     }
 
     bool m_isOld;

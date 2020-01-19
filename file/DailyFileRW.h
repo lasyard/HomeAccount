@@ -54,6 +54,11 @@ protected:
         return m_title;
     }
 
+    virtual wxString header() const
+    {
+        return "HADL";
+    }
+
     void addEmptyPage();
 };
 

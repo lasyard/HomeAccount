@@ -34,7 +34,12 @@ public:
     }
 
     void readStream(std::istream &is);
-    virtual void writeStream(std::ostream &os) const = 0;
+
+    void writeStream(std::ostream &os) const
+    {
+        os << header() << ": exported by " << HaFile::idString() << std::endl;
+        writeData(os);
+    }
 
     void setModified()
     {
@@ -71,6 +76,8 @@ protected:
     HaFile *m_file;
 
     virtual void parseLine(const char *line) = 0;
+    virtual wxString header() const = 0;
+    virtual void writeData(std::ostream &os) const = 0;
 };
 
 #endif

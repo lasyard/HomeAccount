@@ -50,10 +50,10 @@ void CatFileRW::writeNode(std::ostream &os, const struct cat_node *node) const
     writeWords(os, &node->words);
 }
 
-void CatFileRW::writeCat(std::ostream &os, struct cat_root *cr) const
+void CatFileRW::writeData(std::ostream &os) const
 {
-    struct mtree_node *node = mtree_pf_first(&cr->root);
-    for (node = mtree_pf_next(&cr->root, node); node != NULL; node = mtree_pf_next(&cr->root, node)) {
+    struct mtree_node *node = mtree_pf_first(&m_cr->root);
+    for (node = mtree_pf_next(&m_cr->root, node); node != NULL; node = mtree_pf_next(&m_cr->root, node)) {
         writeNode(os, get_cat_node(node));
     }
 }

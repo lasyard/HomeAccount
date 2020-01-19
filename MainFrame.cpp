@@ -113,12 +113,10 @@ void MainFrame::onPageChanging(wxBookCtrlEvent &event)
     int sel = event.GetOldSelection();
     switch (sel) {
         case DAILY_PAGE:
-            m_grid->SaveEditControlValue();
             dailyQuerySave();
             loadCashFile();
             break;
         case CASH_PAGE:
-            m_cashGrid->SaveEditControlValue();
             cashQuerySave();
             break;
         default:
@@ -365,6 +363,7 @@ void MainFrame::loadCashFile()
 
 void MainFrame::dailyQuerySave()
 {
+    m_grid->SaveEditControlValue();
     if (m_daily->catModified()) {
         copyFile();
         m_daily->saveCat();
@@ -377,6 +376,7 @@ void MainFrame::dailyQuerySave()
 
 void MainFrame::cashQuerySave()
 {
+    m_cashGrid->SaveEditControlValue();
     if (m_cash->dataModified()) {
         copyFile();
         m_cash->save();

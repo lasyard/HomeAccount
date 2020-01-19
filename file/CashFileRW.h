@@ -21,6 +21,10 @@ public:
     }
 
 protected:
+    virtual wxString header() const
+    {
+        return "HACS";
+    }
 };
 
 #endif
