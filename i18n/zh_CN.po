@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: HomeAccount 1.0\n"
 "Report-Msgid-Bugs-To: lasyard@yeah.net\n"
-"POT-Creation-Date: 2020-01-16 14:48+0800\n"
+"POT-Creation-Date: 2020-01-19 18:34+0800\n"
 "PO-Revision-Date: 2020-01-10 19:06+0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -53,8 +53,14 @@ msgstr "当前数据"
 msgid "Categories config"
 msgstr "分类配置"
 
+msgid "All datum"
+msgstr "全部数据"
+
 msgid "Choose one to export"
 msgstr "选择导出的内容"
+
+msgid "Nothing to export"
+msgstr "没有内容可导出"
 
 msgid "File is empty"
 msgstr "文件是空的"
@@ -62,6 +68,9 @@ msgstr "文件是空的"
 #, c-format
 msgid "Invalid date \"%1$s\""
 msgstr "错误的日期：\"%1$s\""
+
+msgid "Not a valid file."
+msgstr ""
 
 msgid "Input passwords are not the same"
 msgstr "两次输入的密码不同"

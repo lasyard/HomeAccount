@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: HomeAccount 1.0\n"
 "Report-Msgid-Bugs-To: lasyard@yeah.net\n"
-"POT-Creation-Date: 2020-01-16 14:48+0800\n"
+"POT-Creation-Date: 2020-01-19 18:34+0800\n"
 "PO-Revision-Date: 2020-01-10 19:06+0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -53,8 +53,14 @@ msgstr "Current datum"
 msgid "Categories config"
 msgstr "Categories config"
 
+msgid "All datum"
+msgstr "All datum"
+
 msgid "Choose one to export"
 msgstr "Choose one to export"
+
+msgid "Nothing to export"
+msgstr "Nothing to export"
 
 msgid "File is empty"
 msgstr "File is empty"
@@ -62,6 +68,9 @@ msgstr "File is empty"
 #, c-format
 msgid "Invalid date \"%1$s\""
 msgstr "Invalid date \"%1$s\""
+
+msgid "Not a valid file."
+msgstr ""
 
 msgid "Input passwords are not the same"
 msgstr "Input passwords are not the same"
