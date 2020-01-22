@@ -3,10 +3,11 @@
 
 #include <fstream>
 
+#include "FileType.h"
 #include "HaFile.h"
 #include "except/InternalError.h"
 
-class FileRW
+class FileRW : public FileType
 {
 public:
     static const int LINE_LEN = 256;
@@ -79,7 +80,7 @@ public:
         return true;
     }
 
-    virtual const HaFile::FileType type()
+    virtual const FileType::Type type() const
     {
         throw InternalError("Should not run to here: %s : %d", __FILE__, __LINE__);
     }

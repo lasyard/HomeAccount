@@ -10,9 +10,11 @@
 class wxDatePickerCtrl;
 class wxDateEvent;
 class wxNotebook;
+class wxDataViewCtrl;
 
 class DataTable;
 class DailyTable;
+class CatModel;
 class StatHtml;
 class FileError;
 
@@ -36,6 +38,7 @@ public:
     void onStatButton(wxCommandEvent &event);
     void onExportButton(wxCommandEvent &event);
     void onImportButton(wxCommandEvent &event);
+    void onCategoryButton(wxCommandEvent &event);
     void onConfigButton(wxCommandEvent &event);
     void onClose(wxCloseEvent &event);
     void onPageChanging(wxBookCtrlEvent &event);
@@ -44,17 +47,20 @@ private:
     static const int DAILY_PAGE = 0;
     static const int CASH_PAGE = 1;
     static const int STATISTICS_PAGE = 2;
+    static const int CAT_PAGE = 3;
 
     wxDateTime m_date;
     wxString m_dir;
     HaFile *m_file;
     DailyTable *m_daily;
     DataTable *m_cash;
+    CatModel *m_cat;
 
     wxNotebook *m_book;
     DailyGrid *m_grid;
     DataGrid *m_cashGrid;
     StatHtml *m_html;
+    wxDataViewCtrl *m_catView;
     wxDatePickerCtrl *m_datePicker;
 
     void safeDeleteFile()

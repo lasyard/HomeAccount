@@ -31,6 +31,12 @@ struct mtree_node *mtree_first_child(struct mtree_node *node)
     return get_mtree_node(ulist_first(&node->children));
 }
 
+struct mtree_node *mtree_next_child(struct mtree_node *node)
+{
+    if (node->ulist.next == NULL) return NULL;
+    return get_mtree_node(node->ulist.next);
+}
+
 struct mtree_node *mtree_last_child(struct mtree_node *node)
 {
     if (ulist_is_empty(&node->children)) return NULL;

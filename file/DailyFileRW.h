@@ -43,9 +43,9 @@ public:
 
     virtual bool import(const char *header, std::istream &is);
 
-    virtual const HaFile::FileType type()
+    virtual const FileType::Type type() const
     {
-        return HaFile::DAILY;
+        return DAILY;
     }
 
 protected:

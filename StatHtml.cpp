@@ -102,7 +102,7 @@ void StatHtml::totalTableHtml(struct mtree_node *root, money_t no_cat_sum)
     m_src += "</font></th></tr>\n";
     firstLevelRow(_("Total"), cat->total);
     firstLevelRow(_("Unclassified"), no_cat_sum, _("Percentage in total"), calCent(no_cat_sum, cat->total));
-    firstLevelRow(_("Other"), cat->sub_total, _("Percentage in total"), calCent(cat->sub_total, cat->total));
+    firstLevelRow(_("Other"), cat->own_total, _("Percentage in total"), calCent(cat->own_total, cat->total));
     firstCatStatHtml(root);
     m_src += "</table>\n";
 }
@@ -124,7 +124,7 @@ void StatHtml::firstCatStatHtml(struct mtree_node *root)
                        calCent(cat->total, root_cat->total),
                        true);
         secondLevelRow(
-            _("Other"), cat->sub_total, _("Percentage in total of this category"), calCent(cat->sub_total, cat->total));
+            _("Other"), cat->own_total, _("Percentage in total of this category"), calCent(cat->own_total, cat->total));
         secondCatStatHtml(node);
         m_src += "</table>\n";
         m_src += "</td></tr>\n";

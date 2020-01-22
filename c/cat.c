@@ -145,6 +145,11 @@ struct cat_node *add_cat_node(struct mtree_node *parent, struct string *name, in
     return node;
 }
 
+BOOL cat_is_leaf(const struct cat_node *node)
+{
+    return mtree_is_leaf(&node->mtree);
+}
+
 struct word *add_word(struct cat_node *node, struct string *name, int *dup)
 {
     struct word *p;
@@ -159,23 +164,23 @@ struct word *add_word(struct cat_node *node, struct string *name, int *dup)
         __release_word(p);
         return NULL;
     }
+    p->owner = node;
     return p;
 }
 
-void delete_word(struct cat_node *node, const struct string *word)
+void delete_word(struct word *word)
 {
-    struct word *w;
-    if ((w = __search_cat_word(node, word)) == NULL) return;
-    rbtree_delete(&node->words, &w->rbtree);
-    __release_word(w);
+    rbtree_delete(&word->owner->words, &word->rbtree);
+    __release_word(word);
 }
 
-struct cat_node *get_cat_from_word(struct mtree_node *root, const struct string *word)
+struct word *get_word_by_name(struct mtree_node *root, const struct string *word)
 {
     struct mtree_node *node;
+    struct word *w;
     if (root == NULL) return NULL;
     for (node = mtree_pf_first(root); node != NULL; node = mtree_pf_next(root, node)) {
-        if (__search_cat_word(get_cat_node(node), word) != NULL) return get_cat_node(node);
+        if ((w = __search_cat_word(get_cat_node(node), word)) != NULL) return w;
     }
     return NULL;
 }
@@ -203,9 +208,13 @@ struct cat_node *get_cat_from_cstr_name(struct mtree_node *root, const char *nam
 void clear_total(struct cat_root *cat)
 {
     struct mtree_node *node = mtree_pf_first(&cat->root);
+    struct rbtree_node *rb;
     for (node = mtree_pf_next(&cat->root, node); node != NULL; node = mtree_pf_next(&cat->root, node)) {
-        get_cat_node(node)->total = 0;
-        get_cat_node(node)->sub_total = 0;
+        struct cat_node *cat_node = get_cat_node(node);
+        for (rb = rbtree_first(&cat_node->words); rb != NULL; rb = rbtree_next(rb)) {
+            get_word(rb)->total = 0;
+            get_word(rb)->count = 0;
+        }
     }
     cat->no_cat_in_sum = 0;
     cat->no_cat_out_sum = 0;
@@ -216,12 +225,16 @@ void sum_total(struct mtree_node *root)
     struct mtree_node *node;
     if (root == NULL) return;
     for (node = mtree_cf_first(root); node != NULL; node = mtree_cf_next(root, node)) {
-        struct cat_node *cat = get_cat_node(node);
-        cat->total = cat->sub_total;
+        struct cat_node *cat_node = get_cat_node(node);
+        struct rbtree_node *rb;
+        cat_node->own_total = 0;
+        for (rb = rbtree_first(&cat_node->words); rb != NULL; rb = rbtree_next(rb)) {
+            cat_node->own_total += get_word(rb)->total;
+        }
+        cat_node->total = cat_node->own_total;
         if (!mtree_is_leaf(node)) {
-            struct ulist_item *item;
-            for (item = node->children.first; item != NULL; item = item->next) {
-                cat->total += get_cat_node(get_mtree_node(item))->total;
+            for (struct mtree_node *m = mtree_first_child(node); m != NULL; m = mtree_next_child(m)) {
+                cat_node->total += get_cat_node(m)->total;
             }
         }
     }

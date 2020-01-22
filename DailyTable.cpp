@@ -9,8 +9,9 @@ wxString DailyTable::GetValue(int row, int col)
     if (row > 0 && row <= m_rows.size() && col == m_categoryColumn) {
         struct item *it = m_rows[row - 1];
         if (setCatNotAllowed(it)) return "";
-        if (it->cat == NULL) return _("Unclassified");
-        return it->cat->name.str;
+        const char *name = item_cat_name(it);
+        if (name != NULL) return name;
+        return _("Unclassified");
     }
     return "";
 }
@@ -29,8 +30,8 @@ void DailyTable::changeCat(struct item *it, const char *name)
     } else {
         cat = NULL;
     }
-    if (it->cat != NULL) delete_word(it->cat, &it->desc);
-    if (cat != NULL && add_word(cat, &it->desc, &dup) == NULL) throw std::bad_alloc();
+    if (it->word != NULL) delete_word(it->word);
+    if (cat != NULL && (it->word = add_word(cat, &it->desc, &dup)) == NULL) throw std::bad_alloc();
     m_cat->setModified();
 }
 
@@ -67,7 +68,7 @@ wxGridCellAttr *DailyTable::GetAttr(int row, int col, wxGridCellAttr::wxAttrKind
             return m_moneyRoAttr;
         }
         if (it->money > 0) {
-            if (it->cat == NULL) {
+            if (it->word == NULL) {
                 m_categoryNoCatAttrO->IncRef();
                 return m_categoryNoCatAttrO;
             } else {
@@ -75,7 +76,7 @@ wxGridCellAttr *DailyTable::GetAttr(int row, int col, wxGridCellAttr::wxAttrKind
                 return m_categoryAttrO;
             }
         } else {
-            if (it->cat == NULL) {
+            if (it->word == NULL) {
                 m_categoryNoCatAttrI->IncRef();
                 return m_categoryNoCatAttrI;
             } else {

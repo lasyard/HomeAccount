@@ -24,6 +24,7 @@ void mtree_add_first(struct mtree_node *parent, struct mtree_node *node);
 void mtree_del(struct mtree_node *node);
 
 struct mtree_node *mtree_first_child(struct mtree_node *node);
+struct mtree_node *mtree_next_child(struct mtree_node *node);
 struct mtree_node *mtree_last_child(struct mtree_node *node);
 
 /* parent first tranversing */

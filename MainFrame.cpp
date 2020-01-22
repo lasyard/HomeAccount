@@ -5,15 +5,18 @@
 #include <wx/button.h>
 #include <wx/choicdlg.h>
 #include <wx/choice.h>
+#include <wx/dataview.h>
 #include <wx/datectrl.h>
 #include <wx/dateevt.h>
 #include <wx/filedlg.h>
 #include <wx/filefn.h>
 #include <wx/msgdlg.h>
+#include <wx/panel.h>
 #include <wx/stdpaths.h>
 #include <wx/textdlg.h>
 #include <wx/xrc/xmlres.h>
 
+#include "CatModel.h"
 #include "ConfigDialog.h"
 #include "DailyTable.h"
 #include "MainFrame.h"
@@ -40,6 +43,7 @@ EVT_DATE_CHANGED(XRCID("date"), MainFrame::onDateChanged)
 EVT_BUTTON(XRCID("statistics"), MainFrame::onStatButton)
 EVT_BUTTON(XRCID("export"), MainFrame::onExportButton)
 EVT_BUTTON(XRCID("import"), MainFrame::onImportButton)
+EVT_BUTTON(XRCID("category"), MainFrame::onCategoryButton)
 EVT_BUTTON(XRCID("config"), MainFrame::onConfigButton)
 EVT_NOTEBOOK_PAGE_CHANGING(XRCID("book"), MainFrame::onPageChanging)
 EVT_CLOSE(MainFrame::onClose)
@@ -53,6 +57,9 @@ MainFrame::MainFrame() : m_dir(), m_file(nullptr), m_daily(nullptr), m_cash(null
     m_cashGrid = XRCCTRL(*this, "cash", DataGrid);
     m_datePicker = XRCCTRL(*this, "date", wxDatePickerCtrl);
     m_html = XRCCTRL(*this, "html", StatHtml);
+    wxPanel *panel = XRCCTRL(*this, "categories_panel", wxPanel);
+    m_catView = new wxDataViewCtrl(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDV_HORIZ_RULES);
+    wxXmlResource::Get()->AttachUnknownControl("categories", m_catView);
 }
 
 void MainFrame::initView(const wxString &dir)
@@ -91,6 +98,8 @@ void MainFrame::initView(const wxString &dir)
     loadDailyFile();
     loadCashFile();
     showDaily();
+    m_catView->AppendTextColumn("haha", 0, wxDATAVIEW_CELL_INERT, 180);
+    m_catView->AppendTextColumn("words", 1, wxDATAVIEW_CELL_INERT, 500);
 }
 
 void MainFrame::onDateChanged(wxDateEvent &event)
@@ -234,7 +243,7 @@ void MainFrame::onImportButton(wxCommandEvent &event)
         dailyQuerySave();
         cashQuerySave();
         std::string path = fileDlg->GetPath().ToStdString();
-        FileRW *file;
+        FileType *file;
         copyFile();
         try {
             file = m_file->import(path);
@@ -255,26 +264,38 @@ void MainFrame::onImportButton(wxCommandEvent &event)
             return;
         }
         switch (file->type()) {
-            case HaFile::DAILY: {
+            case FileType::DAILY: {
                 DailyFileRW *daily = static_cast<DailyFileRW *>(file);
                 m_date = wxDateTime(1, wxDateTime::Month(daily->month() - 1), daily->year());
                 m_datePicker->SetValue(m_date);
                 loadDailyFile();
                 showDaily();
             } break;
-            case HaFile::CASH:
+            case FileType::CASH:
                 loadCashFile();
                 showCash();
                 break;
-            case HaFile::CAT:
+            case FileType::CAT:
                 loadDailyFile();
                 break;
-            case HaFile::INVALID:
+            case FileType::WHOLE:
+                loadDailyFile();
+                loadCashFile();
+                break;
+            case FileType::INVALID:
                 break;
         }
         delete file;
     }
     fileDlg->Destroy();
+}
+
+void MainFrame::onCategoryButton(wxCommandEvent &event)
+{
+    m_cat = new CatModel(m_daily->getCatRoot());
+    m_catView->AssociateModel(m_cat);
+    m_cat->DecRef();
+    m_book->SetSelection(CAT_PAGE);
 }
 
 void MainFrame::onConfigButton(wxCommandEvent &event)

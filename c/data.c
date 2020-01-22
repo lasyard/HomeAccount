@@ -1,5 +1,6 @@
 #include <stdlib.h>
 
+#include "cat.h"
 #include "data.h"
 #include "utils.h"
 
@@ -10,7 +11,7 @@ static void __init_item(struct item *it)
     it->money = 0;
     string_init(&it->desc);
     string_init(&it->comment);
-    it->cat = NULL;
+    it->word = NULL;
 }
 
 static void __release_item(struct item *it)
@@ -139,7 +140,7 @@ void clear_item(struct item *it)
     it->money = 0;
     string_init(&it->desc);
     string_init(&it->comment);
-    it->cat = NULL;
+    it->word = NULL;
 }
 
 void delete_item(struct item *it)
@@ -163,6 +164,12 @@ BOOL is_single_item(const struct item *it)
 BOOL is_last_item(const struct item *it)
 {
     return ulist_is_last(&it->owner->items, &it->ulist);
+}
+
+const char *item_cat_name(const struct item *it)
+{
+    if (it->word == NULL) return NULL;
+    return it->word->owner->name.str;
 }
 
 static void __init_page(struct page *pg)

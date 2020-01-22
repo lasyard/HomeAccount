@@ -25,7 +25,7 @@ struct item {
     money_t money;
     struct string desc;
     struct string comment;
-    struct cat_node *cat;
+    struct word *word;
 };
 
 #define get_item(ptr) ulist_entry(ptr, struct item, ulist)
@@ -48,6 +48,7 @@ struct item *item_set_desc(struct item *it, struct string *desc);
 struct item *item_set_comment(struct item *it, struct string *comment);
 void clear_item(struct item *it);
 void delete_item(struct item *it);
+const char *item_cat_name(const struct item *it);
 
 BOOL is_dummy_item(const struct item *it);
 BOOL is_single_item(const struct item *it);

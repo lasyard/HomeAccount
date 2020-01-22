@@ -56,7 +56,18 @@
                         </object>
                     </object>
                     <object class="spacer">
-                        <size>150, 24</size>
+                        <size>120, 24</size>
+                    </object>
+                    <object class="sizeritem">
+                        <flag>wxALIGN_CENTER_VERTICAL | wxLEFT | wxRIGHT</flag>
+                        <border>9</border>
+                        <object class="wxButton" name="category">
+                            <label>Category</label>
+                            <font>
+                                <family>teletype</family>
+                                <size>20</size>
+                            </font>
+                        </object>
                     </object>
                     <object class="sizeritem">
                         <flag>wxSHAPED | wxLEFT | wxRIGHT</flag>
@@ -110,6 +121,21 @@
                                     <flag>wxEXPAND | wxALL</flag>
                                     <border>0</border>
                                     <object class="wxHtmlWindow" name="html" subclass="StatHtml">
+                                        <size>960,720</size>
+                                    </object>
+                                </object>
+                            </object>
+                        </object>
+                    </object>
+                    <object class="notebookpage">
+                        <label>Categories View</label>
+                        <object class="wxPanel" name="categories_panel">
+                            <object class="wxBoxSizer">
+                                <orient>wxVERTICAL</orient>
+                                <object class="sizeritem">
+                                    <flag>wxEXPAND | wxALL</flag>
+                                    <border>0</border>
+                                    <object class="unknown" name="categories">
                                         <size>960,720</size>
                                     </object>
                                 </object>

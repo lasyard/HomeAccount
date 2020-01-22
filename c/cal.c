@@ -5,7 +5,7 @@
 static void __cal_item_total(struct item *it, struct cat_root *cat)
 {
     update_item_cat(it, cat);
-    if (it->cat == NULL) {
+    if (it->word == NULL) {
         if (it->money < 0) {
             cat->no_cat_in_sum -= it->money;
         } else {
@@ -13,9 +13,11 @@ static void __cal_item_total(struct item *it, struct cat_root *cat)
         }
     } else {
         if (it->money < 0) {
-            it->cat->sub_total -= it->money;
+            it->word->total -= it->money;
+            it->word->count++;
         } else {
-            it->cat->sub_total += it->money;
+            it->word->total += it->money;
+            it->word->count++;
         }
     }
 }
@@ -39,10 +41,10 @@ void cal_data_total(struct data *dt, struct cat_root *cat)
 void update_item_cat(struct item *it, struct cat_root *cat)
 {
     if (mtree_is_leaf(&cat->root)) {
-        it->cat = NULL;
+        it->word = NULL;
     } else if (it->money < 0) {
-        it->cat = get_cat_from_word(mtree_first_child(&cat->root), &it->desc);
+        it->word = get_word_by_name(mtree_first_child(&cat->root), &it->desc);
     } else {
-        it->cat = get_cat_from_word(mtree_last_child(&cat->root), &it->desc);
+        it->word = get_word_by_name(mtree_last_child(&cat->root), &it->desc);
     }
 }

@@ -8,6 +8,7 @@
 #include "CryptoFile.h"
 #include "FileNames.h"
 
+class FileType;
 class FileRW;
 class CatFileRW;
 class CashFileRW;
@@ -23,8 +24,6 @@ public:
     static const char *const ANNUALLY_FILE_NAME;
     static const char *const EXT;
     static const char *const HEADER;
-
-    enum FileType { DAILY, CASH, CAT, INVALID };
 
     HaFile(const char *fileName, bool isOld = true) : CryptoFile(fileName, IV), m_isOld(isOld)
     {
@@ -68,7 +67,7 @@ public:
         return m_isOld;
     }
 
-    FileRW *import(const std::string &path);
+    FileType *import(const std::string &path);
     void exportAll(const std::string &path);
 
 protected:

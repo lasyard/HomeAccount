@@ -108,6 +108,7 @@
                     <object class="button">
                         <object class="wxButton" name="wxID_OK">
                             <label>OK</label>
+                            <default>1</default>
                         </object>
                     </object>
                     <object class="button">

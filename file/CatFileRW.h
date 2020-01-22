@@ -38,9 +38,9 @@ public:
     {
     }
 
-    virtual const HaFile::FileType type()
+    virtual const FileType::Type type() const
     {
-        return HaFile::CAT;
+        return CAT;
     }
 
 protected:

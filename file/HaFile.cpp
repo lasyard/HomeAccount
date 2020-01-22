@@ -69,7 +69,7 @@ void HaFile::save(FileRW *file)
     flush();
 }
 
-FileRW *HaFile::import(const std::string &path)
+FileType *HaFile::import(const std::string &path)
 {
     std::ifstream ifs(path);
     char line[FileRW::LINE_LEN];
@@ -81,10 +81,10 @@ FileRW *HaFile::import(const std::string &path)
             ifs.getline(line, FileRW::LINE_LEN);
             file = importOne(line, ifs);
             if (file == nullptr) return nullptr;
-            if (ifs.eof()) break;
             delete file;
+            if (ifs.eof()) break;
         }
-        return file;
+        return new HaFileStub();
     } else {
         return importOne(line, ifs);
     }
