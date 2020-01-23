@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: HomeAccount 1.0\n"
 "Report-Msgid-Bugs-To: lasyard@yeah.net\n"
-"POT-Creation-Date: 2020-01-19 18:34+0800\n"
+"POT-Creation-Date: 2020-01-23 10:44+0800\n"
 "PO-Revision-Date: 2020-01-10 19:06+0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -31,6 +31,30 @@ msgstr "Initial balance"
 
 msgid "Total"
 msgstr "Total"
+
+msgid "Income"
+msgstr "Income"
+
+msgid "Outlay"
+msgstr "Outlay"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Comments"
+msgstr "Comments"
+
+msgid "Balance"
+msgstr "Balance"
+
+msgid "Category"
+msgstr "Category"
+
+msgid "Count"
+msgstr "Count"
+
+msgid "In use"
+msgstr "In use"
 
 msgid "File corrupted"
 msgstr "File corrupted"
@@ -70,7 +94,7 @@ msgid "Invalid date \"%1$s\""
 msgstr "Invalid date \"%1$s\""
 
 msgid "Not a valid file."
-msgstr ""
+msgstr "Not a valid file."
 
 msgid "Input passwords are not the same"
 msgstr "Input passwords are not the same"
@@ -103,12 +127,6 @@ msgstr "Classified statistics from %1$d/%2$d to %3$d/%4$d"
 
 msgid "Time"
 msgstr "Time"
-
-msgid "Income"
-msgstr "Income"
-
-msgid "Outlay"
-msgstr "Outlay"
 
 msgid "Net Income"
 msgstr "Net Income"
@@ -178,3 +196,6 @@ msgstr "To"
 
 msgid "Statistics result"
 msgstr "Statistics result"
+
+msgid "Categories view"
+msgstr "Categories view"

@@ -121,9 +121,14 @@ void HaFile::exportAll(const std::string &path)
 
 void HaFile::calTotal(struct cat_root *cat, int sYear, int sMonth, int eYear, int eMonth)
 {
+    clear_total(cat);
     for (MonthIterator i(sYear, sMonth); i < MonthIterator(eYear, eMonth); ++i) {
         cal_data_total(SubDailyFile(this, i.year(), i.month())()->getData(), cat);
     }
+    sum_total(mtree_first_child(&cat->root));
+    get_cat_node(mtree_first_child(&cat->root))->total += cat->no_cat_in_sum;
+    sum_total(mtree_last_child(&cat->root));
+    get_cat_node(mtree_last_child(&cat->root))->total += cat->no_cat_out_sum;
 }
 
 money_t HaFile::calBalanceBefore(int year, int month)

@@ -3,6 +3,7 @@ DailyGrid.cpp
 DailyTable.cpp
 DataGrid.cpp
 DataTable.cpp
+DataTable.h
 MainFrame.cpp
 MonthValidator.cpp
 StatDialog.cpp

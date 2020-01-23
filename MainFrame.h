@@ -11,6 +11,7 @@ class wxDatePickerCtrl;
 class wxDateEvent;
 class wxNotebook;
 class wxDataViewCtrl;
+class wxDataViewItem;
 
 class DataTable;
 class DailyTable;
@@ -38,7 +39,6 @@ public:
     void onStatButton(wxCommandEvent &event);
     void onExportButton(wxCommandEvent &event);
     void onImportButton(wxCommandEvent &event);
-    void onCategoryButton(wxCommandEvent &event);
     void onConfigButton(wxCommandEvent &event);
     void onClose(wxCloseEvent &event);
     void onPageChanging(wxBookCtrlEvent &event);
@@ -54,7 +54,6 @@ private:
     HaFile *m_file;
     DailyTable *m_daily;
     DataTable *m_cash;
-    CatModel *m_cat;
 
     wxNotebook *m_book;
     DailyGrid *m_grid;
@@ -85,6 +84,7 @@ private:
         m_book->SetSelection(STATISTICS_PAGE);
     }
 
+    void expandAllCat(const wxDataViewItem &item);
     void loadDailyFile();
     void loadCashFile();
     void dailyQuerySave();

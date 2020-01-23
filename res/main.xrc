@@ -59,17 +59,6 @@
                         <size>120, 24</size>
                     </object>
                     <object class="sizeritem">
-                        <flag>wxALIGN_CENTER_VERTICAL | wxLEFT | wxRIGHT</flag>
-                        <border>9</border>
-                        <object class="wxButton" name="category">
-                            <label>Category</label>
-                            <font>
-                                <family>teletype</family>
-                                <size>20</size>
-                            </font>
-                        </object>
-                    </object>
-                    <object class="sizeritem">
                         <flag>wxSHAPED | wxLEFT | wxRIGHT</flag>
                         <border>0</border>
                         <object class="wxBitmapButton" name="config">
@@ -128,7 +117,7 @@
                         </object>
                     </object>
                     <object class="notebookpage">
-                        <label>Categories View</label>
+                        <label>Categories view</label>
                         <object class="wxPanel" name="categories_panel">
                             <object class="wxBoxSizer">
                                 <orient>wxVERTICAL</orient>

@@ -8,6 +8,12 @@
 class CatModel : public wxDataViewModel
 {
 public:
+    static const int NAME_COLUMN = 0;
+    static const int COUNT_COLUMN = 1;
+    static const int TOTAL_COLUMN = 2;
+    static const int INUSE_COLUMN = 3;
+    static const int COLUMN_NUM = 4;
+
     CatModel(struct cat_root *cat) : m_root()
     {
         m_root.buildRoot(cat);
@@ -45,7 +51,7 @@ public:
 
     virtual unsigned int GetColumnCount() const
     {
-        return 2;
+        return COLUMN_NUM;
     }
 
     /**
@@ -63,18 +69,48 @@ public:
      */
     virtual wxString GetColumnType(unsigned int col) const
     {
+        // Seems no use, decided by column type when columns are added.
         return "string";
     }
 
     virtual void GetValue(wxVariant &variant, const wxDataViewItem &item, unsigned int col) const
     {
         CatItem *it = static_cast<CatItem *>(item.GetID());
-        variant = it->getName();
+        switch (col) {
+            case NAME_COLUMN: {
+                variant = it->getName();
+            } break;
+            case COUNT_COLUMN: {
+                variant = wxString::Format("%d", it->getCount());
+            } break;
+            case TOTAL_COLUMN: {
+                variant = it->getTotal();
+            } break;
+            case INUSE_COLUMN: {
+                if (it->getCount() > 0) {
+                    variant << wxArtProvider::GetBitmap("checkmark");
+                } else {
+                    variant << wxArtProvider::GetBitmap("cross");
+                }
+            } break;
+            default:
+                break;
+        }
     }
 
     virtual bool SetValue(const wxVariant &variant, const wxDataViewItem &item, unsigned int col)
     {
         return true;
+    }
+
+    void *income()
+    {
+        return m_root.getChildren()[0];
+    }
+
+    void *outlay()
+    {
+        return m_root.getChildren()[1];
     }
 
 protected:

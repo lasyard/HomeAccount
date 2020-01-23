@@ -43,7 +43,6 @@ EVT_DATE_CHANGED(XRCID("date"), MainFrame::onDateChanged)
 EVT_BUTTON(XRCID("statistics"), MainFrame::onStatButton)
 EVT_BUTTON(XRCID("export"), MainFrame::onExportButton)
 EVT_BUTTON(XRCID("import"), MainFrame::onImportButton)
-EVT_BUTTON(XRCID("category"), MainFrame::onCategoryButton)
 EVT_BUTTON(XRCID("config"), MainFrame::onConfigButton)
 EVT_NOTEBOOK_PAGE_CHANGING(XRCID("book"), MainFrame::onPageChanging)
 EVT_CLOSE(MainFrame::onClose)
@@ -60,6 +59,10 @@ MainFrame::MainFrame() : m_dir(), m_file(nullptr), m_daily(nullptr), m_cash(null
     wxPanel *panel = XRCCTRL(*this, "categories_panel", wxPanel);
     m_catView = new wxDataViewCtrl(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDV_HORIZ_RULES);
     wxXmlResource::Get()->AttachUnknownControl("categories", m_catView);
+    m_catView->AppendTextColumn(_("Category"), CatModel::NAME_COLUMN, wxDATAVIEW_CELL_INERT, 200);
+    m_catView->AppendTextColumn(_("Count"), CatModel::COUNT_COLUMN, wxDATAVIEW_CELL_INERT, 80);
+    m_catView->AppendTextColumn(_("Total"), CatModel::TOTAL_COLUMN, wxDATAVIEW_CELL_INERT, 200);
+    m_catView->AppendBitmapColumn(_("In use"), CatModel::INUSE_COLUMN, wxDATAVIEW_CELL_INERT, 80);
 }
 
 void MainFrame::initView(const wxString &dir)
@@ -98,8 +101,6 @@ void MainFrame::initView(const wxString &dir)
     loadDailyFile();
     loadCashFile();
     showDaily();
-    m_catView->AppendTextColumn("haha", 0, wxDATAVIEW_CELL_INERT, 180);
-    m_catView->AppendTextColumn("words", 1, wxDATAVIEW_CELL_INERT, 500);
 }
 
 void MainFrame::onDateChanged(wxDateEvent &event)
@@ -131,6 +132,29 @@ void MainFrame::onPageChanging(wxBookCtrlEvent &event)
         default:
             break;
     }
+    if (event.GetSelection() == CAT_PAGE) {
+        struct cat_root *cat = m_daily->getCatRoot();
+        int sYear = m_file->minYear();
+        int sMonth = m_file->minMonth(sYear);
+        int eYear = m_file->maxYear();
+        int eMonth = m_file->maxMonth(eYear);
+        m_file->calTotal(cat, sYear, sMonth, eYear, eMonth);
+        CatModel *model = new CatModel(cat);
+        m_catView->AssociateModel(model);
+        expandAllCat(wxDataViewItem(model->income()));
+        expandAllCat(wxDataViewItem(model->outlay()));
+        model->DecRef();
+    }
+}
+
+void MainFrame::expandAllCat(const wxDataViewItem &item)
+{
+    m_catView->Expand(item);
+    const CatItem *it = static_cast<const CatItem *>(item.GetID());
+    std::vector<CatItem *> children = it->getChildren();
+    for (auto i = children.cbegin(); i != children.cend(); ++i) {
+        if ((*i)->hasChild()) expandAllCat(wxDataViewItem(*i));
+    }
 }
 
 void MainFrame::onStatButton(wxCommandEvent &event)
@@ -149,12 +173,7 @@ void MainFrame::onStatButton(wxCommandEvent &event)
             }
             int sYear, sMonth, eYear, eMonth;
             dlg->getData(sYear, sMonth, eYear, eMonth);
-            clear_total(cat);
             m_file->calTotal(cat, sYear, sMonth, eYear, eMonth);
-            sum_total(mtree_first_child(&cat->root));
-            get_cat_node(mtree_first_child(&cat->root))->total += cat->no_cat_in_sum;
-            sum_total(mtree_last_child(&cat->root));
-            get_cat_node(mtree_last_child(&cat->root))->total += cat->no_cat_out_sum;
             m_html->showTotal(cat, sYear, sMonth, eYear, eMonth);
         } else if (sel == 1) {
             SubAnnuallyFile t(m_file);
@@ -288,14 +307,6 @@ void MainFrame::onImportButton(wxCommandEvent &event)
         delete file;
     }
     fileDlg->Destroy();
-}
-
-void MainFrame::onCategoryButton(wxCommandEvent &event)
-{
-    m_cat = new CatModel(m_daily->getCatRoot());
-    m_catView->AssociateModel(m_cat);
-    m_cat->DecRef();
-    m_book->SetSelection(CAT_PAGE);
 }
 
 void MainFrame::onConfigButton(wxCommandEvent &event)
