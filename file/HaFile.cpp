@@ -76,6 +76,7 @@ FileType *HaFile::import(const std::string &path)
     ifs.getline(line, FileRW::LINE_LEN);
     if (strncmp(line, HEADER, FileRW::TYPE_HEADER_LEN) == 0) {
         clearFile();
+        tryLoadFile();
         FileRW *file;
         while (true) {
             ifs.getline(line, FileRW::LINE_LEN);
@@ -93,8 +94,8 @@ FileType *HaFile::import(const std::string &path)
 FileRW *HaFile::importOne(const char *header, std::istream &is)
 {
     FileRW *file;
-    if ((file = new CatFileRW())->import(header, is) || (file = new CashFileRW())->import(header, is) ||
-        (file = new DailyFileRW())->import(header, is)) {
+    if ((file = new DailyFileRW())->import(header, is) || (file = new CatFileRW())->import(header, is) ||
+        (file = new CashFileRW())->import(header, is)) {
         file->setHaFile(this);
         file->save();
         return file;

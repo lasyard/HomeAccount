@@ -84,6 +84,7 @@ private:
         m_book->SetSelection(STATISTICS_PAGE);
     }
 
+    struct cat_root *checkGetCat();
     void expandAllCat(const wxDataViewItem &item);
     void loadDailyFile();
     void loadCashFile();

@@ -133,7 +133,8 @@ void MainFrame::onPageChanging(wxBookCtrlEvent &event)
             break;
     }
     if (event.GetSelection() == CAT_PAGE) {
-        struct cat_root *cat = m_daily->getCatRoot();
+        struct cat_root *cat = checkGetCat();
+        if (cat == nullptr) return;
         int sYear = m_file->minYear();
         int sMonth = m_file->minMonth(sYear);
         int eYear = m_file->maxYear();
@@ -157,6 +158,16 @@ void MainFrame::expandAllCat(const wxDataViewItem &item)
     }
 }
 
+struct cat_root *MainFrame::checkGetCat()
+{
+    struct cat_root *cat = m_daily->getCatRoot();
+    if (mtree_is_leaf(&cat->root)) {
+        wxMessageBox(_("Category config is empty"), _("App name"), wxOK | wxICON_ERROR);
+        return nullptr;
+    }
+    return cat;
+}
+
 void MainFrame::onStatButton(wxCommandEvent &event)
 {
     StatDialog *dlg = new StatDialog();
@@ -165,9 +176,8 @@ void MainFrame::onStatButton(wxCommandEvent &event)
         dailyQuerySave();
         int sel = dlg->getSelection();
         if (sel == 0) {
-            struct cat_root *cat = m_daily->getCatRoot();
-            if (mtree_is_leaf(&cat->root)) {
-                wxMessageBox(_("Category config is empty"), _("App name"), wxOK | wxICON_ERROR);
+            struct cat_root *cat = checkGetCat();
+            if (cat == nullptr) {
                 dlg->Destroy();
                 return;
             }
@@ -199,7 +209,7 @@ void MainFrame::onExportButton(wxCommandEvent &event)
 {
     wxArrayString choices;
     choices.Add(_("Current datum"));
-    choices.Add(_("Categories config"));
+    // choices.Add(_("Categories config"));
     choices.Add(_("All datum"));
     wxSingleChoiceDialog *dlg = new wxSingleChoiceDialog(this, _("Choose one to export"), _("App name"), choices);
     if (dlg->ShowModal() == wxID_OK) {
@@ -219,10 +229,10 @@ void MainFrame::onExportButton(wxCommandEvent &event)
                 defaultFileName = wxString::Format("daily_%s", m_daily->dataFileName());
             } else if (m_book->GetSelection() == CASH_PAGE) {
                 defaultFileName = m_cash->dataFileName();
+            } else if (m_book->GetSelection() == CAT_PAGE) {
+                defaultFileName = "category";
             }
         } else if (index == 1) {
-            defaultFileName = "category";
-        } else if (index == 2) {
             defaultFileName = "ha_all_data";
         }
         defaultFileName.Replace("/", "_");
@@ -242,10 +252,10 @@ void MainFrame::onExportButton(wxCommandEvent &event)
                     m_cash->saveAs(path);
                 } else if (m_book->GetSelection() == STATISTICS_PAGE) {
                     m_html->saveAs(path);
+                } else if (m_book->GetSelection() == CAT_PAGE) {
+                    m_daily->saveCatAs(path);
                 }
             } else if (index == 1) {
-                m_daily->saveCatAs(path);
-            } else if (index == 2) {
                 m_file->exportAll(path);
             }
         }
