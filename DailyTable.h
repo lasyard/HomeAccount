@@ -75,6 +75,7 @@ protected:
     wxGridCellAttr *m_categoryAttrO;
     wxGridCellAttr *m_categoryNoCatAttrI;
     wxGridCellAttr *m_categoryNoCatAttrO;
+    wxGridCellAttr *m_categoryNoCatRoAttr;
 
     CatFileRW *m_cat;
 
@@ -143,6 +144,8 @@ protected:
         m_categoryNoCatAttrI->SetBackgroundColour(*wxYELLOW);
         m_categoryNoCatAttrO = m_categoryAttrO->Clone();
         m_categoryNoCatAttrO->SetBackgroundColour(*wxYELLOW);
+        m_categoryNoCatRoAttr = m_moneyRoAttr->Clone();
+        m_categoryNoCatRoAttr->SetBackgroundColour(*wxYELLOW);
     }
 
     void releaseCellAttr()

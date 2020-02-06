@@ -64,8 +64,13 @@ wxGridCellAttr *DailyTable::GetAttr(int row, int col, wxGridCellAttr::wxAttrKind
     if (row > 0 && row <= m_rows.size() && col == m_categoryColumn) {
         struct item *it = m_rows[row - 1];
         if (setCatNotAllowed(it)) {
-            m_moneyRoAttr->IncRef();
-            return m_moneyRoAttr;
+            if (is_dummy_item(it)) {
+                m_moneyRoAttr->IncRef();
+                return m_moneyRoAttr;
+            } else {
+                m_categoryNoCatRoAttr->IncRef();
+                return m_categoryNoCatRoAttr;
+            }
         }
         if (it->money > 0) {
             if (it->word == NULL) {
