@@ -1,6 +1,6 @@
-#include <wx/msgdlg.h>
-
 #include "DataTable.h"
+
+#include <wx/msgdlg.h>
 
 void DataTable::prepareData()
 {
@@ -85,6 +85,9 @@ wxString DataTable::GetValue(int row, int col)
     return "";
 }
 
+/**
+ * Return Value: whether the category column should be updated.
+ */
 bool DataTable::doSetValue(int row, int col, const wxString &value)
 {
     wxASSERT(row >= 1 && row <= m_rows.size());
@@ -94,11 +97,17 @@ bool DataTable::doSetValue(int row, int col, const wxString &value)
     bool setMoney = false;
     if (col == m_incomeColumn) {
         money = -str_to_money(value);
+        if (money == 0 && it->money >= 0) {
+            return false;
+        }
         setMoney = true;
         if (it->money > 0) showMsg = true;
     } else if (col == m_outlayColumn) {
-        setMoney = true;
         money = str_to_money(value);
+        if (money == 0 && it->money <= 0) {
+            return false;
+        }
+        setMoney = true;
         if (it->money < 0) showMsg = true;
     }
     if (setMoney) {
@@ -116,10 +125,17 @@ bool DataTable::doSetValue(int row, int col, const wxString &value)
     struct string str;
     string_init(&str);
     if (col == m_descColumn) {
+        if (value.IsEmpty() && string_is_empty(&it->desc)) {
+            return false;
+        }
         string_mock_slice(&str, value, '\0');
         if (item_set_desc(it, &str) == NULL) throw std::bad_alloc();
         m_data->setModified();
+        return true;
     } else if (col == m_commentsColumn) {
+        if (value.IsEmpty() && string_is_empty(&it->comment)) {
+            return false;
+        }
         string_mock_slice(&str, value, '\0');
         if (item_set_comment(it, &str) == NULL) throw std::bad_alloc();
         m_data->setModified();

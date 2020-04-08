@@ -1,6 +1,6 @@
-#include <wx/combobox.h>
-
 #include "DailyTable.h"
+
+#include <wx/combobox.h>
 
 wxString DailyTable::GetValue(int row, int col)
 {
@@ -46,7 +46,7 @@ void DailyTable::SetValue(int row, int col, const wxString &value)
             changeCat(it, value);
             updateCat();
         }
-    } else if (doSetValue(row, col, value) || col == m_descColumn) {
+    } else if (doSetValue(row, col, value)) {
         update_item_cat(it, m_cat->getCatRoot());
         if (GetView() != nullptr) {
             GetView()->AutoSizeColumn(m_categoryColumn);
