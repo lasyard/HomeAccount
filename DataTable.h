@@ -1,13 +1,12 @@
 #ifndef _DATA_TABLE_H_
 #define _DATA_TABLE_H_
 
-#include <vector>
-
 #include <wx/grid.h>
 
-#include "file/DataFileRW.h"
+#include <vector>
 
 #include "c/data.h"
+#include "file/DataFileRW.h"
 
 class DataTable : public wxGridTableBase
 {
@@ -161,6 +160,7 @@ protected:
     void prepareData();
     void updateBalanceAndTotal();
     bool doSetValue(int row, int col, const wxString &value);
+    bool setMoney(struct item *it, money_t money);
 };
 
 #endif

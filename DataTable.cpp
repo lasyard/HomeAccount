@@ -92,35 +92,18 @@ bool DataTable::doSetValue(int row, int col, const wxString &value)
 {
     wxASSERT(row >= 1 && row <= m_rows.size());
     struct item *it = m_rows[row - 1];
-    money_t money = 0;
-    bool showMsg = false;
-    bool setMoney = false;
     if (col == m_incomeColumn) {
-        money = -str_to_money(value);
+        money_t money = -str_to_money(value);
         if (money == 0 && it->money >= 0) {
             return false;
         }
-        setMoney = true;
-        if (it->money > 0) showMsg = true;
+        return setMoney(it, money);
     } else if (col == m_outlayColumn) {
-        money = str_to_money(value);
+        money_t money = str_to_money(value);
         if (money == 0 && it->money <= 0) {
             return false;
         }
-        setMoney = true;
-        if (it->money < 0) showMsg = true;
-    }
-    if (setMoney) {
-        if (showMsg) {
-            wxMessageBox(_("Cannot set both income and outlay in one line"), _("App name"), wxOK | wxICON_ERROR);
-        }
-        item_set_money(it, money);
-        updateBalanceAndTotal();
-        m_data->setModified();
-        if (GetView() != nullptr) {
-            GetView()->AutoSizeColumn(m_balanceColumn);
-        }
-        return showMsg;
+        return setMoney(it, money);
     }
     struct string str;
     string_init(&str);
@@ -141,6 +124,43 @@ bool DataTable::doSetValue(int row, int col, const wxString &value)
         m_data->setModified();
     }
     return false;
+}
+
+/**
+ * Return Value: whether the category column should be updated.
+ */
+bool DataTable::setMoney(struct item *it, money_t money)
+{
+    enum MoneyChange {
+        SAME_SIGN,
+        INVERT_ZERO_NONZERO,
+        INVERT_SIGN,
+    } moneyChange = SAME_SIGN;
+    if (it->money == 0) {
+        moneyChange = INVERT_ZERO_NONZERO;
+    } else if (it->money < 0) {
+        if (money == 0) {
+            moneyChange = INVERT_ZERO_NONZERO;
+        } else if (money > 0) {
+            moneyChange = INVERT_SIGN;
+        }
+    } else if (it->money > 0) {
+        if (money == 0) {
+            moneyChange = INVERT_ZERO_NONZERO;
+        } else if (money < 0) {
+            moneyChange = INVERT_SIGN;
+        }
+    }
+    if (moneyChange == INVERT_SIGN) {
+        wxMessageBox(_("Cannot set both income and outlay in one line"), _("App name"), wxOK | wxICON_ERROR);
+    }
+    item_set_money(it, money);
+    updateBalanceAndTotal();
+    m_data->setModified();
+    if (GetView() != nullptr) {
+        GetView()->AutoSizeColumn(m_balanceColumn);
+    }
+    return moneyChange == INVERT_ZERO_NONZERO || moneyChange == INVERT_SIGN;
 }
 
 void DataTable::SetValue(int row, int col, const wxString &value)
