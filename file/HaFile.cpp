@@ -123,7 +123,7 @@ void HaFile::exportAll(const std::string &path)
 void HaFile::calTotal(struct cat_root *cat, int sYear, int sMonth, int eYear, int eMonth)
 {
     clear_total(cat);
-    for (MonthIterator i(sYear, sMonth); i < MonthIterator(eYear, eMonth); ++i) {
+    for (MonthIterator i(sYear, sMonth); i <= MonthIterator(eYear, eMonth); ++i) {
         cal_data_total(SubDailyFile(this, i.year(), i.month())()->getData(), cat);
     }
     sum_total(mtree_first_child(&cat->root));

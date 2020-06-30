@@ -36,21 +36,21 @@ public:
 
     bool operator<(const MonthIterator &obj)
     {
-        return m_year < obj.m_year || (m_year == obj.m_year && m_month < obj.m_year);
+        return m_year < obj.m_year || (m_year == obj.m_year && m_month < obj.m_month);
     }
 
     bool operator<=(const MonthIterator &obj)
     {
-        return m_year < obj.m_year || (m_year == obj.m_year && m_month <= obj.m_year);
+        return m_year < obj.m_year || (m_year == obj.m_year && m_month <= obj.m_month);
     }
 
     bool operator>(const MonthIterator &obj)
     {
-        return m_year > obj.m_year || (m_year == obj.m_year && m_month > obj.m_year);
+        return m_year > obj.m_year || (m_year == obj.m_year && m_month > obj.m_month);
     }
     bool operator>=(const MonthIterator &obj)
     {
-        return m_year > obj.m_year || (m_year == obj.m_year && m_month >= obj.m_year);
+        return m_year > obj.m_year || (m_year == obj.m_year && m_month >= obj.m_month);
     }
 
     int year()
