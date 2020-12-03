@@ -85,7 +85,8 @@ void MainFrame::initView(const wxString &dir)
             wxMessageBox(_("File corrupted"), _("App name"), wxOK | wxICON_ERROR);
             wxExit();
         } catch (BadPassword &) {
-            if (count == 3) break;
+            if (count == 3)
+                break;
             count++;
             wxPasswordEntryDialog *dlg = new wxPasswordEntryDialog(this, _("Input password"), _("App name"));
             if (dlg->ShowModal() == wxID_OK) {
@@ -96,8 +97,10 @@ void MainFrame::initView(const wxString &dir)
             dlg->Destroy();
         }
     }
-    if (count >= 3) wxExit();
+    if (count >= 3)
+        wxExit();
     m_date.SetToCurrent();
+    m_datePicker->SetValue(m_date);
     loadDailyFile();
     loadCashFile();
     showDaily();
@@ -122,19 +125,20 @@ void MainFrame::onPageChanging(wxBookCtrlEvent &event)
 {
     int sel = event.GetOldSelection();
     switch (sel) {
-        case DAILY_PAGE:
-            dailyQuerySave();
-            loadCashFile();
-            break;
-        case CASH_PAGE:
-            cashQuerySave();
-            break;
-        default:
-            break;
+    case DAILY_PAGE:
+        dailyQuerySave();
+        loadCashFile();
+        break;
+    case CASH_PAGE:
+        cashQuerySave();
+        break;
+    default:
+        break;
     }
     if (event.GetSelection() == CAT_PAGE) {
         struct cat_root *cat = checkGetCat();
-        if (cat == nullptr) return;
+        if (cat == nullptr)
+            return;
         int sYear = m_file->minYear();
         int sMonth = m_file->minMonth(sYear);
         int eYear = m_file->maxYear();
@@ -154,7 +158,8 @@ void MainFrame::expandAllCat(const wxDataViewItem &item)
     const CatItem *it = static_cast<const CatItem *>(item.GetID());
     std::vector<CatItem *> children = it->getChildren();
     for (auto i = children.cbegin(); i != children.cend(); ++i) {
-        if ((*i)->hasChild()) expandAllCat(wxDataViewItem(*i));
+        if ((*i)->hasChild())
+            expandAllCat(wxDataViewItem(*i));
     }
 }
 
@@ -293,26 +298,26 @@ void MainFrame::onImportButton(wxCommandEvent &event)
             return;
         }
         switch (file->type()) {
-            case FileType::DAILY: {
-                DailyFileRW *daily = static_cast<DailyFileRW *>(file);
-                m_date = wxDateTime(1, wxDateTime::Month(daily->month() - 1), daily->year());
-                m_datePicker->SetValue(m_date);
-                loadDailyFile();
-                showDaily();
-            } break;
-            case FileType::CASH:
-                loadCashFile();
-                showCash();
-                break;
-            case FileType::CAT:
-                loadDailyFile();
-                break;
-            case FileType::WHOLE:
-                loadDailyFile();
-                loadCashFile();
-                break;
-            case FileType::INVALID:
-                break;
+        case FileType::DAILY: {
+            DailyFileRW *daily = static_cast<DailyFileRW *>(file);
+            m_date = wxDateTime(1, wxDateTime::Month(daily->month() - 1), daily->year());
+            m_datePicker->SetValue(m_date);
+            loadDailyFile();
+            showDaily();
+        } break;
+        case FileType::CASH:
+            loadCashFile();
+            showCash();
+            break;
+        case FileType::CAT:
+            loadDailyFile();
+            break;
+        case FileType::WHOLE:
+            loadDailyFile();
+            loadCashFile();
+            break;
+        case FileType::INVALID:
+            break;
         }
         delete file;
     }

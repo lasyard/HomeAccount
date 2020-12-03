@@ -6,11 +6,11 @@ TARGET := HomeAccount
 VERSION := 1.1
 YEAR := 2020
 
-WX_VERSION := 3.1.3
-WX_DYLIBS_VERSION := 3.1.3.0.0
+WX_VERSION := 3.1.4
+WX_DYLIBS_VERSION := 3.1.4.0.0
 WX_PATH := $(HOME)/workspace/devel/wxWidgets-$(WX_VERSION)
-CRYPTOPP_VERSION := CRYPTOPP_8_2_0
-CRYPTOPP_PATH := $(HOME)/workspace/devel/cryptopp-$(CRYPTOPP_VERSION)
+CRYPTOPP_VERSION := 820
+CRYPTOPP_PATH := $(HOME)/workspace/devel/cryptopp$(CRYPTOPP_VERSION)
 
 # Source files
 CPP_SRCS := \

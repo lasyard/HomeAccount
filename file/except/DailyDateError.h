@@ -9,6 +9,7 @@ class DailyDateError : public std::exception
 public:
     DailyDateError(const char *title) : m_title(title)
     {
+        m_msg = std::string("Wrong date in daily file: ") + m_title + ".";
     }
 
     virtual ~DailyDateError() _NOEXCEPT
@@ -17,7 +18,7 @@ public:
 
     virtual const char *what() const _NOEXCEPT
     {
-        return (std::string("Wrong date in daily file: ") + m_title + ".").c_str();
+        return m_msg.c_str();
     }
 
     const std::string &title() const
@@ -27,6 +28,7 @@ public:
 
 protected:
     std::string m_title;
+    std::string m_msg;
 };
 
 #endif

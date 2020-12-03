@@ -14,8 +14,10 @@ void DataGrid::setGrid()
     SetRowMinimalAcceptableHeight(18);
     SetRowLabelSize(wxGRID_AUTOSIZE);
     SetColLabelSize(wxGRID_AUTOSIZE);
-    if (GetRowLabelSize() < m_logo.GetWidth() + 2) SetRowLabelSize(m_logo.GetWidth() + 2);
-    if (GetColLabelSize() < m_logo.GetHeight() + 2) SetColLabelSize(m_logo.GetHeight() + 2);
+    if (GetRowLabelSize() < m_logo.GetWidth() + 2)
+        SetRowLabelSize(m_logo.GetWidth() + 2);
+    if (GetColLabelSize() < m_logo.GetHeight() + 2)
+        SetColLabelSize(m_logo.GetHeight() + 2);
     AutoSizeColumns(false);
     AutoSizeRows(false);
     DisableDragColMove();
@@ -65,7 +67,7 @@ void DataGrid::onKeyDown(wxKeyEvent &event)
             }
             wxArrayInt rows = GetSelectedRows();
             if (rows.Count() > 0) {
-                rows.Sort([](int a, int b) -> int { return a < b ? 1 : a > b ? -1 : 0; });
+                rows.Sort([](int *a, int *b) -> int { return *a < *b ? 1 : *a > *b ? -1 : 0; });
                 int rowStart = rows[0];
                 int numRows = 1;
                 for (size_t i = 1; i < rows.Count(); ++i) {

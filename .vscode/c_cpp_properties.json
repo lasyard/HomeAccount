@@ -10,9 +10,9 @@
                 "VER_STR=\"VER_STR\""
             ],
             "includePath": [
-                "${HOME}/workspace/devel/wxWidgets-3.1.3/include",
-                "${HOME}/workspace/devel/wxWidgets-3.1.3/build-cocoa-debug/lib/wx/include/osx_cocoa-unicode-3.1",
-                "${HOME}/workspace/devel/cryptopp"
+                "${HOME}/workspace/devel/wxWidgets-3.1.4/include",
+                "${HOME}/workspace/devel/wxWidgets-3.1.4/build-cocoa-debug/lib/wx/include/osx_cocoa-unicode-3.1",
+                "${HOME}/workspace/devel/cryptopp820"
             ],
             "macFrameworkPath": [
                 "/System/Library/Frameworks",

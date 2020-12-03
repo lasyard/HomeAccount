@@ -1,13 +1,18 @@
 ---
-BasedOnStyle: Google
-IndentWidth: 4
+BasedOnStyle: LLVM
 ColumnLimit: 120
+IndentWidth: 4
+UseTab: Never
+BreakBeforeBraces: Linux
+IndentCaseLabels: false
+MaxEmptyLinesToKeep: 1
+BinPackParameters: false
+BinPackArguments: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AlignConsecutiveMacros: true
+AlignTrailingComments: true
+AllowShortFunctionsOnASingleLine: false
 ---
 Language: Cpp
 AccessModifierOffset: -4
-AlignTrailingComments: true
-#AlignConsecutiveMacros: true
-AllowShortFunctionsOnASingleLine: false
-BreakBeforeBraces: Linux
-BinPackArguments: false
-BinPackParameters: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
