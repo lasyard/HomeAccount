@@ -13,18 +13,21 @@ const wxString HaApp::RESOURCE_IN_RES = "r";
 
 bool HaApp::OnInit()
 {
-    if (!wxApp::OnInit()) return false;
+    if (!wxApp::OnInit()) {
+        return false;
+    }
     m_locale.Init();
     if (!m_locale.AddCatalog("ha")) {
         wxLogError("Couldn't find/load the \"ha\" catalog");
     }
     m_locale.AddCatalog("wxstd");
+    wxImage::AddHandler(new wxPNGHandler());
     wxArtProvider::Push(new ArtProvider(m_resDir));
     wxImage::AddHandler(new wxPNGHandler);
     wxFileSystem::AddHandler(new wxArchiveFSHandler);
     wxXmlResource::Get()->InitAllHandlers();
     (this->*m_loadXmlResource)();
-    MainFrame* frame = new MainFrame();
+    MainFrame *frame = new MainFrame();
     SetTopWindow(frame);
     frame->Show();
 #ifdef DEBUG
@@ -39,15 +42,16 @@ int HaApp::OnExit()
     return wxApp::OnExit();
 }
 
-void HaApp::OnInitCmdLine(wxCmdLineParser& parser)
+void HaApp::OnInitCmdLine(wxCmdLineParser &parser)
 {
     parser.AddSwitch(RESOURCE_IN_RES);
     wxAppConsole::OnInitCmdLine(parser);
 }
 
-bool HaApp::OnCmdLineParsed(wxCmdLineParser& parser)
+bool HaApp::OnCmdLineParsed(wxCmdLineParser &parser)
 {
-    if (!wxApp::OnCmdLineParsed(parser)) return false;
+    if (!wxApp::OnCmdLineParsed(parser))
+        return false;
     if (parser.Found(RESOURCE_IN_RES)) {
         m_dataDir = "HA";
         m_resDir = "res";

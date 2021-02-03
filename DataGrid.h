@@ -4,6 +4,7 @@
 #include <wx/artprov.h>
 #include <wx/bitmap.h>
 #include <wx/grid.h>
+#include <wx/pen.h>
 
 #include "c/utils.h"
 
@@ -44,7 +45,9 @@ public:
 
     virtual wxPen GetRowGridLinePen(int row)
     {
-        if (GetRowLabelValue(row + 1) != "") return *wxLIGHT_GREY_PEN;
+        if (GetRowLabelValue(row + 1) != "") {
+            return *wxLIGHT_GREY_PEN;
+        }
         return *wxWHITE_PEN;
     }
 
@@ -58,7 +61,9 @@ protected:
 
     void safeClearCell(int row, int col)
     {
-        if (!IsReadOnly(row, col)) SetCellValue(row, col, "");
+        if (!IsReadOnly(row, col)) {
+            SetCellValue(row, col, "");
+        }
     }
 
     DECLARE_EVENT_TABLE()

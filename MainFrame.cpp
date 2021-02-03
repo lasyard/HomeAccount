@@ -97,8 +97,9 @@ void MainFrame::initView(const wxString &dir)
             dlg->Destroy();
         }
     }
-    if (count >= 3)
+    if (count >= 3) {
         wxExit();
+    }
     m_date.SetToCurrent();
     m_datePicker->SetValue(m_date);
     loadDailyFile();
@@ -137,8 +138,9 @@ void MainFrame::onPageChanging(wxBookCtrlEvent &event)
     }
     if (event.GetSelection() == CAT_PAGE) {
         struct cat_root *cat = checkGetCat();
-        if (cat == nullptr)
+        if (cat == nullptr) {
             return;
+        }
         int sYear = m_file->minYear();
         int sMonth = m_file->minMonth(sYear);
         int eYear = m_file->maxYear();
@@ -158,8 +160,9 @@ void MainFrame::expandAllCat(const wxDataViewItem &item)
     const CatItem *it = static_cast<const CatItem *>(item.GetID());
     std::vector<CatItem *> children = it->getChildren();
     for (auto i = children.cbegin(); i != children.cend(); ++i) {
-        if ((*i)->hasChild())
+        if ((*i)->hasChild()) {
             expandAllCat(wxDataViewItem(*i));
+        }
     }
 }
 
@@ -380,7 +383,7 @@ void MainFrame::removeOldFiles(const wxString &dirName)
     wxArrayString fileNames = HaFile::getFileList(dirName);
     if (fileNames.GetCount() > 10) {
         fileNames.Sort(false);
-        for (int i = 0; i < fileNames.GetCount() - 10; i++) {
+        for (size_t i = 0; i < fileNames.GetCount() - 10; i++) {
             wxRemoveFile(wxFileName(dirName, fileNames[i]).GetFullPath());
         }
     }
@@ -388,10 +391,11 @@ void MainFrame::removeOldFiles(const wxString &dirName)
 
 void MainFrame::loadDailyFile()
 {
-    CatFileRW *cat;
-    DailyFileRW *file;
+    CatFileRW *cat = nullptr;
+    DailyFileRW *file = nullptr;
     try {
         file = m_file->getDailyFile(m_date.GetYear(), m_date.GetMonth() + 1);
+        file->afterLoad();
         cat = m_file->getCatFile();
     } catch (DataFileError &e) {
         showFileError(e);
@@ -404,7 +408,6 @@ void MainFrame::loadDailyFile()
         str.Printf(_("Duplicate words in categories config at line %1$d"), e.lineNo());
         wxMessageBox(str, _("App name"), wxOK | wxICON_ERROR);
     }
-    file->afterLoad();
     // The number of cols and rows are only updated in SetTable, so make new table each time.
     m_daily = new DailyTable(file, cat);
     m_grid->SetTable(m_daily, true);
@@ -415,13 +418,13 @@ void MainFrame::loadDailyFile()
 
 void MainFrame::loadCashFile()
 {
-    CashFileRW *file;
+    CashFileRW *file = nullptr;
     try {
         file = m_file->getCashFile();
+        file->afterLoad();
     } catch (DataFileError &e) {
         showFileError(e);
     }
-    file->afterLoad();
     m_cash = new DataTable(file);
     m_cashGrid->SetTable(m_cash, true);
     m_cashGrid->ForceRefresh();

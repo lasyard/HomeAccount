@@ -12,11 +12,11 @@ public:
         m_msg = std::string("Wrong date in daily file: ") + m_title + ".";
     }
 
-    virtual ~DailyDateError() _NOEXCEPT
+    virtual ~DailyDateError() wxNOEXCEPT
     {
     }
 
-    virtual const char *what() const _NOEXCEPT
+    virtual const char *what() const wxNOEXCEPT
     {
         return m_msg.c_str();
     }

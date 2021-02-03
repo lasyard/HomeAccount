@@ -1,3 +1,5 @@
+#include <wx/dc.h>
+
 #include "DataGrid.h"
 #include "DataTable.h"
 
@@ -14,10 +16,12 @@ void DataGrid::setGrid()
     SetRowMinimalAcceptableHeight(18);
     SetRowLabelSize(wxGRID_AUTOSIZE);
     SetColLabelSize(wxGRID_AUTOSIZE);
-    if (GetRowLabelSize() < m_logo.GetWidth() + 2)
+    if (GetRowLabelSize() < m_logo.GetWidth() + 2) {
         SetRowLabelSize(m_logo.GetWidth() + 2);
-    if (GetColLabelSize() < m_logo.GetHeight() + 2)
+    }
+    if (GetColLabelSize() < m_logo.GetHeight() + 2) {
         SetColLabelSize(m_logo.GetHeight() + 2);
+    }
     AutoSizeColumns(false);
     AutoSizeRows(false);
     DisableDragColMove();

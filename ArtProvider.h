@@ -10,9 +10,9 @@ class ArtProvider : public wxArtProvider
 public:
     ArtProvider(const wxString &dir) : wxArtProvider()
     {
-        m_logo.LoadFile(wxFileName(dir, "logo").GetFullPath(), wxBITMAP_TYPE_PNG_RESOURCE);
-        m_checkmark.LoadFile(wxFileName(dir, "checkmark").GetFullPath(), wxBITMAP_TYPE_PNG_RESOURCE);
-        m_cross.LoadFile(wxFileName(dir, "cross").GetFullPath(), wxBITMAP_TYPE_PNG_RESOURCE);
+        m_logo.LoadFile(wxFileName(dir, "logo.png").GetFullPath(), wxBITMAP_TYPE_PNG);
+        m_checkmark.LoadFile(wxFileName(dir, "checkmark.png").GetFullPath(), wxBITMAP_TYPE_PNG);
+        m_cross.LoadFile(wxFileName(dir, "cross.png").GetFullPath(), wxBITMAP_TYPE_PNG);
     }
 
 protected:

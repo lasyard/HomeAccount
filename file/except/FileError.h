@@ -11,7 +11,7 @@ public:
     {
     }
 
-    virtual ~FileError() _NOEXCEPT
+    virtual ~FileError() wxNOEXCEPT
     {
     }
 

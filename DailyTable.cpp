@@ -5,12 +5,18 @@
 wxString DailyTable::GetValue(int row, int col)
 {
     wxString v = DataTable::GetValue(row, col);
-    if (!v.IsEmpty()) return v;
-    if (row > 0 && row <= m_rows.size() && col == m_categoryColumn) {
+    if (!v.IsEmpty()) {
+        return v;
+    }
+    if (row > 0 && (size_t)row <= m_rows.size() && col == m_categoryColumn) {
         struct item *it = m_rows[row - 1];
-        if (setCatNotAllowed(it)) return "";
+        if (setCatNotAllowed(it)) {
+            return "";
+        }
         const char *name = item_cat_name(it);
-        if (name != NULL) return name;
+        if (name != NULL) {
+            return name;
+        }
         return _("Unclassified");
     }
     return "";
@@ -30,8 +36,12 @@ void DailyTable::changeCat(struct item *it, const char *name)
     } else {
         cat = NULL;
     }
-    if (it->word != NULL) delete_word(it->word);
-    if (cat != NULL && (it->word = add_word(cat, &it->desc, &dup)) == NULL) throw std::bad_alloc();
+    if (it->word != NULL) {
+        delete_word(it->word);
+    }
+    if (cat != NULL && (it->word = add_word(cat, &it->desc, &dup)) == NULL) {
+        throw std::bad_alloc();
+    }
     m_cat->setModified();
 }
 
@@ -60,8 +70,10 @@ void DailyTable::SetValue(int row, int col, const wxString &value)
 wxGridCellAttr *DailyTable::GetAttr(int row, int col, wxGridCellAttr::wxAttrKind kind)
 {
     wxGridCellAttr *attr = DataTable::GetAttr(row, col, kind);
-    if (attr != nullptr) return attr;
-    if (row > 0 && row <= m_rows.size() && col == m_categoryColumn) {
+    if (attr != nullptr) {
+        return attr;
+    }
+    if (row > 0 && (size_t)row <= m_rows.size() && col == m_categoryColumn) {
         struct item *it = m_rows[row - 1];
         if (setCatNotAllowed(it)) {
             if (is_dummy_item(it)) {

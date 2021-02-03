@@ -5,7 +5,7 @@
 
 class DailyFileEmpty : public std::exception
 {
-    virtual const char *what() const _NOEXCEPT
+    virtual const char *what() const wxNOEXCEPT
     {
         return "Daily File is empty.";
     }

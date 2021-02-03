@@ -20,7 +20,7 @@ public:
     {
     }
 
-    virtual const char *what() const _NOEXCEPT
+    virtual const char *what() const wxNOEXCEPT
     {
         return m_msg;
     }

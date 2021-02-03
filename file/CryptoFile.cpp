@@ -25,7 +25,9 @@ off_t CryptoFile::findSlot(size_t length)
     std::sort(vec.begin(), vec.end(), cp);
     off_t offset = HEADER_LEN + OFFSET_LEN + SIZE_LEN;
     for (std::vector<const FileInfo *>::const_iterator i = vec.cbegin(); i != vec.cend(); ++i) {
-        if ((size_t)(*i)->offset - (size_t)offset >= length) break;
+        if ((size_t)(*i)->offset - (size_t)offset >= length) {
+            break;
+        }
         offset = (*i)->offset + (*i)->size;
     }
     return offset;
@@ -56,7 +58,9 @@ void CryptoFile::copyFrom(CryptoFile *file)
     memcpy(m_key, file->m_key, KEY_LEN);
     memcpy(m_iv, file->m_iv, IV_LEN);
     for (auto i = file->m_catalog.cbegin(); i != file->m_catalog.cend(); ++i) {
-        if (i->first == CATALOG_NAME) continue;
+        if (i->first == CATALOG_NAME) {
+            continue;
+        }
         std::stringstream ss;
         file->loadFile(i->first, ss);
         saveFile(i->first, ss);
@@ -69,7 +73,9 @@ void CryptoFile::tryLoadFile()
     if (!m_file.is_open()) {
         m_file.open(m_fileName, std::ios::binary | std::ios::in | std::ios::out);
     }
-    if (!catalogLoaded()) loadCatalog();
+    if (!catalogLoaded()) {
+        loadCatalog();
+    }
 }
 
 void CryptoFile::loadCatalog()
@@ -96,7 +102,9 @@ void CryptoFile::loadCatalog()
     CatRecord rec;
     while (1) {
         output.read((char *)&rec, sizeof(rec));
-        if (output.gcount() < sizeof(rec)) break;
+        if ((size_t)output.gcount() < sizeof(rec)) {
+            break;
+        }
         m_catalog[rec.fileName] = FileInfo(rec);
     }
 }
@@ -105,7 +113,9 @@ void CryptoFile::saveCatalog()
 {
     std::stringstream stream;
     for (auto i = m_catalog.cbegin(); i != m_catalog.cend(); ++i) {
-        if (i->first == CATALOG_NAME) continue;
+        if (i->first == CATALOG_NAME) {
+            continue;
+        }
         CatRecord cr(i->first, i->second);
         stream.write((char *)&cr, sizeof(CatRecord));
     }
@@ -166,7 +176,9 @@ char *CryptoFile::readSection(off_t offset, size_t length)
 
 void CryptoFile::decSection(off_t offset, size_t length, std::ostream &output, unsigned char key[KEY_LEN])
 {
-    if (key == nullptr) key = m_key;
+    if (key == nullptr) {
+        key = m_key;
+    }
     char *buf = readSection(offset, length);
     std::string tmp;
     try {
@@ -181,7 +193,9 @@ void CryptoFile::decSection(off_t offset, size_t length, std::ostream &output, u
 
 void CryptoFile::encStream(std::istream &input, std::string &output, unsigned char key[KEY_LEN])
 {
-    if (key == nullptr) key = m_key;
+    if (key == nullptr) {
+        key = m_key;
+    }
     std::string tmp;
     compress(input, tmp);
     encrypt(tmp, output, key);

@@ -9,7 +9,9 @@ void DataTable::prepareData()
     m_outlay = 0;
     m_rows.clear();
     m_balance.clear();
-    if (m_data == nullptr) return;
+    if (m_data == nullptr) {
+        return;
+    }
     m_initial = m_data->getInitial();
     for (auto p = m_data->ItemBegin(); p != m_data->ItemEnd(); ++p) {
         m_rows.push_back(p);
@@ -23,7 +25,7 @@ void DataTable::updateBalanceAndTotal()
     m_income = 0;
     m_outlay = 0;
     money_t balance = m_initial;
-    for (int i = 0; i < m_rows.size(); ++i) {
+    for (size_t i = 0; i < m_rows.size(); ++i) {
         struct item *p = m_rows[i];
         balance = cal_item_balance(p, balance);
         m_balance[i] = balance;
@@ -51,7 +53,7 @@ wxString DataTable::GetValue(int row, int col)
             money_to_str(buf, m_initial);
             return buf;
         }
-    } else if (row > m_rows.size()) {
+    } else if ((size_t)row > m_rows.size()) {
         if (col == m_incomeColumn) {
             money_to_str(buf, m_income);
             return buf;
@@ -90,7 +92,7 @@ wxString DataTable::GetValue(int row, int col)
  */
 bool DataTable::doSetValue(int row, int col, const wxString &value)
 {
-    wxASSERT(row >= 1 && row <= m_rows.size());
+    wxASSERT(row >= 1 && (size_t)row <= m_rows.size());
     struct item *it = m_rows[row - 1];
     if (col == m_incomeColumn) {
         money_t money = -str_to_money(value);
@@ -112,7 +114,9 @@ bool DataTable::doSetValue(int row, int col, const wxString &value)
             return false;
         }
         string_mock_slice(&str, value, '\0');
-        if (item_set_desc(it, &str) == NULL) throw std::bad_alloc();
+        if (item_set_desc(it, &str) == NULL) {
+            throw std::bad_alloc();
+        }
         m_data->setModified();
         return true;
     } else if (col == m_commentsColumn) {
@@ -120,7 +124,9 @@ bool DataTable::doSetValue(int row, int col, const wxString &value)
             return false;
         }
         string_mock_slice(&str, value, '\0');
-        if (item_set_comment(it, &str) == NULL) throw std::bad_alloc();
+        if (item_set_comment(it, &str) == NULL) {
+            throw std::bad_alloc();
+        }
         m_data->setModified();
     }
     return false;
@@ -173,7 +179,9 @@ void DataTable::SetValue(int row, int col, const wxString &value)
 
 bool DataTable::InsertRows(size_t pos, size_t numRows)
 {
-    if (pos < 1 || pos > m_rows.size()) return true;
+    if (pos < 1 || pos > m_rows.size()) {
+        return true;
+    }
     struct item *it = m_rows[pos - 1];
     for (size_t i = 0; i < numRows; i++) {
         it = insert_dummy_item(it);
@@ -188,11 +196,15 @@ bool DataTable::InsertRows(size_t pos, size_t numRows)
 
 bool DataTable::DeleteRows(size_t pos, size_t numRows)
 {
-    if (pos < 1 || pos > m_rows.size()) return true;
+    if (pos < 1 || pos > m_rows.size()) {
+        return true;
+    }
     size_t rowDeleted = 0;
     for (size_t i = 0; i < numRows; i++) {
-        int row = pos + i;
-        if (row > m_rows.size()) break;
+        size_t row = pos + i;
+        if (row > m_rows.size()) {
+            break;
+        }
         struct item *it = m_rows[row - 1];
         if (is_single_item(it)) {
             clear_item(it);
@@ -213,7 +225,7 @@ wxString DataTable::GetRowLabelValue(int row)
 {
     if (row == 0) {
         return _("Initial balance");
-    } else if (row > m_rows.size()) {
+    } else if ((size_t)row > m_rows.size()) {
         return _("Total");
     }
     struct item *p = m_rows[row - 1];
@@ -232,7 +244,7 @@ wxString DataTable::GetColLabelValue(int col)
 // Return attr will be taken ownership, so inc ref to keep it.
 wxGridCellAttr *DataTable::GetAttr(int row, int col, wxGridCellAttr::wxAttrKind kind)
 {
-    if (row > 0 && row <= m_rows.size()) {
+    if (row > 0 && (size_t)row <= m_rows.size()) {
         if (col == m_incomeColumn || col == m_outlayColumn) {
             m_moneyAttr->IncRef();
             return m_moneyAttr;
