@@ -35,40 +35,40 @@ void StatDialog::onRadioBox(wxCommandEvent &event)
     int year = wxDateTime::Today().GetYear();
     int month = wxDateTime::Today().GetMonth() + 1;
     switch (sel) {
-        case 0:
-            m_sYear = m_eYear = year;
-            m_sMonth = m_eMonth = month;
-            break;
-        case 1:
-            if (--month == 0) {
-                year--;
-                month = 12;
-            }
-            m_sYear = m_eYear = year;
-            m_sMonth = m_eMonth = month;
-            break;
-        case 2:
-            m_sYear = m_eYear = year;
-            m_sMonth = m_file->minMonth(year);
-            m_eMonth = m_file->maxMonth(year);
-            break;
-        case 3:
-            m_sYear = m_eYear = year - 1;
-            m_sMonth = m_file->minMonth(year - 1);
-            m_eMonth = m_file->maxMonth(year - 1);
-            break;
-        case 4:
-            m_sYear = m_file->minYear();
-            m_eYear = m_file->maxYear();
-            m_sMonth = m_file->minMonth(m_sYear);
-            m_eMonth = m_file->maxMonth(m_eYear);
-            break;
-        case 5:
-            m_from->Enable();
-            m_to->Enable();
-            break;
-        default:
-            break;
+    case 0:
+        m_sYear = m_eYear = year;
+        m_sMonth = m_eMonth = month;
+        break;
+    case 1:
+        if (--month == 0) {
+            year--;
+            month = 12;
+        }
+        m_sYear = m_eYear = year;
+        m_sMonth = m_eMonth = month;
+        break;
+    case 2:
+        m_sYear = m_eYear = year;
+        m_sMonth = m_file->minMonth(year);
+        m_eMonth = m_file->maxMonth(year);
+        break;
+    case 3:
+        m_sYear = m_eYear = year - 1;
+        m_sMonth = m_file->minMonth(year - 1);
+        m_eMonth = m_file->maxMonth(year - 1);
+        break;
+    case 4:
+        m_sYear = m_file->minYear();
+        m_eYear = m_file->maxYear();
+        m_sMonth = m_file->minMonth(m_sYear);
+        m_eMonth = m_file->maxMonth(m_eYear);
+        break;
+    case 5:
+        m_from->Enable();
+        m_to->Enable();
+        break;
+    default:
+        break;
     }
     m_book->GetPage(0)->TransferDataToWindow();
 }
@@ -83,7 +83,11 @@ void StatDialog::setFile(HaFile *file)
     }
     years.Sort(true);
     wxString str;
-    str.Printf(_("Annually statistics from %1$s to %2$s"), years.Last(), years[0]);
+    if (!years.IsEmpty()) {
+        str.Printf(_("Annually statistics from %1$s to %2$s"), years.Last(), years[0]);
+    } else {
+        str.Printf(_("No data is available"));
+    }
     XRCCTRL(*this, "min_max_year", wxStaticText)->SetLabel(str);
     wxPanel *panel = XRCCTRL(*this, "monthly", wxPanel);
     m_year = new wxChoice(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, years);

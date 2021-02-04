@@ -122,6 +122,10 @@ msgid "Annually statistics from %1$s to %2$s"
 msgstr "Annually statistics from %1$s to %2$s"
 
 #, c-format
+msgid "No data is available"
+msgstr "No data is available"
+
+#, c-format
 msgid "Classified statistics from %1$d/%2$d to %3$d/%4$d"
 msgstr "Classified statistics from %1$d/%2$d to %3$d/%4$d"
 

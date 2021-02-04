@@ -178,6 +178,7 @@ struct cat_root *MainFrame::checkGetCat()
 
 void MainFrame::onStatButton(wxCommandEvent &event)
 {
+    dailyQuerySave();
     StatDialog *dlg = new StatDialog();
     dlg->setFile(m_file);
     if (dlg->ShowModal() == wxID_OK) {
