@@ -30,6 +30,8 @@
 
 # Executables
 HomeAccount
+HomeAccount.app
+HomeAccount_win
 HA/
 *.exe
 *.out

@@ -1,18 +1,22 @@
 #!/usr/bin/env bash
 
-APP="HomeAccount"
-
-APP_DIR="${APP}.app"
-FRM_DIR="${APP_DIR}/Contents/Frameworks"
-EXE_FILE="${APP_DIR}/Contents/MacOS/${APP}"
+EXE_FILE="$1"
+FRM_DIR="$(dirname "${EXE_FILE}")/../Frameworks"
 
 dep_list() {
-    objdump -macho -dylibs-used -non-verbose "$1" | grep wxWidgets | cut -d' ' -f 1
+    otool -L "$1" |
+        tail +2 |
+        grep -v '/System/Library/' |
+        grep -v '/usr/lib/' |
+        cut -d' ' -f 1
 }
 
 check_dylib() {
     local TARGET="$1"
     local DEPS=$(dep_list "${TARGET}")
+    if [ "${TARGET}" != "${EXE_FILE}" ]; then
+        install_name_tool -id "${name}" "${TARGET}"
+    fi
     for dep in ${DEPS}; do
         local name="$(basename "${dep}")"
         local target="${FRM_DIR}/${name}"
@@ -23,8 +27,12 @@ check_dylib() {
             install_name_tool -change "${dep}" "@loader_path/${name}" "${TARGET}"
         fi
         if [ ! -f "${target}" ]; then
-            cp "${dep}" "${target}"
-            check_dylib ${target}
+            if [ -f "${dep}" ]; then
+                cp "${dep}" "${target}"
+                check_dylib ${target}
+            else
+                echo -e "\033[0;31mDylib \"${dep}\" not found.\033[0m"
+            fi
         fi
     done
 }

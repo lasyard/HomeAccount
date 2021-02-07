@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-APP="HomeAccount"
+EXE_FILE="$1"
+LIB_PATHS="$2"
+APP_DIR="$(dirname "${EXE_FILE}")"
 
-APP_DIR="${APP}"
-EXE_FILE="${APP_DIR}/${APP}.exe"
-
-for dll in $(ldd "${EXE_FILE}" | grep mingw | cut -d ' ' -f 3); do
-    cp "${dll}" ${APP_DIR}
+for dll in $(PATH=${PATH}:${LIB_PATHS} ldd "${EXE_FILE}" | grep -v -i 'c/windows' | cut -d ' ' -f 3); do
+    cp "${dll}" "${APP_DIR}"
+    echo "cp \"${dll}\" to \"${APP_DIR}\"."
 done

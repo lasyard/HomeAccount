@@ -17,14 +17,14 @@ public:
 
     int minYear() const
     {
-        if (is_empty_data(m_dt)) return 0;
+        if (is_empty_data(m_dt)) return 2000;
         const struct string &title = get_page(m_dt->pages.first)->title;
         return str_to_int(title.str, YEAR_LEN);
     }
 
     int maxYear() const
     {
-        if (is_empty_data(m_dt)) return 0;
+        if (is_empty_data(m_dt)) return 2000;
         const struct string &title = get_page(m_dt->pages.last)->title;
         return str_to_int(title.str, YEAR_LEN);
     }

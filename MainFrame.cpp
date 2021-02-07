@@ -45,6 +45,7 @@ EVT_BUTTON(XRCID("export"), MainFrame::onExportButton)
 EVT_BUTTON(XRCID("import"), MainFrame::onImportButton)
 EVT_BUTTON(XRCID("config"), MainFrame::onConfigButton)
 EVT_NOTEBOOK_PAGE_CHANGING(XRCID("book"), MainFrame::onPageChanging)
+EVT_NOTEBOOK_PAGE_CHANGED(XRCID("book"), MainFrame::onPageChanged)
 EVT_CLOSE(MainFrame::onClose)
 END_EVENT_TABLE()
 
@@ -122,6 +123,7 @@ void MainFrame::onDateChanged(wxDateEvent &event)
     showDaily();
 }
 
+// On Windows, GetOldSelection() == GetSelection(), so `PageChanged` must be handled.
 void MainFrame::onPageChanging(wxBookCtrlEvent &event)
 {
     int sel = event.GetOldSelection();
@@ -136,7 +138,23 @@ void MainFrame::onPageChanging(wxBookCtrlEvent &event)
     default:
         break;
     }
-    if (event.GetSelection() == CAT_PAGE) {
+}
+
+void MainFrame::onPageChanged(wxBookCtrlEvent &event)
+{
+    if (event.GetSelection() == STATISTICS_PAGE) {
+        if (m_html->GetOpenedPageTitle().IsEmpty()) {
+            struct cat_root *cat = checkGetCat();
+            if (cat != nullptr) {
+                int sYear = m_file->minYear();
+                int eYear = m_file->maxYear();
+                int sMonth = m_file->minMonth(sYear);
+                int eMonth = m_file->maxMonth(eYear);
+                m_file->calTotal(cat, sYear, sMonth, eYear, eMonth);
+                m_html->showTotal(cat, sYear, sMonth, eYear, eMonth);
+            }
+        }
+    } else if (event.GetSelection() == CAT_PAGE) {
         struct cat_root *cat = checkGetCat();
         if (cat == nullptr) {
             return;

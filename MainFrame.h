@@ -42,6 +42,7 @@ public:
     void onConfigButton(wxCommandEvent &event);
     void onClose(wxCloseEvent &event);
     void onPageChanging(wxBookCtrlEvent &event);
+    void onPageChanged(wxBookCtrlEvent &event);
 
 private:
     static const int DAILY_PAGE = 0;
@@ -64,7 +65,9 @@ private:
 
     void safeDeleteFile()
     {
-        if (m_file != nullptr) delete m_file;
+        if (m_file != nullptr) {
+            delete m_file;
+        }
         m_file = nullptr;
     }
 

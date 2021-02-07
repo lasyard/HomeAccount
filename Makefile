@@ -1,13 +1,16 @@
 # define this to turn on debug
 DEBUG ?= y
 
-# Application name
+# Application info
 APP_NAME := HomeAccount
 VERSION := 1.1
 YEAR := 2021
+VER_STR := v$(subst .,_,$(VERSION))
 
+# Where the 3rd-party libs are
 DEV_ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../devel
 
+# 3rd-party libs
 WX_VERSION := 3.1.4
 WX_DYLIBS_VERSION := 3.1.4.0.0
 WX_PATH := $(DEV_ROOT)/wxWidgets-$(WX_VERSION)
@@ -25,30 +28,47 @@ LCS := $(wildcard i18n/*.po)
 XRCS := $(wildcard res/*.xrc)
 SRCS := $(CPP_SRCS) $(C_SRCS)
 
-VER_STR := v$(subst .,_,$(VERSION))
+# Shell command
+CP ?= cp
+MV ?= mv
+RM ?= rm -f
+CAT ?= cat
+GREP ?= grep
+SED ?= sed -e
+MKDIR ?= mkdir -p
 
-OS := $(shell uname)
+# Attempt to determine platform
+SYSTEMX := $(shell $(CC) $(CFLAGS) -dumpmachine 2>/dev/null)
+ARCH := $(shell echo $(MACHINEX) | cut -f 1 -d '-')
+ifeq ($(ARCH),)
+  ARCH := $(shell uname -m 2>/dev/null)
+endif
+ifeq ($(SYSTEMX),)
+  SYSTEMX := $(shell uname -s 2>/dev/null)
+endif
+IS_DARWIN := $(shell echo "$(SYSTEMX)" | $(GREP) -i -c "Darwin")
+IS_MINGW := $(shell echo "$(SYSTEMX)" | $(GREP) -i -c "MinGW")
 
-ifeq ($(OS), Darwin)
-  VER_STR := $(VER_STR)_darwin
-  STUB := cocoa
+ifneq ($(IS_DARWIN),0)
+  STUB := $(ARCH)-darwin
   TARGET := $(APP_NAME)
 endif
-ifeq ($(findstring MINGW64,$(OS)), MINGW64)
-  VER_STR := $(VER_STR)_mingw64
-  STUB := $(MSYSTEM_CARCH)-msw-static
+ifneq ($(IS_MINGW),0)
+  STUB := $(ARCH)-mingw
   TARGET := $(APP_NAME).exe
 endif
 
-CRYPTOPP_PATH := $(CRYPTOPP_PATH)-$(STUB)
+VER_STR := $(VER_STR)_$(STUB)
+
+CRYPTOPP_PATH := $(CRYPTOPP_PATH)-$(STUB)-release
 
 ifeq ($(DEBUG), y)
   CFLAGS += -O0 -g -DDEBUG
-  VER_STR := $(VER_STR)_debug
+  VER_STR := $(VER_STR)-debug
   WX_BUILD_PATH := $(WX_PATH)/build-$(STUB)-debug
 else
   CFLAGS += -O2
-  VER_STR := $(VER_STR)_release
+  VER_STR := $(VER_STR)-release
   WX_BUILD_PATH := $(WX_PATH)/build-$(STUB)-release
 endif
 
@@ -59,7 +79,7 @@ CXXFLAGS += -pipe -Wall -std=c++11
 WX_CONFIG := $(WX_BUILD_PATH)/wx-config
 
 CXXFLAGS += $(shell $(WX_CONFIG) --cxxflags)
-ifeq ($(OS), Darwin)
+ifneq ($(IS_DARWIN),0)
   CXXFLAGS += -DwxHAS_IMAGES_IN_RESOURCES
 endif
 CXXFLAGS += -I$(CRYPTOPP_PATH)
@@ -77,7 +97,7 @@ DEPFILE := .depend
 
 all: app-bundle
 
-ifeq ($(OS), Darwin)
+ifneq ($(IS_DARWIN),0)
 APP_DIR := $(APP_NAME).app
 CTS_DIR := $(APP_DIR)/Contents
 EXE_DIR := $(CTS_DIR)/MacOS
@@ -93,16 +113,15 @@ app-bundle: \
   $(subst res,$(RCS_DIR),$(PNGS)) \
   $(subst .po,.lproj/ha.mo,$(subst i18n,$(RCS_DIR),$(LCS))) \
   $(RCS_DIR)/$(XRS)
-	./cp-dylibs.sh
 
-$(CTS_DIR) $(EXE_DIR) $(RCS_DIR):
-	-mkdir -p $@
+$(CTS_DIR) $(EXE_DIR) $(FRM_DIR) $(RCS_DIR):
+	-$(MKDIR) $@
 
 $(CTS_DIR)/Info.plist: res/Info.plist.in $(CTS_DIR)
-	cat $< \
-	  | sed -e 's/EXECUTABLE/$(TARGET)/' \
-	  | sed -e 's/VERSION/$(VERSION)/' \
-	  | sed -e 's/YEAR/$(YEAR)/' \
+	$(CAT) $< \
+	  | $(SED) 's/EXECUTABLE/$(TARGET)/' \
+	  | $(SED) 's/VERSION/$(VERSION)/' \
+	  | $(SED) 's/YEAR/$(YEAR)/' \
 	  > $@
 
 $(CTS_DIR)/PkgInfo: $(CTS_DIR)
@@ -110,68 +129,80 @@ $(CTS_DIR)/PkgInfo: $(CTS_DIR)
 
 $(EXE_DIR)/$(TARGET): $(TARGET) $(EXE_DIR)
 	SetFile -t APPL $<
-	cp $< $@
+	$(CP) $< $@
+	./cp-dylibs.sh $@
 
 $(RCS_DIR)/$(APP_ICON): res/macos.iconset $(RCS_DIR)
 	iconutil -c icns -o $@ $<
 
 $(RCS_DIR)/%.lproj/ha.mo: i18n/%.mo $(RCS_DIR)
-	-mkdir -p $(dir $@)
-	cp $< $@
+	-$(MKDIR) $(dir $@)
+	$(CP) $< $@
 endif
 
-ifeq ($(findstring MINGW64,$(OS)), MINGW64)
-APP_DIR := $(APP_NAME)
+ifneq ($(IS_MINGW),0)
+# Don't simply use APP_NAME for MSYS2 make a ghost executable of the same name.
+APP_DIR := $(APP_NAME)_win
 EXE_DIR := $(APP_DIR)
 RCS_DIR := $(APP_DIR)
 
 $(APP_DIR):
-	-mkdir -p $@
+	-$(MKDIR) $@
 
 app-bundle: \
   $(EXE_DIR)/$(TARGET) \
   $(RCS_DIR)/$(XRS) \
   $(subst res,$(RCS_DIR),$(PNGS)) \
   $(subst .po,/ha.mo,$(subst i18n,$(RCS_DIR),$(LCS)))
-	./cp-dlls.sh
+	./cp-dlls.sh $(EXE_DIR)/$(TARGET) $(WX_BUILD_PATH)/lib
 
 $(EXE_DIR)/$(TARGET): $(TARGET) $(EXE_DIR)
-	cp $< $@
+	$(CP) $< $@
 
 $(RCS_DIR)/%/ha.mo: i18n/%.mo $(RCS_DIR)
-	-mkdir -p $(dir $@)
-	cp $< $@
+	-$(MKDIR) $(dir $@)
+	$(CP) $< $@
 endif
 
 %.mo: %.po
 	msgfmt -o $@ $^
 
 $(RCS_DIR)/$(XRS): $(XRS) $(RCS_DIR)
-	cp $< $@
+	$(CP) $< $@
 
 $(RCS_DIR)/%.png: res/%.png $(RCS_DIR)
-	cp $< $@
+	$(CP) $< $@
 
 $(XRS): $(XRCS)
+ifeq ($(IS_MINGW),1)
+# PE executables don't know where the dll is
+# and MinGw honor PATH instead of LD_LIBRARY_PATH
+	PATH=$(PATH):$(WX_BUILD_PATH)/lib $(WX_BUILD_PATH)/utils/wxrc/wxrc $^ -o $@
+else
 	$(WX_BUILD_PATH)/utils/wxrc/wxrc $^ -o $@
+endif
 
 $(TARGET): $(OBJS)
 # LDFLAGS must be put at end for MinGW build.
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
-dep:
-	$(CXX) -MM $(CXXFLAGS) $(CPP_SRCS) > $(DEPFILE)
-	$(CC) -MM $(CFLAGS) $(C_SRCS) >> $(DEPFILE)
+dep: $(DEPFILE)
 
 clean:
-	-rm -f $(OBJS)
-	-rm -f $(TARGET)
-	-rm -f $(XRS)
-	-rm -rf $(APP_DIR)
+	-$(RM) $(OBJS)
+	-$(RM) $(TARGET)
+	-$(RM) $(XRS)
+	-$(RM) -r $(APP_DIR)
 
 clean-dep:
-	-rm -f $(DEPFILE)
+	-$(RM) $(DEPFILE)
 
-ifeq ($(DEPFILE), $(wildcard $(DEPFILE)))
-  include $(DEPFILE)
+$(DEPFILE): $(C_SRCS) $(CPP_SRCS)
+	$(CC) -MM $(CFLAGS) $(C_SRCS) > $@
+	$(CXX) -MM $(CXXFLAGS) $(CPP_SRCS) >> $@
+
+ifeq ($(filter clean%,$(MAKECMDGOALS)),)
+  ifeq ($(DEPFILE),$(wildcard $(DEPFILE)))
+    include $(DEPFILE)
+  endif
 endif

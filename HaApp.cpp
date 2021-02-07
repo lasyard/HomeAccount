@@ -23,7 +23,6 @@ bool HaApp::OnInit()
     m_locale.AddCatalog("wxstd");
     wxImage::AddHandler(new wxPNGHandler());
     wxArtProvider::Push(new ArtProvider(m_resDir));
-    wxImage::AddHandler(new wxPNGHandler);
     wxFileSystem::AddHandler(new wxArchiveFSHandler);
     wxXmlResource::Get()->InitAllHandlers();
     (this->*m_loadXmlResource)();
