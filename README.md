@@ -15,6 +15,7 @@ HomeAccount is an application to record and calculate personal financial data.  
 You can edit a text file and import it as cash file.  Here is an example of the text file:
 
 ```
+HACS:
 #Deposit
 #Debt
 #Credit card
@@ -27,6 +28,7 @@ The lines beginning with "#" are not calculated but displayed.
 You can edit a text file and import it as category config.  Here is an example of the text file:
 
 ```
+HACT:
 ###Income
 ##Regular
 #Salary

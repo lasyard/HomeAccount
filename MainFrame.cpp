@@ -64,6 +64,7 @@ MainFrame::MainFrame() : m_dir(), m_file(nullptr), m_daily(nullptr), m_cash(null
     m_catView->AppendTextColumn(_("Count"), CatModel::COUNT_COLUMN, wxDATAVIEW_CELL_INERT, 80);
     m_catView->AppendTextColumn(_("Total"), CatModel::TOTAL_COLUMN, wxDATAVIEW_CELL_INERT, 200);
     m_catView->AppendBitmapColumn(_("In use"), CatModel::INUSE_COLUMN, wxDATAVIEW_CELL_INERT, 80);
+    SetIcon(wxICON(APP_ICON));
 }
 
 void MainFrame::initView(const wxString &dir)

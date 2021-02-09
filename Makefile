@@ -3,7 +3,7 @@ DEBUG ?= y
 
 # Application info
 APP_NAME := HomeAccount
-VERSION := 1.1
+VERSION := 1.2
 YEAR := 2021
 VER_STR := v$(subst .,_,$(VERSION))
 
@@ -36,6 +36,12 @@ CAT ?= cat
 GREP ?= grep
 SED ?= sed -e
 MKDIR ?= mkdir -p
+ZIP ?= zip -9 -r
+TAR ?= tar -cjv
+
+OBJS := $(CPP_SRCS:.cpp=.o) $(C_SRCS:.c=.o)
+XRS := resources.xrs
+PNGS := $(wildcard res/*.png)
 
 # Attempt to determine platform
 SYSTEMX := $(shell $(CC) $(CFLAGS) -dumpmachine 2>/dev/null)
@@ -56,6 +62,8 @@ endif
 ifneq ($(IS_MINGW),0)
   STUB := $(ARCH)-mingw
   TARGET := $(APP_NAME).exe
+  RES_OBJ := resources.o
+  OBJS := $(OBJS) $(RES_OBJ)
 endif
 
 VER_STR := $(VER_STR)_$(STUB)
@@ -86,16 +94,12 @@ CXXFLAGS += -I$(CRYPTOPP_PATH)
 LDFLAGS += $(shell $(WX_CONFIG) --libs)
 LDFLAGS += -L$(CRYPTOPP_PATH) -lcryptopp
 
-OBJS := $(CPP_SRCS:.cpp=.o) $(C_SRCS:.c=.o)
-XRS := resources.xrs
-PNGS := $(wildcard res/*.png)
-
 DEPFILE := .depend
 
 .PHONY: all clean dep clean-dep
-.PHONY: app-bundle
+.PHONY: app-bundle, app-zipped
 
-all: app-bundle
+all: app-zipped
 
 ifneq ($(IS_DARWIN),0)
 APP_DIR := $(APP_NAME).app
@@ -104,6 +108,13 @@ EXE_DIR := $(CTS_DIR)/MacOS
 RCS_DIR := $(CTS_DIR)/Resources
 FRM_DIR := $(CTS_DIR)/Frameworks
 APP_ICON := macos.icns
+APP_ZIP := $(APP_NAME)-$(VER_STR).tar.bz2
+
+app-zipped: $(APP_ZIP)
+
+$(APP_ZIP): app-bundle
+	-$(RM) $(APP_ZIP)
+	$(TAR) -f $@ $(APP_DIR)
 
 app-bundle: \
   $(CTS_DIR)/Info.plist \
@@ -145,6 +156,13 @@ ifneq ($(IS_MINGW),0)
 APP_DIR := $(APP_NAME)_win
 EXE_DIR := $(APP_DIR)
 RCS_DIR := $(APP_DIR)
+APP_ZIP := $(APP_NAME)-$(VER_STR).zip
+
+app-zipped: $(APP_ZIP)
+
+$(APP_ZIP): app-bundle
+	-$(RM) $(APP_ZIP)
+	$(ZIP) $@ $(APP_DIR) -x \*\/HA\/\*
 
 $(APP_DIR):
 	-$(MKDIR) $@
@@ -162,6 +180,9 @@ $(EXE_DIR)/$(TARGET): $(TARGET) $(EXE_DIR)
 $(RCS_DIR)/%/ha.mo: i18n/%.mo $(RCS_DIR)
 	-$(MKDIR) $(dir $@)
 	$(CP) $< $@
+
+$(RES_OBJ): res/resources.rc res/appIcon.ico
+	windres $< -o $@ -I$(WX_PATH)/include
 endif
 
 %.mo: %.po
@@ -193,6 +214,7 @@ clean:
 	-$(RM) $(TARGET)
 	-$(RM) $(XRS)
 	-$(RM) -r $(APP_DIR)
+	-$(RM) $(APP_ZIP)
 
 clean-dep:
 	-$(RM) $(DEPFILE)
