@@ -3,6 +3,7 @@
 !.vscode
 !.clang-format
 !.editorconfig
+*.tmp
 
 # Compiled object files
 *.slo

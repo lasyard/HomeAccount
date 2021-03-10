@@ -6,7 +6,7 @@ POT="${DIR}/messages.pot"
 xgettext --c++ --no-location -k_ -f xgettext.list -o "${POT}" \
     --copyright-holder=Lasyard \
     --package-name=HomeAccount \
-    --package-version=1.1 \
+    --package-version=1.2 \
     --msgid-bugs-address=lasyard@yeah.net
 
 EN_US="en_US"

@@ -223,13 +223,13 @@ size_t timestamp_to_str(char *buf, time_t t)
 {
     char *p = buf;
     if (t > 0) {
-        struct tm tm;
-        localtime_r(&t, &tm);
-        p += ymd_to_str(p, tm.tm_year + 1900, tm.tm_mon, tm.tm_mday, '.');
+        // This is not thread-safe, but localtime_r is not supported in mingw.
+        struct tm *tm = localtime(&t);
+        p += ymd_to_str(p, tm->tm_year + 1900, tm->tm_mon, tm->tm_mday, '.');
         *p++ = ' ';
-        p += int_to_str_len(p, tm.tm_hour, 2);
+        p += int_to_str_len(p, tm->tm_hour, 2);
         *p++ = ':';
-        p += int_to_str_len(p, tm.tm_min, 2);
+        p += int_to_str_len(p, tm->tm_min, 2);
     }
     *p = '\0';
     return p - buf;
