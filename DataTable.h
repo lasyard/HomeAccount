@@ -33,23 +33,31 @@ public:
 
     bool dataModified() const
     {
-        if (m_data == nullptr) return false;
+        if (m_data == nullptr) {
+            return false;
+        }
         return m_data->modified();
     }
 
     void setHaFile(HaFile *file)
     {
-        if (m_data != nullptr) m_data->setHaFile(file);
+        if (m_data != nullptr) {
+            m_data->setHaFile(file);
+        }
     }
 
     void save()
     {
-        if (m_data != nullptr) m_data->save();
+        if (m_data != nullptr) {
+            m_data->save();
+        }
     }
 
     void saveAs(const std::string &path)
     {
-        if (m_data != nullptr) m_data->saveAs(path);
+        if (m_data != nullptr) {
+            m_data->saveAs(path);
+        }
     }
 
     const char *dataFileName() const
@@ -93,6 +101,7 @@ public:
 
 protected:
     wxArrayString m_columnLabels;
+    int m_timeColumn;
     int m_incomeColumn;
     int m_outlayColumn;
     int m_descColumn;
@@ -100,10 +109,12 @@ protected:
     int m_balanceColumn;
 
     wxGridCellFloatEditor *m_floatEditor;
+    wxGridCellAttr *m_roAttr;
     wxGridCellAttr *m_moneyAttr;
     wxGridCellAttr *m_moneyRoAttr;
     wxGridCellAttr *m_moneyRedRoAttr;
     wxGridCellAttr *m_moneyBoldRoAttr;
+    wxGridCellAttr *m_timeAttr;
 
     DataFileRW *m_data;
 
@@ -115,28 +126,35 @@ protected:
 
     void safeDeleteData()
     {
-        if (m_data != nullptr) delete m_data;
+        if (m_data != nullptr) {
+            delete m_data;
+        }
         m_data = nullptr;
         prepareData();
     }
 
     void initCellAttr()
     {
+        m_roAttr = new wxGridCellAttr();
+        m_roAttr->SetReadOnly();
         m_moneyAttr = new wxGridCellAttr();
         m_moneyAttr->SetAlignment(wxALIGN_RIGHT, wxALIGN_CENTER_VERTICAL);
         m_moneyBoldRoAttr = m_moneyAttr->Clone();
-        wxFont monoFont(15, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+        wxFont monoFont(16, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
         m_moneyAttr->SetFont(monoFont);
         m_moneyBoldRoAttr->SetFont(monoFont.MakeBold());
         m_moneyBoldRoAttr->SetReadOnly();
         m_moneyRoAttr = m_moneyAttr->Clone();
         m_moneyRoAttr->SetReadOnly();
         m_moneyRedRoAttr = m_moneyRoAttr->Clone();
-        m_moneyRedRoAttr->SetTextColour(wxColor(0x000000CC));
+        m_moneyRedRoAttr->SetTextColour(*wxRED);
         m_floatEditor = new wxGridCellFloatEditor(7, 2);
         // SetEditor will take the editor ownership, so inc the ref to keep it.
         m_floatEditor->IncRef();
         m_moneyAttr->SetEditor(m_floatEditor);
+        m_timeAttr = m_roAttr->Clone();
+        m_timeAttr->SetFont(monoFont.Smaller());
+        m_timeAttr->SetTextColour(*wxBLUE);
     }
 
     void releaseCellAttr()
@@ -149,12 +167,13 @@ protected:
 
     void setColumns()
     {
-        m_columnLabels.SetCount(5);
+        m_columnLabels.SetCount(6);
         m_columnLabels[m_incomeColumn = 0] = _("Income");
         m_columnLabels[m_outlayColumn = 1] = _("Outlay");
         m_columnLabels[m_descColumn = 2] = _("Description");
         m_columnLabels[m_commentsColumn = 3] = _("Comments");
         m_columnLabels[m_balanceColumn = 4] = _("Balance");
+        m_columnLabels[m_timeColumn = 5] = _("Modification Time");
     }
 
     void prepareData();

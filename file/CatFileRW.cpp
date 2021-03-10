@@ -4,33 +4,16 @@
 
 void CatFileRW::parseLine(const char *line)
 {
-    const char *p;
-    int i;
-    int level;
-    for (level = 0, p = line; *p == '#'; p++) level++;
-    if (level > 3) throw CatFileError();
-    struct string name;
-    string_mock_slice(&name, p, '\0');
-    struct mtree_node *parent;
-    if (level == 0) {
-        int dup;
-        for (parent = &m_cr->root; !mtree_is_leaf(parent); parent = mtree_last_child(parent))
-            ;
-        if (add_word(get_cat_node(parent), &name, &dup) == NULL) {
-            if (dup) {
-                throw CatDupItem();
-            } else {
-                throw std::bad_alloc();
-            }
-        }
-    } else {
-        for (i = 3, parent = &m_cr->root; i > level && parent != NULL; i--) {
-            parent = mtree_last_child(parent);
-        }
-        if (parent == NULL) throw CatFileError();
-        if (add_cat_node(parent, &name, level) == NULL) {
-            throw std::bad_alloc();
-        }
+    err_code err = parse_cat(m_cr, line);
+    switch (err) {
+    case ERR_BAD_ALLOC:
+        throw std::bad_alloc();
+    case ERR_CAT_DUP_WORD:
+        throw CatDupItem();
+    case ERR_CAT_FILE:
+        throw CatFileError();
+    default:
+        break;
     }
 }
 
@@ -45,7 +28,9 @@ void CatFileRW::writeWords(std::ostream &os, const struct rbtree_root *root) con
 void CatFileRW::writeNode(std::ostream &os, const struct cat_node *node) const
 {
     int i;
-    for (i = 0; i < node->level; i++) os << '#';
+    for (i = 0; i < node->level; i++) {
+        os << '#';
+    }
     os << node->name.str << std::endl;
     writeWords(os, &node->words);
 }

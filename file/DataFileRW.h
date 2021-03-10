@@ -95,7 +95,9 @@ public:
             m_q = m_q->next;
             if (m_q == NULL) {
                 m_p = m_p->next;
-                if (m_p != NULL) m_q = get_page(m_p)->items.first;
+                if (m_p != NULL) {
+                    m_q = get_page(m_p)->items.first;
+                }
             }
             return *this;
         }

@@ -63,7 +63,10 @@ wxString DataTable::GetValue(int row, int col)
         }
     } else {
         struct item *p = m_rows[row - 1];
-        if (col == m_incomeColumn) {
+        if (col == m_timeColumn) {
+            timestamp_to_str(buf, p->time);
+            return buf;
+        } else if (col == m_incomeColumn) {
             if (p->money < 0) {
                 money_to_str(buf, -p->money);
                 return buf;
@@ -161,6 +164,7 @@ bool DataTable::setMoney(struct item *it, money_t money)
         wxMessageBox(_("Cannot set both income and outlay in one line"), _("App name"), wxOK | wxICON_ERROR);
     }
     item_set_money(it, money);
+    item_set_time(it, time(NULL));
     updateBalanceAndTotal();
     m_data->setModified();
     if (GetView() != nullptr) {
@@ -256,10 +260,18 @@ wxGridCellAttr *DataTable::GetAttr(int row, int col, wxGridCellAttr::wxAttrKind 
                 m_moneyRedRoAttr->IncRef();
                 return m_moneyRedRoAttr;
             }
+        } else if (col == m_timeColumn) {
+            m_timeAttr->IncRef();
+            return m_timeAttr;
         }
     } else {
-        m_moneyBoldRoAttr->IncRef();
-        return m_moneyBoldRoAttr;
+        if (col == m_incomeColumn || col == m_outlayColumn || col == m_balanceColumn) {
+            m_moneyBoldRoAttr->IncRef();
+            return m_moneyBoldRoAttr;
+        } else {
+            m_roAttr->IncRef();
+            return m_roAttr;
+        }
     }
     return nullptr;
 }

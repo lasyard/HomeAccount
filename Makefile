@@ -12,7 +12,6 @@ DEV_ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../devel
 
 # 3rd-party libs
 WX_VERSION := 3.1.4
-WX_DYLIBS_VERSION := 3.1.4.0.0
 WX_PATH := $(DEV_ROOT)/wxWidgets-$(WX_VERSION)
 CRYPTOPP_VERSION := 840
 CRYPTOPP_PATH := $(DEV_ROOT)/cryptopp$(CRYPTOPP_VERSION)

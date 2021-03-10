@@ -24,7 +24,6 @@ wxString DailyTable::GetValue(int row, int col)
 
 void DailyTable::changeCat(struct item *it, const char *name)
 {
-    int dup;
     struct cat_node *cat;
     mtree_node *root = &m_cat->getCatRoot()->root;
     if (root != nullptr) {
@@ -39,7 +38,7 @@ void DailyTable::changeCat(struct item *it, const char *name)
     if (it->word != NULL) {
         delete_word(it->word);
     }
-    if (cat != NULL && (it->word = add_word(cat, &it->desc, &dup)) == NULL) {
+    if (cat != NULL && (it->word = add_word(cat, &it->desc, NULL)) == NULL) {
         throw std::bad_alloc();
     }
     m_cat->setModified();

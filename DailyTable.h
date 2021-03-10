@@ -30,7 +30,9 @@ public:
 
     bool catModified()
     {
-        if (m_cat == nullptr) return false;
+        if (m_cat == nullptr) {
+            return false;
+        }
         return m_cat->modified();
     }
 
@@ -49,12 +51,16 @@ public:
 
     void saveCat()
     {
-        if (m_cat != nullptr) m_cat->save();
+        if (m_cat != nullptr) {
+            m_cat->save();
+        }
     }
 
     void saveCatAs(const std::string &path)
     {
-        if (m_cat != nullptr) m_cat->saveAs(path);
+        if (m_cat != nullptr) {
+            m_cat->saveAs(path);
+        }
     }
 
     const char *catFileName() const
@@ -81,14 +87,19 @@ protected:
 
     void safeDeleteCat()
     {
-        if (m_cat != nullptr) delete m_cat;
+        if (m_cat != nullptr) {
+            delete m_cat;
+        }
         m_cat = nullptr;
     }
 
     void setColumns()
     {
-        m_categoryColumn = m_columnLabels.size();
-        m_columnLabels.Add(_("Category"));
+        int origSize = m_columnLabels.size();
+        m_columnLabels.SetCount(origSize + 1);
+        wxString timeLabel = m_columnLabels[m_timeColumn];
+        m_columnLabels[m_categoryColumn = m_timeColumn] = _("Category");
+        m_columnLabels[m_timeColumn = origSize] = timeLabel;
     }
 
     void updateCat()
@@ -102,7 +113,9 @@ protected:
     {
         arr.clear();
         arr.Add(_("Unclassified"));
-        if (root == NULL) return;
+        if (root == NULL) {
+            return;
+        }
         struct mtree_node *node;
         for (node = mtree_pf_first(root); node != NULL; node = mtree_pf_next(root, node)) {
             arr.Add(get_cat_node(node)->name.str);
@@ -130,8 +143,8 @@ protected:
     {
         m_categoryAttrI = new wxGridCellAttr();
         m_categoryAttrO = m_categoryAttrI->Clone();
-        m_categoryAttrI->SetTextColour(wxColor(0x00008800));
-        m_categoryAttrO->SetTextColour(wxColor(0x000000CC));
+        m_categoryAttrI->SetTextColour(*wxGREEN);
+        m_categoryAttrO->SetTextColour(*wxRED);
         wxArrayString choiceI, choiceO;
         setCatChoices(choiceI, choiceO);
         m_choiceEditorI = new wxGridCellChoiceEditor(choiceI);

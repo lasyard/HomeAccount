@@ -8,6 +8,7 @@ static void __init_item(struct item *it)
 {
     ulist_item_init(&it->ulist);
     it->owner = NULL;
+    it->time = 0;
     it->money = 0;
     string_init(&it->desc);
     string_init(&it->comment);
@@ -23,7 +24,9 @@ static void __release_item(struct item *it)
 static struct item *__new_item()
 {
     struct item *p;
-    if ((p = (struct item *)malloc(sizeof(struct item))) == NULL) return NULL;
+    if ((p = (struct item *)malloc(sizeof(struct item))) == NULL) {
+        return NULL;
+    }
     __init_item(p);
     return p;
 }
@@ -31,13 +34,17 @@ static struct item *__new_item()
 static void __inc_items_num(struct page *pg)
 {
     pg->items_num++;
-    if (pg->owner != NULL) pg->owner->items_num++;
+    if (pg->owner != NULL) {
+        pg->owner->items_num++;
+    }
 }
 
 static void __dec_items_num(struct page *pg)
 {
     pg->items_num--;
-    if (pg->owner != NULL) pg->owner->items_num--;
+    if (pg->owner != NULL) {
+        pg->owner->items_num--;
+    }
 }
 
 static void __add_item_to_page(struct page *pg, struct item *it)
@@ -64,16 +71,20 @@ static void __insert_item(struct item *pos, struct item *it)
 struct item *add_dummy_item(struct page *pg)
 {
     struct item *p;
-    if ((p = __new_item()) == NULL) return NULL;
+    if ((p = __new_item()) == NULL) {
+        return NULL;
+    }
     __add_item_to_page(pg, p);
     return p;
 }
 
-struct item *add_item(struct page *pg, money_t money, struct string *desc, struct string *comment)
+struct item *add_item(struct page *pg, time_t time, money_t money, struct string *desc, struct string *comment)
 {
     struct item *p;
-    if ((p = add_dummy_item(pg)) == NULL) return NULL;
-    if (item_set(p, money, desc, comment) == NULL) {
+    if ((p = add_dummy_item(pg)) == NULL) {
+        return NULL;
+    }
+    if (item_set(p, time, money, desc, comment) == NULL) {
         delete_item(p);
         return NULL;
     }
@@ -83,7 +94,9 @@ struct item *add_item(struct page *pg, money_t money, struct string *desc, struc
 struct item *add_simple_item(struct page *pg, money_t money)
 {
     struct item *p;
-    if ((p = add_dummy_item(pg)) == NULL) return NULL;
+    if ((p = add_dummy_item(pg)) == NULL) {
+        return NULL;
+    }
     p->money = money;
     return p;
 }
@@ -91,7 +104,9 @@ struct item *add_simple_item(struct page *pg, money_t money)
 struct item *insert_dummy_item(struct item *pos)
 {
     struct item *p;
-    if ((p = __new_item()) == NULL) return NULL;
+    if ((p = __new_item()) == NULL) {
+        return NULL;
+    }
     __insert_item(pos, p);
     return p;
 }
@@ -99,16 +114,30 @@ struct item *insert_dummy_item(struct item *pos)
 struct item *insert_dummy_item_head(struct page *pg)
 {
     struct item *p;
-    if ((p = __new_item()) == NULL) return NULL;
+    if ((p = __new_item()) == NULL) {
+        return NULL;
+    }
     __add_item_to_page_head(pg, p);
     return p;
 }
 
-struct item *item_set(struct item *it, money_t money, struct string *desc, struct string *comment)
+struct item *item_set(struct item *it, time_t time, money_t money, struct string *desc, struct string *comment)
 {
-    if (item_set_desc(it, desc) == NULL) return NULL;
-    if (item_set_comment(it, comment) == NULL) return NULL;
-    return item_set_money(it, money);
+    if (item_set_desc(it, desc) == NULL) {
+        return NULL;
+    }
+    if (item_set_comment(it, comment) == NULL) {
+        return NULL;
+    }
+    item_set_time(it, time);
+    item_set_money(it, money);
+    return it;
+}
+
+struct item *item_set_time(struct item *it, time_t time)
+{
+    it->time = time;
+    return it;
 }
 
 struct item *item_set_money(struct item *it, money_t money)
@@ -168,7 +197,9 @@ BOOL is_last_item(const struct item *it)
 
 const char *item_cat_name(const struct item *it)
 {
-    if (it->word == NULL) return NULL;
+    if (it->word == NULL) {
+        return NULL;
+    }
     return it->word->owner->name.str;
 }
 
@@ -184,7 +215,9 @@ static void __init_page(struct page *pg)
 static struct page *__new_page()
 {
     struct page *p;
-    if ((p = (struct page *)malloc(sizeof(struct page))) == NULL) return NULL;
+    if ((p = (struct page *)malloc(sizeof(struct page))) == NULL) {
+        return NULL;
+    }
     __init_page(p);
     return p;
 }
@@ -216,7 +249,9 @@ void clear_page(struct page *pg)
 static struct page *__new_page_with_title(struct string *title)
 {
     struct page *p;
-    if ((p = __new_page()) == NULL) return NULL;
+    if ((p = __new_page()) == NULL) {
+        return NULL;
+    }
     if (string_copy(&p->title, title) == NULL) {
         __release_page(p);
         free(p);
@@ -258,7 +293,9 @@ struct page *add_page(struct data *dt, struct string *title)
 {
     struct page *p;
     p = __new_page_with_title(title);
-    if (p == NULL) return NULL;
+    if (p == NULL) {
+        return NULL;
+    }
     __add_page_to_data(dt, p);
     return p;
 }
@@ -266,7 +303,9 @@ struct page *add_page(struct data *dt, struct string *title)
 struct page *insert_page(struct page *pos, struct string *title)
 {
     struct page *p;
-    if ((p = __new_page_with_title(title)) == NULL) return NULL;
+    if ((p = __new_page_with_title(title)) == NULL) {
+        return NULL;
+    }
     __insert_page(pos, p);
     return p;
 }
@@ -274,7 +313,9 @@ struct page *insert_page(struct page *pos, struct string *title)
 struct page *insert_page_head(struct data *dt, struct string *title)
 {
     struct page *p;
-    if ((p = __new_page_with_title(title)) == NULL) return NULL;
+    if ((p = __new_page_with_title(title)) == NULL) {
+        return NULL;
+    }
     __insert_page_head(dt, p);
     return p;
 }
@@ -314,7 +355,9 @@ struct data *add_dummy_item_to_empty_page(struct data *dt)
     struct ulist_item *p;
     for (p = dt->pages.first; p != NULL; p = p->next) {
         if (is_empty_page(get_page(p))) {
-            if (add_dummy_item(get_page(p)) == NULL) return NULL;
+            if (add_dummy_item(get_page(p)) == NULL) {
+                return NULL;
+            }
         }
     }
     return dt;
@@ -373,4 +416,47 @@ void cal_data_income_outlay(const struct data *dt, money_t *income, money_t *out
     }
     *income = i;
     *outlay = o;
+}
+
+err_code parse_data(struct data *dt, const char *line)
+{
+    const char *p = line;
+    if (*p == '#') {
+        struct string title;
+        string_mock_slice(&title, p + 1, '\0');
+        if (add_page(dt, &title) == NULL) {
+            return ERR_BAD_ALLOC;
+        }
+        return ERR_OK;
+    }
+    time_t time = 0;
+    if (*p == '@') {
+        p += parse_time(++p, &time);
+    }
+    int len;
+    money_t money = 0;
+    if ((len = parse_str_to_money(p, &money)) <= 0) {
+        return ERR_DATA_FILE;
+    }
+    p += len;
+    struct string desc;
+    string_init(&desc);
+    if (is_space(*p)) {
+        p++;
+        p += string_mock_slice(&desc, p, ':');
+    }
+    struct string comment;
+    string_init(&comment);
+    if (*p == ':') {
+        p++;
+        p += string_mock_slice(&comment, p, '\0');
+    }
+    if (ulist_is_empty(&dt->pages)) {
+        dt->initial -= money;
+    } else {
+        if (add_item(get_page(dt->pages.last), time, money, &desc, &comment) == NULL) {
+            return ERR_BAD_ALLOC;
+        }
+    }
+    return ERR_OK;
 }

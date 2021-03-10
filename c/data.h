@@ -1,6 +1,9 @@
 #ifndef _DATA_H_
 #define _DATA_H_
 
+#include <time.h>
+
+#include "err.h"
 #include "str.h"
 #include "ulist.h"
 
@@ -22,6 +25,7 @@ struct page {
 struct item {
     struct ulist_item ulist;
     struct page *owner;
+    time_t time;
     money_t money;
     struct string desc;
     struct string comment;
@@ -36,13 +40,14 @@ extern "C" {
 #endif
 
 struct item *add_dummy_item(struct page *pg);
-struct item *add_item(struct page *pg, money_t money, struct string *desc, struct string *comment);
+struct item *add_item(struct page *pg, time_t time, money_t money, struct string *desc, struct string *comment);
 struct item *add_simple_item(struct page *pg, money_t money);
 
 struct item *insert_dummy_item(struct item *pos);
 struct item *insert_dummy_item_head(struct page *pg);
 
-struct item *item_set(struct item *it, money_t money, struct string *desc, struct string *comment);
+struct item *item_set(struct item *it, time_t time, money_t money, struct string *desc, struct string *comment);
+struct item *item_set_time(struct item *it, time_t time);
 struct item *item_set_money(struct item *it, money_t money);
 struct item *item_set_desc(struct item *it, struct string *desc);
 struct item *item_set_comment(struct item *it, struct string *comment);
@@ -72,6 +77,8 @@ money_t cal_data_balance(const struct data *dt, money_t initial);
 
 void cal_page_income_outlay(const struct page *pg, money_t *income, money_t *outlay);
 void cal_data_income_outlay(const struct data *dt, money_t *income, money_t *outlay);
+
+err_code parse_data(struct data *dt, const char *line);
 
 #ifdef __cplusplus
 }
