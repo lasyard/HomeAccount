@@ -431,7 +431,8 @@ err_code parse_data(struct data *dt, const char *line)
     }
     time_t time = 0;
     if (*p == '@') {
-        p += parse_time(++p, &time);
+        ++p;
+        p += parse_time(p, &time);
     }
     int len;
     money_t money = 0;

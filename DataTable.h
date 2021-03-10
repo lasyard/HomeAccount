@@ -155,6 +155,7 @@ protected:
         m_timeAttr = m_roAttr->Clone();
         m_timeAttr->SetFont(monoFont.Smaller());
         m_timeAttr->SetTextColour(*wxBLUE);
+        m_timeAttr->SetBackgroundColour(wxColour(0x00AAAAAA));
     }
 
     void releaseCellAttr()

@@ -143,7 +143,7 @@ protected:
     {
         m_categoryAttrI = new wxGridCellAttr();
         m_categoryAttrO = m_categoryAttrI->Clone();
-        m_categoryAttrI->SetTextColour(*wxGREEN);
+        m_categoryAttrI->SetTextColour(wxColour(0x0000AA00));
         m_categoryAttrO->SetTextColour(*wxRED);
         wxArrayString choiceI, choiceO;
         setCatChoices(choiceI, choiceO);
