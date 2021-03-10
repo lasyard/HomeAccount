@@ -225,7 +225,7 @@ size_t timestamp_to_str(char *buf, time_t t)
     if (t > 0) {
         // This is not thread-safe, but localtime_r is not supported in mingw.
         struct tm *tm = localtime(&t);
-        p += ymd_to_str(p, tm->tm_year + 1900, tm->tm_mon, tm->tm_mday, '.');
+        p += ymd_to_str(p, tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, '.');
         *p++ = ' ';
         p += int_to_str_len(p, tm->tm_hour, 2);
         *p++ = ':';

@@ -48,7 +48,7 @@ public:
         if (GetRowLabelValue(row + 1) != "") {
             return *wxLIGHT_GREY_PEN;
         }
-        return *wxWHITE_PEN;
+        return *wxTRANSPARENT_PEN;
     }
 
     virtual wxPen GetColGridLinePen(int col)
