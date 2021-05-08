@@ -10,6 +10,7 @@
                 <object class="wxBoxSizer">
                     <orient>wxHORIZONTAL</orient>
                     <object class="sizeritem">
+                        <option>1</option>
                         <flag>wxALIGN_CENTER_VERTICAL | wxLEFT | wxRIGHT</flag>
                         <border>9</border>
                         <object class="wxDatePickerCtrl" name="date">
@@ -20,6 +21,7 @@
                         </object>
                     </object>
                     <object class="sizeritem">
+                        <option>1</option>
                         <flag>wxALIGN_CENTER_VERTICAL | wxLEFT | wxRIGHT</flag>
                         <border>9</border>
                         <object class="wxButton" name="statistics">
@@ -32,6 +34,7 @@
                         </object>
                     </object>
                     <object class="sizeritem">
+                        <option>1</option>
                         <flag>wxALIGN_CENTER_VERTICAL | wxLEFT | wxRIGHT</flag>
                         <border>9</border>
                         <object class="wxButton" name="export">
@@ -44,6 +47,7 @@
                         </object>
                     </object>
                     <object class="sizeritem">
+                        <option>1</option>
                         <flag>wxALIGN_CENTER_VERTICAL | wxLEFT | wxRIGHT</flag>
                         <border>9</border>
                         <object class="wxButton" name="import">
@@ -68,19 +72,21 @@
                 </object>
             </object>
             <object class="sizeritem">
+                <option>1</option>
                 <flag>wxEXPAND | wxALL</flag>
                 <border>0</border>
                 <object class="wxNotebook" name="book">
+                    <size>1080,720</size>
                     <object class="notebookpage">
                         <label>Monthly</label>
                         <object class="wxPanel">
                             <object class="wxBoxSizer">
                                 <orient>wxVERTICAL</orient>
                                 <object class="sizeritem">
+                                    <option>1</option>
                                     <flag>wxEXPAND | wxALL</flag>
                                     <border>0</border>
                                     <object class="wxGrid" name="daily" subclass="DailyGrid">
-                                        <size>960,720</size>
                                     </object>
                                 </object>
                             </object>
@@ -92,10 +98,10 @@
                             <object class="wxBoxSizer">
                                 <orient>wxVERTICAL</orient>
                                 <object class="sizeritem">
+                                    <option>1</option>
                                     <flag>wxEXPAND | wxALL</flag>
                                     <border>0</border>
                                     <object class="wxGrid" name="cash" subclass="DataGrid">
-                                        <size>960,720</size>
                                     </object>
                                 </object>
                             </object>
@@ -107,10 +113,10 @@
                             <object class="wxBoxSizer">
                                 <orient>wxVERTICAL</orient>
                                 <object class="sizeritem">
+                                    <option>1</option>
                                     <flag>wxEXPAND | wxALL</flag>
                                     <border>0</border>
                                     <object class="wxHtmlWindow" name="html" subclass="StatHtml">
-                                        <size>960,720</size>
                                     </object>
                                 </object>
                             </object>
@@ -122,10 +128,10 @@
                             <object class="wxBoxSizer">
                                 <orient>wxVERTICAL</orient>
                                 <object class="sizeritem">
+                                    <option>1</option>
                                     <flag>wxEXPAND | wxALL</flag>
                                     <border>0</border>
                                     <object class="unknown" name="categories">
-                                        <size>960,720</size>
                                     </object>
                                 </object>
                             </object>
